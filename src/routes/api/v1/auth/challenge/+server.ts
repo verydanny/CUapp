@@ -30,8 +30,6 @@ export async function POST({ request }: RequestEvent) {
 
 		const user = await appwriteAuth.prepareUser(body.email);
 
-		console.log('User', user);
-
 		return json({
 			success: true
 		});
