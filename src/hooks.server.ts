@@ -8,7 +8,9 @@ export async function handle({ event, resolve }) {
 		// Store the current logged in user in locals,
 		// for easy access in our other routes.
 		event.locals.user = await account.get();
-	} catch {}
+	} catch {
+		// dingus
+	}
 
 	// Continue with the request.
 	return resolve(event);
