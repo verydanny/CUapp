@@ -4,8 +4,8 @@ import { generateRegistrationOptions } from '@simplewebauthn/server'
 // import * as SimpleWebAuthnServerHelpers from '@simplewebauthn/server/helpers';
 
 import {
-	// MY_SALT,
-	ALLOWED_HOSTNAME
+    // MY_SALT,
+    ALLOWED_HOSTNAME
 } from '$env/static/private'
 
 // import { SESSION_COOKIE, createAdminClient, createSessionClient } from '$lib/server/appwrite.js';
@@ -29,70 +29,70 @@ import type { RequestEvent } from './$types'
 // }
 
 export const actions = {
-	signup: async (req: RequestEvent) => {
-		const authUser = new AppwriteAuth()
+    signup: async (req: RequestEvent) => {
+        const authUser = new AppwriteAuth()
 
-		const {
-			request
-			// cookies
-		} = req
+        const {
+            request
+            // cookies
+        } = req
 
-		// Extract the form data.
-		const form = await request.formData()
-		const email = form.get('email')
+        // Extract the form data.
+        const form = await request.formData()
+        const email = form.get('email')
 
-		if (!email) {
-			return {
-				status: 400,
-				body: { error: 'Missing required fields' }
-			}
-		}
+        if (!email) {
+            return {
+                status: 400,
+                body: { error: 'Missing required fields' }
+            }
+        }
 
-		if (typeof email !== 'string') {
-			return {
-				status: 400,
-				body: { error: 'Invalid form data' }
-			}
-		}
+        if (typeof email !== 'string') {
+            return {
+                status: 400,
+                body: { error: 'Invalid form data' }
+            }
+        }
 
-		/**
-		 * @todo: Move this to an Appwrite Function to avoid blocking the main thread
-		 */
+        /**
+         * @todo: Move this to an Appwrite Function to avoid blocking the main thread
+         */
 
-		const user = await authUser.prepareUser(email)
-		const credentials = await authUser.getCredential(user.$id)
+        const user = await authUser.prepareUser(email)
+        const credentials = await authUser.getCredential(user.$id)
 
-		if (credentials) {
-			return fail(400, {
-				error: 'User already has credentials'
-			})
-		}
+        if (credentials) {
+            return fail(400, {
+                error: 'User already has credentials'
+            })
+        }
 
-		const encoder = new TextEncoder()
-		const userIdArrayBuffer = encoder.encode(user.$id)
-		const options = await generateRegistrationOptions({
-			rpName: 'CUApp',
-			rpID: ALLOWED_HOSTNAME,
-			userID: userIdArrayBuffer,
-			userName: email,
-			userDisplayName: email,
-			attestationType: 'none',
-			authenticatorSelection: {
-				residentKey: 'preferred',
-				userVerification: 'preferred',
-				authenticatorAttachment: 'platform'
-			}
-		})
-		const challenge = await authUser.createChallenge(user.$id, options.challenge)
+        const encoder = new TextEncoder()
+        const userIdArrayBuffer = encoder.encode(user.$id)
+        const options = await generateRegistrationOptions({
+            rpName: 'CUApp',
+            rpID: ALLOWED_HOSTNAME,
+            userID: userIdArrayBuffer,
+            userName: email,
+            userDisplayName: email,
+            attestationType: 'none',
+            authenticatorSelection: {
+                residentKey: 'preferred',
+                userVerification: 'preferred',
+                authenticatorAttachment: 'platform'
+            }
+        })
+        const challenge = await authUser.createChallenge(user.$id, options.challenge)
 
-		return {
-			success: true,
-			body: {
-				challengeId: challenge.$id,
-				options
-			}
-		}
-	}
+        return {
+            success: true,
+            body: {
+                challengeId: challenge.$id,
+                options
+            }
+        }
+    }
 }
 
 // Old flow

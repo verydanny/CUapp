@@ -8,60 +8,60 @@ import { APPWRITE_KEY } from '$env/static/private'
  * @todo: Logging in on desktop browsers should not require a challenge/verification process. Instead, send a magic link email.
  */
 export class AppwriteAuth {
-	users: Users
-	databases: Databases
+    users: Users
+    databases: Databases
 
-	constructor() {
-		const client = new Client()
-			.setEndpoint(PUBLIC_APPWRITE_ENDPOINT)
-			.setProject(PUBLIC_APPWRITE_PROJECT)
-			.setKey(APPWRITE_KEY)
+    constructor() {
+        const client = new Client()
+            .setEndpoint(PUBLIC_APPWRITE_ENDPOINT)
+            .setProject(PUBLIC_APPWRITE_PROJECT)
+            .setKey(APPWRITE_KEY)
 
-		this.users = new Users(client)
-		this.databases = new Databases(client)
-	}
+        this.users = new Users(client)
+        this.databases = new Databases(client)
+    }
 
-	async prepareUser(email: string) {
-		const reponse = await this.users.list([Query.equal('email', email), Query.limit(1)])
-		const user = reponse.users[0] ?? null
+    async prepareUser(email: string) {
+        const reponse = await this.users.list([Query.equal('email', email), Query.limit(1)])
+        const user = reponse.users[0] ?? null
 
-		if (!user) {
-			return this.users.create(ID.unique(), email)
-		}
+        if (!user) {
+            return this.users.create(ID.unique(), email)
+        }
 
-		return user
-	}
+        return user
+    }
 
-	async createChallenge(userId: string, token: string) {
-		return await this.databases.createDocument('main', 'challenges', ID.unique(), {
-			userId: userId,
-			token
-		})
-	}
+    async createChallenge(userId: string, token: string) {
+        return await this.databases.createDocument('main', 'challenges', ID.unique(), {
+            userId: userId,
+            token
+        })
+    }
 
-	async getChallenge(challengeId: string) {
-		return await this.databases.getDocument('main', 'challenges', challengeId)
-	}
+    async getChallenge(challengeId: string) {
+        return await this.databases.getDocument('main', 'challenges', challengeId)
+    }
 
-	async deleteChallenge(challengeId: string) {
-		return await this.databases.deleteDocument('main', 'challenges', challengeId)
-	}
+    async deleteChallenge(challengeId: string) {
+        return await this.databases.deleteDocument('main', 'challenges', challengeId)
+    }
 
-	async createCredentials(userId: string, credentials: string) {
-		return await this.databases.createDocument('main', 'credentials', ID.unique(), {
-			userId,
-			credentials: credentials
-		})
-	}
+    async createCredentials(userId: string, credentials: string) {
+        return await this.databases.createDocument('main', 'credentials', ID.unique(), {
+            userId,
+            credentials: credentials
+        })
+    }
 
-	async getCredential(userId: string) {
-		const documents = (
-			await this.databases.listDocuments('main', 'credentials', [
-				Query.equal('userId', userId),
-				Query.limit(1)
-			])
-		).documents
+    async getCredential(userId: string) {
+        const documents = (
+            await this.databases.listDocuments('main', 'credentials', [
+                Query.equal('userId', userId),
+                Query.limit(1)
+            ])
+        ).documents
 
-		return documents[0]
-	}
+        return documents[0]
+    }
 }
