@@ -1,7 +1,5 @@
 <script>
-	export let data;
-
-	const { user } = data;
+	const { user } = $props()
 </script>
 
 <ul>

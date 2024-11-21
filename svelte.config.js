@@ -1,8 +1,8 @@
-import { mdsvex } from 'mdsvex';
-import adapter from '@sveltejs/adapter-auto';
-import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import { mdsvex } from 'mdsvex'
+import adapter from '@sveltejs/adapter-auto'
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte'
 
-console.log(process.env.NODE_ENV);
+console.log(process.env.NODE_ENV)
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -24,6 +24,6 @@ const config = {
 	},
 
 	extensions: ['.svelte', '.svx']
-};
+}
 
-export default config;
+export default config

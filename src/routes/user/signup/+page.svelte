@@ -1,8 +1,18 @@
 <!-- src/routes/signup/+page.svelte -->
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	// import { startRegistration } from '@simplewebauthn/browser';
+	import { onMount } from 'svelte'
+	import { enhance } from '$app/forms'
 
-	let { form } = $props();
+	import type { ActionData } from './$types'
+	import type { ActionResult } from '@sveltejs/kit'
+
+	type NonNullableActionData = NonNullable<ActionData>
+
+	let { data, form } = $props()
+	let startRegistration = $state<typeof import('@simplewebauthn/browser').startRegistration | null>(
+		null
+	)
 
 	/**
 	 * 1. We create custom form action that POSTS to api/v1/auth/challenge
@@ -19,9 +29,29 @@
 	 * 12. We return "Signup successful. Please sign in."
 	 *
 	 */
+	onMount(async () => {
+		startRegistration = await import('@simplewebauthn/browser').then(
+			(module) => module.startRegistration
+		)
+	})
+
+	const handleSignupChallenge = () => {
+		return async ({ result }: { result: ActionResult<NonNullableActionData> }) => {
+			if (result.type === 'success') {
+				if (result.data?.body?.options) {
+					if (startRegistration) {
+						const registration = await startRegistration({
+							optionsJSON: result.data.body.options
+						})
+					}
+				}
+				// const body = (result?.data as ActionData)?.body;
+			}
+		}
+	}
 </script>
 
-<form action="?/signup" method="post" use:enhance>
+<form action="?/signup" method="post" use:enhance={handleSignupChallenge}>
 	<input id="email" name="email" placeholder="Email" type="email" />
 	<button type="submit">Sign up</button>
 </form>

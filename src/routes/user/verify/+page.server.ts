@@ -1,30 +1,30 @@
-import { decrypt } from '$lib/server/crypto.js';
-import { createPublicAccountClient } from '$lib/server/appwrite.js';
-import { MY_SALT } from '$env/static/private';
+import { decrypt } from '$lib/server/crypto.js'
+import { createPublicAccountClient } from '$lib/server/appwrite.js'
+import { MY_SALT } from '$env/static/private'
 
-import type { PageServerLoadEvent } from './$types';
+import type { PageServerLoadEvent } from './$types'
 
 export async function load(req: PageServerLoadEvent) {
-	const { url } = req;
-	const query = url.searchParams.get('query');
-	const secret = url.searchParams.get('secret');
-	const userId = url.searchParams.get('userId');
+	const { url } = req
+	const query = url.searchParams.get('query')
+	const secret = url.searchParams.get('secret')
+	const userId = url.searchParams.get('userId')
 
 	// Todo: check if userId already verified
 
 	if (query && secret && userId) {
-		const { account } = createPublicAccountClient();
+		const { account } = createPublicAccountClient()
 
 		try {
-			console.log('userId', userId);
-			console.log('secret', secret);
-			await account.updateVerification(userId, secret);
+			console.log('userId', userId)
+			console.log('secret', secret)
+			await account.updateVerification(userId, secret)
 		} catch (verificationError) {
-			console.error(`email verification error: ${verificationError}`);
+			console.error(`email verification error: ${verificationError}`)
 		}
 
 		return {
 			password: decrypt(query, MY_SALT)
-		};
+		}
 	}
 }
