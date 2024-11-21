@@ -1,5 +1,5 @@
 // src/routes/signup/+page.server.js
-// import { fail } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit'
 import { generateRegistrationOptions } from '@simplewebauthn/server'
 // import * as SimpleWebAuthnServerHelpers from '@simplewebauthn/server/helpers';
 
@@ -36,29 +36,34 @@ export const actions = {
 			request
 			// cookies
 		} = req
+
 		// Extract the form data.
 		const form = await request.formData()
 		const email = form.get('email')
+
 		if (!email) {
 			return {
 				status: 400,
 				body: { error: 'Missing required fields' }
 			}
 		}
+
 		if (typeof email !== 'string') {
 			return {
 				status: 400,
 				body: { error: 'Invalid form data' }
 			}
 		}
+
 		const user = await authUser.prepareUser(email)
 		const credentials = await authUser.getCredential(user.$id)
+
 		if (credentials) {
-			return {
-				status: 400,
-				body: { error: 'User already has credentials' }
-			}
+			return fail(400, {
+				error: 'User already has credentials'
+			})
 		}
+
 		const encoder = new TextEncoder()
 		const userIdArrayBuffer = encoder.encode(user.$id)
 		const options = await generateRegistrationOptions({
@@ -75,6 +80,7 @@ export const actions = {
 			}
 		})
 		const challenge = await authUser.createChallenge(user.$id, options.challenge)
+
 		return {
 			success: true,
 			body: {
