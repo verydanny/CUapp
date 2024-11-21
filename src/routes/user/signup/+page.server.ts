@@ -3,7 +3,10 @@
 import { generateRegistrationOptions } from '@simplewebauthn/server'
 // import * as SimpleWebAuthnServerHelpers from '@simplewebauthn/server/helpers';
 
-import { MY_SALT, ALLOWED_HOSTNAME } from '$env/static/private'
+import {
+	// MY_SALT,
+	ALLOWED_HOSTNAME
+} from '$env/static/private'
 
 // import { SESSION_COOKIE, createAdminClient, createSessionClient } from '$lib/server/appwrite.js';
 import { AppwriteAuth } from '$lib/server/appwrite-auth'
@@ -29,7 +32,10 @@ export const actions = {
 	signup: async (req: RequestEvent) => {
 		const authUser = new AppwriteAuth()
 
-		const { request, cookies } = req
+		const {
+			request
+			// cookies
+		} = req
 		// Extract the form data.
 		const form = await request.formData()
 		const email = form.get('email')

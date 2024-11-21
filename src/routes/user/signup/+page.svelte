@@ -9,7 +9,7 @@
 
 	type NonNullableActionData = NonNullable<ActionData>
 
-	let { data, form } = $props()
+	// let { data, form } = $props()
 	let startRegistration = $state<typeof import('@simplewebauthn/browser').startRegistration | null>(
 		null
 	)
@@ -43,6 +43,8 @@
 						const registration = await startRegistration({
 							optionsJSON: result.data.body.options
 						})
+
+						console.log(registration)
 					}
 				}
 				// const body = (result?.data as ActionData)?.body;
