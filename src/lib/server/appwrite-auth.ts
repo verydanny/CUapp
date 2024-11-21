@@ -2,6 +2,11 @@ import { Client, Users, ID, Databases, Query } from 'node-appwrite'
 import { PUBLIC_APPWRITE_ENDPOINT, PUBLIC_APPWRITE_PROJECT } from '$env/static/public'
 import { APPWRITE_KEY } from '$env/static/private'
 
+/**
+ * @todo: Move this to an Appwrite Function to avoid blocking the main thread. Also, add try/catch blocks.
+ * @todo: Add support for multiple credentials (passkeys) per user.
+ * @todo: Logging in on desktop browsers should not require a challenge/verification process. Instead, send a magic link email.
+ */
 export class AppwriteAuth {
 	users: Users
 	databases: Databases

@@ -55,6 +55,10 @@ export const actions = {
 			}
 		}
 
+		/**
+		 * @todo: Move this to an Appwrite Function to avoid blocking the main thread
+		 */
+
 		const user = await authUser.prepareUser(email)
 		const credentials = await authUser.getCredential(user.$id)
 
