@@ -6,7 +6,6 @@ export async function load({ locals }) {
         // If no user is logged in, redirect to the sign up page.
         redirect(301, '/user/signup')
     }
-
     // If the user is logged in, redirect to the account page.
-    redirect(301, '/user/account')
+    // redirect(301, '/user/account')
 }

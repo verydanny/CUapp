@@ -1,19 +1,20 @@
-<script>
-    const { user } = $props()
+<script lang="ts">
+    let { data } = $props()
+    let user = data?.user
 </script>
 
 <ul>
     <li>
         <strong>Email:</strong>
-        {user.email}
+        {user?.email}
     </li>
     <li>
         <strong>Name:</strong>
-        {user.name}
+        {user?.name}
     </li>
     <li>
         <strong>ID: </strong>
-        {user.$id}
+        {user?.$id}
     </li>
 </ul>
 

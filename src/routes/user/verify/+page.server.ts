@@ -16,8 +16,6 @@ export async function load(req: PageServerLoadEvent) {
         const { account } = createPublicAccountClient()
 
         try {
-            console.log('userId', userId)
-            console.log('secret', secret)
             await account.updateVerification(userId, secret)
         } catch (verificationError) {
             console.error(`email verification error: ${verificationError}`)

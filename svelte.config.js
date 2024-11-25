@@ -2,8 +2,6 @@ import { mdsvex } from 'mdsvex'
 import adapter from '@sveltejs/adapter-auto'
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte'
 
-console.log(process.env.NODE_ENV)
-
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
     // Consult https://svelte.dev/docs/kit/integrations

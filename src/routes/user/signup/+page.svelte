@@ -2,14 +2,15 @@
 <script lang="ts">
     // import { startRegistration } from '@simplewebauthn/browser';
     import { onMount } from 'svelte'
-    import { enhance } from '$app/forms'
+    import { enhance, applyAction } from '$app/forms'
 
     import type { ActionData } from './$types'
     import type { ActionResult } from '@sveltejs/kit'
+    import { goto } from '$app/navigation'
 
     type NonNullableActionData = NonNullable<ActionData>
 
-    // let { data, form } = $props()
+    let { form } = $props()
     let startRegistration = $state<
         typeof import('@simplewebauthn/browser').startRegistration | null
     >(null)
@@ -30,30 +31,56 @@
      *
      */
     onMount(async () => {
-        startRegistration = await import('@simplewebauthn/browser').then(
-            (module) => module.startRegistration
-        )
+        try {
+            ;({ startRegistration } = await import('@simplewebauthn/browser'))
+        } catch (error) {
+            console.error(`Error importing startRegistration: ${error}`)
+        }
     })
 
     const handleSignupChallenge = () => {
         return async ({ result }: { result: ActionResult<NonNullableActionData> }) => {
-            if (result.type === 'success') {
-                if (result.data?.body?.options) {
-                    if (startRegistration) {
-                        const registration = await startRegistration({
-                            optionsJSON: result.data.body.options
-                        })
-
-                        console.log(registration)
-                    }
-                }
-                // const body = (result?.data as ActionData)?.body;
+            if (result?.type === 'redirect') {
+                return goto(result?.location)
             }
+
+            if (result?.type === 'success') {
+                if (result.data?.body && 'challengeId' in result.data.body && startRegistration) {
+                    const registration = await startRegistration({
+                        optionsJSON: result?.data?.body?.options
+                    })
+
+                    // Add a try/catch to see if registration successful
+                    return fetch('?/verifyPasskey', {
+                        method: 'post',
+                        body: JSON.stringify({
+                            challengeId: result?.data?.body?.challengeId,
+                            registration,
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                    })
+                }
+
+                return applyAction(result)
+            }
+
+            return applyAction(result)
         }
     }
 </script>
 
-<form action="?/signup" method="post" use:enhance={handleSignupChallenge}>
-    <input id="email" name="email" placeholder="Email" type="email" />
+<form action="?/signup" method="post" use:enhance={handleSignupChallenge} autocomplete="on">
+    {#if form?.error}
+        <p>{form.error}</p>
+    {/if}
+    <input
+        id="username"
+        name="username"
+        placeholder="Email"
+        type="email"
+        autocomplete="username webauthn"
+    />
     <button type="submit">Sign up</button>
 </form>

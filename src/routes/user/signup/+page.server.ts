@@ -1,11 +1,13 @@
 // src/routes/signup/+page.server.js
-import { fail } from '@sveltejs/kit'
-import { generateRegistrationOptions } from '@simplewebauthn/server'
+import { fail, redirect } from '@sveltejs/kit'
+import { generateRegistrationOptions, verifyRegistrationResponse } from '@simplewebauthn/server'
+import { isoUint8Array } from '@simplewebauthn/server/helpers'
 // import * as SimpleWebAuthnServerHelpers from '@simplewebauthn/server/helpers';
 
 import {
     // MY_SALT,
-    ALLOWED_HOSTNAME
+    RP_ID,
+    RP_NAME
 } from '$env/static/private'
 
 // import { SESSION_COOKIE, createAdminClient, createSessionClient } from '$lib/server/appwrite.js';
@@ -18,20 +20,20 @@ import type { RequestEvent } from './$types'
 
 // import all from './$types';
 
-// export async function load({ locals }) {
-// 	// Logged out users can't access this page.
-// 	if (locals.user) redirect(302, '/user/account');
+export async function load({ locals }) {
+    // Logged out users can't access this page.
+    if (locals.user) redirect(302, '/user/account')
 
-// 	// Pass the stored user local to the page.
-// 	return {
-// 		user: locals.user
-// 	};
-// }
+    // Pass the stored user local to the page.
+    return {
+        user: locals.user
+    }
+}
+
+const auth = new AppwriteAuth()
 
 export const actions = {
     signup: async (req: RequestEvent) => {
-        const authUser = new AppwriteAuth()
-
         const {
             request
             // cookies
@@ -39,43 +41,38 @@ export const actions = {
 
         // Extract the form data.
         const form = await request.formData()
-        const email = form.get('email')
+        const username = form.get('username')
 
-        if (!email) {
-            return {
-                status: 400,
-                body: { error: 'Missing required fields' }
-            }
+        if (!username) {
+            return fail(400, {
+                error: 'Missing required fields'
+            })
         }
 
-        if (typeof email !== 'string') {
-            return {
-                status: 400,
-                body: { error: 'Invalid form data' }
-            }
+        if (typeof username !== 'string') {
+            return fail(400, {
+                error: 'Invalid form data'
+            })
         }
 
         /**
          * @todo: Move this to an Appwrite Function to avoid blocking the main thread
          */
 
-        const user = await authUser.prepareUser(email)
-        const credentials = await authUser.getCredential(user.$id)
+        const user = await auth.prepareUser(username.toLowerCase())
+        const credentials = await auth.getCredential(user.$id)
 
         if (credentials) {
-            return fail(400, {
-                error: 'User already has credentials'
-            })
+            return redirect(303, '/user/signin')
         }
 
-        const encoder = new TextEncoder()
-        const userIdArrayBuffer = encoder.encode(user.$id)
+        // const encoder = new TextEncoder()
+        // const userIdArrayBuffer = encoder.encode(user.$id)
         const options = await generateRegistrationOptions({
-            rpName: 'CUApp',
-            rpID: ALLOWED_HOSTNAME,
-            userID: userIdArrayBuffer,
-            userName: email,
-            userDisplayName: email,
+            rpName: RP_NAME,
+            rpID: RP_ID,
+            // userID: userIdArrayBuffer,
+            userName: username,
             attestationType: 'none',
             authenticatorSelection: {
                 residentKey: 'preferred',
@@ -83,7 +80,7 @@ export const actions = {
                 authenticatorAttachment: 'platform'
             }
         })
-        const challenge = await authUser.createChallenge(user.$id, options.challenge)
+        const challenge = await auth.createChallenge(user.$id, options.challenge)
 
         return {
             success: true,
@@ -92,9 +89,67 @@ export const actions = {
                 options
             }
         }
+    },
+    verifyPasskey: async (req: RequestEvent) => {
+        const expectedOrigin =
+            process.env.NODE_ENV === 'development' ? 'https://dev.' + RP_ID : 'https://' + RP_ID
+
+        const { challengeId, registration } = await req.request.json()
+
+        try {
+            const challenge = await auth.getChallenge(challengeId)
+
+            try {
+                const verification = await verifyRegistrationResponse({
+                    response: registration,
+                    expectedChallenge: challenge?.token,
+                    expectedOrigin,
+                    expectedRPID: RP_ID
+                })
+
+                const { verified, registrationInfo } = verification
+
+                if (!verified) {
+                    return fail(400, {
+                        error: 'Registration verification failed.'
+                    })
+                }
+
+                if (registrationInfo) {
+                    await auth.createCredentials(challenge?.userId, {
+                        credentialID: registrationInfo?.credential?.id,
+                        credentialPublicKey: isoUint8Array.toHex(
+                            registrationInfo?.credential?.publicKey
+                        ),
+                        counter: registrationInfo?.credential?.counter,
+                        credentialDeviceType: registrationInfo?.credentialDeviceType,
+                        credentialBackedUp: registrationInfo?.credentialBackedUp,
+                        transports: registrationInfo?.credential?.transports
+                    })
+                    await auth.deleteChallenge(challenge.$id)
+
+                    return {
+                        success: true
+                    }
+                }
+            } catch (error) {
+                console.error('Registration verification failed.', error)
+                return fail(400, {
+                    error: 'Registration verification failed.'
+                })
+            }
+        } catch (error) {
+            console.error('Challenge not found. Please start over.', error)
+            return fail(400, {
+                error: 'Challenge not found. Please start over.'
+            })
+        }
+
+        return fail(400, {
+            error: 'Registration verification failed.'
+        })
     }
 }
-
 // Old flow
 // export const actions = {
 // 	signup: async (req: RequestEvent) => {

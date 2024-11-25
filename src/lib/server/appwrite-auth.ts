@@ -2,6 +2,8 @@ import { Client, Users, ID, Databases, Query } from 'node-appwrite'
 import { PUBLIC_APPWRITE_ENDPOINT, PUBLIC_APPWRITE_PROJECT } from '$env/static/public'
 import { APPWRITE_KEY } from '$env/static/private'
 
+import type { AuthenticatorTransportFuture } from '@simplewebauthn/types'
+
 /**
  * @todo: Move this to an Appwrite Function to avoid blocking the main thread. Also, add try/catch blocks.
  * @todo: Add support for multiple credentials (passkeys) per user.
@@ -47,10 +49,20 @@ export class AppwriteAuth {
         return await this.databases.deleteDocument('main', 'challenges', challengeId)
     }
 
-    async createCredentials(userId: string, credentials: string) {
+    async createCredentials(
+        userId: string,
+        credentials: {
+            credentialID: string | undefined
+            credentialPublicKey: string | undefined
+            counter: number | undefined
+            credentialDeviceType: string | undefined
+            credentialBackedUp: boolean | undefined
+            transports: AuthenticatorTransportFuture[] | undefined
+        }
+    ) {
         return await this.databases.createDocument('main', 'credentials', ID.unique(), {
             userId,
-            credentials: credentials
+            credentials: JSON.stringify(credentials)
         })
     }
 

@@ -1,9 +1,7 @@
 import { type RequestEvent } from '@sveltejs/kit'
 import { Client, Account } from 'node-appwrite'
-import { APPWRITE_KEY } from '$env/static/private'
+import { APPWRITE_KEY, SESSION_COOKIE_NAME } from '$env/static/private'
 import { PUBLIC_APPWRITE_ENDPOINT, PUBLIC_APPWRITE_PROJECT } from '$env/static/public'
-
-export const SESSION_COOKIE = 'my-custom-session'
 
 export function createPublicAccountClient() {
     const client = new Client()
@@ -37,7 +35,7 @@ export function createSessionClient(event: RequestEvent) {
         .setProject(PUBLIC_APPWRITE_PROJECT)
 
     // Extract our custom domain's session cookie from the request
-    const session = event.cookies.get(SESSION_COOKIE)
+    const session = event.cookies.get(SESSION_COOKIE_NAME)
     if (!session) {
         throw new Error('No user session')
     }

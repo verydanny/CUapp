@@ -1,6 +1,8 @@
-// src/routes/account/+page.server.js
+// src/routes/user/account/+page.server.ts
 
-import { SESSION_COOKIE, createSessionClient } from '$lib/server/appwrite.js'
+import { SESSION_COOKIE_NAME } from '$env/static/private'
+
+import { createSessionClient } from '$lib/server/appwrite.js'
 import { redirect } from '@sveltejs/kit'
 
 export async function load({ locals }) {
@@ -21,7 +23,7 @@ export const actions = {
 
         // Delete the session on Appwrite, and delete the session cookie.
         await account.deleteSession('current')
-        event.cookies.delete(SESSION_COOKIE, { path: '/' })
+        event.cookies.delete(SESSION_COOKIE_NAME, { path: '/' })
 
         // Redirect to the sign up page.
         redirect(302, '/user/signup')
