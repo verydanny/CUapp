@@ -104,48 +104,6 @@ export class AppwriteAuth {
     }
 }
 
-export async function prepareUserAndCreateCredential(
-    auth: AppwriteAuth,
-    email: string
-): Promise<
-    | ActionResultError
-    | ActionResultSuccess<{ user: Models.User<Models.Preferences> }>
-    | ActionResultRedirect
-> {
-    try {
-        const user = await auth.prepareUser(email)
-        const credentials = await auth.getCredential(user.$id)
-
-        if (credentials) {
-            return {
-                success: false,
-                type: REDIRECT,
-                body: {
-                    status: 303,
-                    url: '/user/signin'
-                }
-            }
-        }
-
-        return {
-            success: true,
-            type: SUCCESS,
-            body: {
-                user
-            }
-        }
-    } catch {
-        // Todo: Handle error w/ Sentry or something
-        return {
-            success: false,
-            type: ERROR,
-            body: {
-                error: 'Failed to prepare user and create credential.'
-            }
-        }
-    }
-}
-
 export async function createRegistrationOptionsAndChallenge(
     auth: AppwriteAuth,
     user: Models.User<Models.Preferences>,
@@ -184,6 +142,45 @@ export async function createRegistrationOptionsAndChallenge(
             type: ERROR,
             body: {
                 error: 'Failed to create registration options and/or challenge.'
+            }
+        }
+    }
+}
+
+export async function prepareUserAndCreateCredential(
+    auth: AppwriteAuth,
+    username: string
+): Promise<
+    | ActionResultError
+    | ActionResultRedirect
+    | ActionResultSuccess<{
+          challengeId: string
+          options: PublicKeyCredentialCreationOptionsJSON
+      }>
+> {
+    try {
+        const user = await auth.prepareUser(username)
+        const credentials = await auth.getCredential(user.$id)
+
+        if (credentials) {
+            return {
+                success: false,
+                type: REDIRECT,
+                body: {
+                    status: 303,
+                    url: '/user/signin'
+                }
+            }
+        }
+
+        return createRegistrationOptionsAndChallenge(auth, user, username)
+    } catch {
+        // Todo: Handle error w/ Sentry or something
+        return {
+            success: false,
+            type: ERROR,
+            body: {
+                error: 'Failed to prepare user and create credential.'
             }
         }
     }

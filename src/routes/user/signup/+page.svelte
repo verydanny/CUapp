@@ -1,11 +1,11 @@
 <!-- src/routes/signup/+page.svelte -->
 <script lang="ts">
     import { onMount } from 'svelte'
-    import type { ActionResult } from '@sveltejs/kit'
     import { goto } from '$app/navigation'
     import { enhance, applyAction, deserialize } from '$app/forms'
     import { startRegistration, startAuthentication } from '@simplewebauthn/browser'
 
+    import type { ActionResult } from '@sveltejs/kit'
     import type { ActionData } from './$types'
 
     type NonNullableActionData = NonNullable<ActionData>

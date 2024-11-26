@@ -9,7 +9,6 @@ import { expectedOrigin, REDIRECT } from '$lib/const'
 import {
     AppwriteAuth,
     attemptToGenerateAuthenticationOptions,
-    createRegistrationOptionsAndChallenge,
     prepareUserAndCreateCredential
 } from '$lib/server/appwrite-auth'
 
@@ -61,20 +60,7 @@ export const actions = {
         )
 
         if (userOrErrorOrRedirect.success) {
-            const registrationOptionsOrError = await createRegistrationOptionsAndChallenge(
-                auth,
-                userOrErrorOrRedirect.body.user,
-                username
-            )
-
-            if (registrationOptionsOrError.success) {
-                return {
-                    success: true,
-                    body: registrationOptionsOrError.body
-                }
-            }
-
-            return fail(400, registrationOptionsOrError.body)
+            return userOrErrorOrRedirect
         }
 
         if (userOrErrorOrRedirect.type === REDIRECT) {
@@ -122,14 +108,12 @@ export const actions = {
                         success: true
                     }
                 }
-            } catch (error) {
-                console.error('Registration verification failed.', error)
+            } catch {
                 return fail(400, {
                     error: 'Registration verification failed.'
                 })
             }
-        } catch (error) {
-            console.error('Challenge not found. Please start over.', error)
+        } catch {
             return fail(400, {
                 error: 'Challenge not found. Please start over.'
             })
