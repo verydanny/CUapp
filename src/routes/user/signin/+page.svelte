@@ -1,36 +1,72 @@
 <!-- src/routes/user/signin/+page.svelte -->
 <script lang="ts">
-    // import { startRegistration } from '@simplewebauthn/browser';
-    import { onMount } from 'svelte'
+    import { startAuthentication } from '@simplewebauthn/browser'
     import { enhance, applyAction, deserialize } from '$app/forms'
 
     import type { ActionData } from './$types'
     import type { ActionResult } from '@sveltejs/kit'
     import { goto } from '$app/navigation'
+    import { onMount } from 'svelte'
 
     type NonNullableActionData = NonNullable<ActionData>
 
-    let { form } = $props()
-    let startAuthentication = $state<
-        typeof import('@simplewebauthn/browser').startAuthentication | null
-    >(null)
+    let { form, data } = $props()
+
+    const challengeId = data?.challengeId
+    const optionsJSON = data?.options
 
     onMount(async () => {
-        try {
-            ;({ startAuthentication } = await import('@simplewebauthn/browser'))
-        } catch (error) {
-            console.error(`Error importing startAuthentication: ${error}`)
+        if (optionsJSON) {
+            try {
+                const authentication = await startAuthentication({
+                    optionsJSON,
+                    useBrowserAutofill: false
+                })
+
+                const response = deserialize(
+                    await (
+                        await fetch('/user/signin?/verifyPasskey', {
+                            method: 'post',
+                            body: JSON.stringify({
+                                challengeId,
+                                authentication
+                            })
+                        })
+                    ).text()
+                )
+
+                if (response.type === 'redirect') {
+                    return goto(response.location)
+                }
+            } catch {
+                // Delete the challenge after it's used.
+                await fetch('/user/signin?/deleteChallenge', {
+                    method: 'post',
+                    body: JSON.stringify({ challengeId })
+                })
+            }
         }
     })
 
     const handleSignupChallenge = () => {
         return async ({ result }: { result: ActionResult<NonNullableActionData> }) => {
+            console.log('result', result)
+
             if (result?.type === 'redirect') {
                 return goto(result?.location)
             }
 
             if (result?.type === 'success') {
-                if (startAuthentication && result?.data?.body && result?.data?.success) {
+                if (result?.data?.body && result?.data?.success) {
+                    if (result.data.body.credentialID) {
+                        await fetch('/api/v1/cookie/set-cookie', {
+                            method: 'post',
+                            body: JSON.stringify({
+                                'device-id': result.data.body.credentialID
+                            })
+                        })
+                    }
+
                     const authentication = await startAuthentication({
                         useBrowserAutofill: false,
                         optionsJSON: result.data.body.options

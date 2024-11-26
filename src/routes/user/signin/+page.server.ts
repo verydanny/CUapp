@@ -3,7 +3,7 @@ import { generateAuthenticationOptions, verifyAuthenticationResponse } from '@si
 import { isoUint8Array } from '@simplewebauthn/server/helpers'
 
 import { RP_ID, SESSION_COOKIE_NAME } from '$env/static/private'
-import { AppwriteAuth } from '$lib/server/appwrite-auth'
+import { AppwriteAuth, attemptToGenerateAuthenticationOptions } from '$lib/server/appwrite-auth'
 import { createAdminClient } from '$lib/server/appwrite'
 
 import type { RequestEvent } from './$types'
@@ -12,13 +12,15 @@ const auth = new AppwriteAuth()
 const expectedOrigin =
     process.env.NODE_ENV === 'development' ? 'https://dev.' + RP_ID : 'https://' + RP_ID
 
-export async function load({ locals }) {
+export async function load(req: RequestEvent) {
+    const options = await attemptToGenerateAuthenticationOptions(auth, req.cookies)
     // Logged out users can't access this page.
-    if (locals.user) redirect(302, '/user/account')
+    if (req.locals.user) redirect(302, '/user/account')
 
     // Pass the stored user local to the page.
     return {
-        user: locals.user
+        user: req.locals.user,
+        ...options
     }
 }
 
@@ -71,9 +73,14 @@ export const actions = {
             success: true,
             body: {
                 challengeId: challenge.$id,
+                credentialID: authenticator?.credentialID,
                 options
             }
         }
+    },
+    deleteChallenge: async (req: RequestEvent) => {
+        const { challengeId } = await req.request.json()
+        await auth.deleteChallenge(challengeId)
     },
     verifyPasskey: async (req: RequestEvent) => {
         const { challengeId, authentication } = await req.request.json()

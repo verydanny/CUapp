@@ -1,19 +1,19 @@
 <!-- src/routes/signup/+page.svelte -->
 <script lang="ts">
-    // import { startRegistration } from '@simplewebauthn/browser';
     import { onMount } from 'svelte'
-    import { enhance, applyAction, deserialize } from '$app/forms'
-
-    import type { ActionData } from './$types'
     import type { ActionResult } from '@sveltejs/kit'
     import { goto } from '$app/navigation'
+    import { enhance, applyAction, deserialize } from '$app/forms'
+    import { startRegistration, startAuthentication } from '@simplewebauthn/browser'
+
+    import type { ActionData } from './$types'
 
     type NonNullableActionData = NonNullable<ActionData>
 
-    let { form } = $props()
-    let startRegistration = $state<
-        typeof import('@simplewebauthn/browser').startRegistration | null
-    >(null)
+    let { form, data } = $props()
+
+    const challengeId = data?.challengeId
+    const optionsJSON = data?.options
 
     /**
      * 1. We create custom form action that POSTS to api/v1/auth/challenge
@@ -31,10 +31,31 @@
      *
      */
     onMount(async () => {
-        try {
-            ;({ startRegistration } = await import('@simplewebauthn/browser'))
-        } catch (error) {
-            console.error(`Error importing startRegistration: ${error}`)
+        if (optionsJSON) {
+            try {
+                const authentication = await startAuthentication({
+                    optionsJSON,
+                    useBrowserAutofill: false
+                })
+
+                const response = deserialize(
+                    await (
+                        await fetch('/user/signin?/verifyPasskey', {
+                            method: 'post',
+                            body: JSON.stringify({
+                                challengeId,
+                                authentication
+                            })
+                        })
+                    ).text()
+                )
+
+                if (response.type === 'redirect') {
+                    return goto(response.location)
+                }
+            } catch {
+                // Sentry error later
+            }
         }
     })
 
@@ -45,30 +66,28 @@
                 return goto(result?.location)
             }
 
-            if (result?.type === 'success') {
-                if (result.data?.body && 'challengeId' in result.data.body && startRegistration) {
-                    const registration = await startRegistration({
-                        optionsJSON: result?.data?.body?.options
-                    })
+            if (result?.type === 'success' && result?.data?.success) {
+                const registration = await startRegistration({
+                    optionsJSON: result?.data?.body?.options
+                })
 
-                    // Add a try/catch to see if registration successful
-                    const deserializedResult = deserialize(
-                        await (
-                            await fetch('?/verifyPasskey', {
-                                method: 'post',
-                                body: JSON.stringify({
-                                    challengeId: result?.data?.body?.challengeId,
-                                    registration,
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    }
-                                })
+                // Add a try/catch to see if registration successful
+                const deserializedResult = deserialize(
+                    await (
+                        await fetch('?/verifyPasskey', {
+                            method: 'post',
+                            body: JSON.stringify({
+                                challengeId: result?.data?.body?.challengeId,
+                                registration,
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
                             })
-                        ).text()
-                    )
+                        })
+                    ).text()
+                )
 
-                    return applyAction(deserializedResult)
-                }
+                return applyAction(deserializedResult)
             }
 
             return applyAction(result)

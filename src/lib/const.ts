@@ -8,7 +8,7 @@ export const ERROR = 'error' as const
 export const REDIRECT = 'redirect' as const
 
 export interface ActionResultRedirect {
-    success: true
+    success: false
     type: typeof REDIRECT
     body: {
         status: number
@@ -29,3 +29,5 @@ export type ActionResultSuccess<T> = {
     type: typeof SUCCESS
     body: T
 }
+
+export const DEVICE_ID_COOKIE = 'device-id'

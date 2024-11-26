@@ -2,30 +2,32 @@
 import { fail, redirect } from '@sveltejs/kit'
 import { verifyRegistrationResponse } from '@simplewebauthn/server'
 import { isoUint8Array } from '@simplewebauthn/server/helpers'
-// import * as SimpleWebAuthnServerHelpers from '@simplewebauthn/server/helpers';
 
 import { RP_ID } from '$env/static/private'
 
-import { expectedOrigin, REDIRECT, SUCCESS } from '$lib/const'
+import { expectedOrigin, REDIRECT } from '$lib/const'
 import {
     AppwriteAuth,
+    attemptToGenerateAuthenticationOptions,
     createRegistrationOptionsAndChallenge,
     prepareUserAndCreateCredential
 } from '$lib/server/appwrite-auth'
 
 import type { RequestEvent } from './$types'
 
-export async function load({ locals }) {
+const auth = new AppwriteAuth()
+
+export async function load(req: RequestEvent) {
+    const options = await attemptToGenerateAuthenticationOptions(auth, req.cookies)
     // Logged out users can't access this page.
-    if (locals.user) redirect(302, '/user/account')
+    if (req.locals.user) redirect(302, '/user/account')
 
     // Pass the stored user local to the page.
     return {
-        user: locals.user
+        user: req.locals.user,
+        ...options
     }
 }
-
-const auth = new AppwriteAuth()
 
 export const actions = {
     signup: async (req: RequestEvent) => {
@@ -53,24 +55,33 @@ export const actions = {
         /**
          * @todo: Move this to an Appwrite Function to avoid blocking the main thread
          */
-        const userErrorOrRedirect = await prepareUserAndCreateCredential(
+        const userOrErrorOrRedirect = await prepareUserAndCreateCredential(
             auth,
             username.toLowerCase()
         )
 
-        if (userErrorOrRedirect.type === SUCCESS) {
-            return createRegistrationOptionsAndChallenge(
+        if (userOrErrorOrRedirect.success) {
+            const registrationOptionsOrError = await createRegistrationOptionsAndChallenge(
                 auth,
-                userErrorOrRedirect.body.user,
+                userOrErrorOrRedirect.body.user,
                 username
             )
+
+            if (registrationOptionsOrError.success) {
+                return {
+                    success: true,
+                    body: registrationOptionsOrError.body
+                }
+            }
+
+            return fail(400, registrationOptionsOrError.body)
         }
 
-        if (userErrorOrRedirect.type === REDIRECT) {
-            return redirect(userErrorOrRedirect?.body?.status, userErrorOrRedirect?.body?.url)
+        if (userOrErrorOrRedirect.type === REDIRECT) {
+            return redirect(userOrErrorOrRedirect?.body?.status, userOrErrorOrRedirect?.body?.url)
         }
 
-        return fail(400, userErrorOrRedirect.body)
+        return fail(400, userOrErrorOrRedirect.body)
     },
     verifyPasskey: async (req: RequestEvent) => {
         const { challengeId, registration } = await req.request.json()

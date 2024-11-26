@@ -1,7 +1,7 @@
 import { Client, Users, ID, Databases, Query, type Models } from 'node-appwrite'
-import { fail, type ActionFailure } from '@sveltejs/kit'
 import {
-    generateRegistrationOptions
+    generateRegistrationOptions,
+    generateAuthenticationOptions
     // verifyRegistrationResponse,
     // type GenerateRegistrationOptionsOpts
 } from '@simplewebauthn/server'
@@ -12,6 +12,7 @@ import { APPWRITE_KEY, RP_ID, RP_NAME } from '$env/static/private'
 
 import type { AuthenticatorTransportFuture } from '@simplewebauthn/types'
 import {
+    DEVICE_ID_COOKIE,
     ERROR,
     REDIRECT,
     SUCCESS,
@@ -92,6 +93,15 @@ export class AppwriteAuth {
 
         return documents[0]
     }
+
+    async getMatchingCredentials(credentialId: string | string[]) {
+        const documents = await this.databases.listDocuments('main', 'credentials', [
+            Query.contains('credentials', credentialId),
+            Query.limit(5)
+        ])
+
+        return documents.documents
+    }
 }
 
 export async function prepareUserAndCreateCredential(
@@ -108,7 +118,7 @@ export async function prepareUserAndCreateCredential(
 
         if (credentials) {
             return {
-                success: true,
+                success: false,
                 type: REDIRECT,
                 body: {
                     status: 303,
@@ -141,16 +151,8 @@ export async function createRegistrationOptionsAndChallenge(
     user: Models.User<Models.Preferences>,
     username: string
 ): Promise<
-    | ActionFailure<{
-          error: string
-      }>
-    | {
-          success: boolean
-          body: {
-              challengeId: string
-              options: PublicKeyCredentialCreationOptionsJSON
-          }
-      }
+    | ActionResultError
+    | ActionResultSuccess<{ challengeId: string; options: PublicKeyCredentialCreationOptionsJSON }>
 > {
     try {
         const options = await generateRegistrationOptions({
@@ -169,16 +171,63 @@ export async function createRegistrationOptionsAndChallenge(
 
         return {
             success: true,
+            type: SUCCESS,
             body: {
                 challengeId: challenge.$id,
                 options
             }
         }
-    } catch (e) {
-        console.error('e', e)
+    } catch {
         // Todo: Handle error w/ Sentry or something
-        return fail(400, {
-            error: 'Failed to create registration options and/or challenge.'
-        })
+        return {
+            success: false,
+            type: ERROR,
+            body: {
+                error: 'Failed to create registration options and/or challenge.'
+            }
+        }
     }
+}
+
+export const attemptToGenerateAuthenticationOptions = async (
+    auth: AppwriteAuth,
+    cookies: import('@sveltejs/kit').Cookies
+) => {
+    const cookieArray = cookies.get(DEVICE_ID_COOKIE)?.split(',')
+
+    if (cookieArray) {
+        try {
+            const matchingCredentialsDocuments = await auth.getMatchingCredentials(cookieArray)
+            const matchingCredentials = matchingCredentialsDocuments.map((credential) => {
+                const authentication = JSON.parse(credential.credentials)
+
+                return {
+                    userId: credential.userId,
+                    id: authentication.credentialID as string,
+                    transports: authentication.transports as AuthenticatorTransportFuture[],
+                    type: authentication.type
+                }
+            })
+
+            const userId = matchingCredentials[0].userId
+            const options = await generateAuthenticationOptions({
+                rpID: RP_ID,
+                allowCredentials: matchingCredentials.map((credential) => ({
+                    id: credential.id,
+                    transports: credential.transports
+                })),
+                userVerification: 'preferred'
+            })
+            const challenge = await auth.createChallenge(userId, options.challenge)
+
+            return {
+                challengeId: challenge.$id,
+                options
+            }
+        } catch {
+            return {}
+        }
+    }
+
+    return {}
 }
