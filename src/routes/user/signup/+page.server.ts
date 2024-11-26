@@ -1,24 +1,19 @@
 // src/routes/signup/+page.server.js
 import { fail, redirect } from '@sveltejs/kit'
-import { generateRegistrationOptions, verifyRegistrationResponse } from '@simplewebauthn/server'
+import { verifyRegistrationResponse } from '@simplewebauthn/server'
 import { isoUint8Array } from '@simplewebauthn/server/helpers'
 // import * as SimpleWebAuthnServerHelpers from '@simplewebauthn/server/helpers';
 
-import {
-    // MY_SALT,
-    RP_ID,
-    RP_NAME
-} from '$env/static/private'
+import { RP_ID } from '$env/static/private'
 
-// import { SESSION_COOKIE, createAdminClient, createSessionClient } from '$lib/server/appwrite.js';
-import { AppwriteAuth } from '$lib/server/appwrite-auth'
-// import { generatePassword, encrypt } from '$lib/server/crypto.js';
-// import { redirect } from '@sveltejs/kit';
-// import { ID } from 'node-appwrite';
+import { expectedOrigin, REDIRECT, SUCCESS } from '$lib/const'
+import {
+    AppwriteAuth,
+    createRegistrationOptionsAndChallenge,
+    prepareUserAndCreateCredential
+} from '$lib/server/appwrite-auth'
 
 import type { RequestEvent } from './$types'
-
-// import all from './$types';
 
 export async function load({ locals }) {
     // Logged out users can't access this page.
@@ -58,42 +53,26 @@ export const actions = {
         /**
          * @todo: Move this to an Appwrite Function to avoid blocking the main thread
          */
+        const userErrorOrRedirect = await prepareUserAndCreateCredential(
+            auth,
+            username.toLowerCase()
+        )
 
-        const user = await auth.prepareUser(username.toLowerCase())
-        const credentials = await auth.getCredential(user.$id)
-
-        if (credentials) {
-            return redirect(303, '/user/signin')
+        if (userErrorOrRedirect.type === SUCCESS) {
+            return createRegistrationOptionsAndChallenge(
+                auth,
+                userErrorOrRedirect.body.user,
+                username
+            )
         }
 
-        // const encoder = new TextEncoder()
-        // const userIdArrayBuffer = encoder.encode(user.$id)
-        const options = await generateRegistrationOptions({
-            rpName: RP_NAME,
-            rpID: RP_ID,
-            // userID: userIdArrayBuffer,
-            userName: username,
-            attestationType: 'none',
-            authenticatorSelection: {
-                residentKey: 'preferred',
-                userVerification: 'preferred',
-                authenticatorAttachment: 'platform'
-            }
-        })
-        const challenge = await auth.createChallenge(user.$id, options.challenge)
-
-        return {
-            success: true,
-            body: {
-                challengeId: challenge.$id,
-                options
-            }
+        if (userErrorOrRedirect.type === REDIRECT) {
+            return redirect(userErrorOrRedirect?.body?.status, userErrorOrRedirect?.body?.url)
         }
+
+        return fail(400, userErrorOrRedirect.body)
     },
     verifyPasskey: async (req: RequestEvent) => {
-        const expectedOrigin =
-            process.env.NODE_ENV === 'development' ? 'https://dev.' + RP_ID : 'https://' + RP_ID
-
         const { challengeId, registration } = await req.request.json()
 
         try {

@@ -2,7 +2,7 @@
 <script lang="ts">
     // import { startRegistration } from '@simplewebauthn/browser';
     import { onMount } from 'svelte'
-    import { enhance, applyAction } from '$app/forms'
+    import { enhance, applyAction, deserialize } from '$app/forms'
 
     import type { ActionData } from './$types'
     import type { ActionResult } from '@sveltejs/kit'
@@ -40,6 +40,7 @@
 
     const handleSignupChallenge = () => {
         return async ({ result }: { result: ActionResult<NonNullableActionData> }) => {
+            console.log('result', result)
             if (result?.type === 'redirect') {
                 return goto(result?.location)
             }
@@ -51,19 +52,23 @@
                     })
 
                     // Add a try/catch to see if registration successful
-                    return fetch('?/verifyPasskey', {
-                        method: 'post',
-                        body: JSON.stringify({
-                            challengeId: result?.data?.body?.challengeId,
-                            registration,
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
-                        })
-                    })
-                }
+                    const deserializedResult = deserialize(
+                        await (
+                            await fetch('?/verifyPasskey', {
+                                method: 'post',
+                                body: JSON.stringify({
+                                    challengeId: result?.data?.body?.challengeId,
+                                    registration,
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    }
+                                })
+                            })
+                        ).text()
+                    )
 
-                return applyAction(result)
+                    return applyAction(deserializedResult)
+                }
             }
 
             return applyAction(result)
