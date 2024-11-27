@@ -1,7 +1,6 @@
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from 'vite'
 import { sveltekit } from '@sveltejs/kit/vite'
 
-// import { HOST, HMR_PORT } from '$env/static/private'
 import { loadEnv } from 'vite'
 
 export default defineConfig(({ mode }) => {
@@ -17,11 +16,11 @@ export default defineConfig(({ mode }) => {
                 clientPort,
                 host
             },
-            origin: host
-        },
-
-        test: {
-            include: ['src/**/*.{test,spec}.{js,ts}']
+            origin: `https://${host}`
         }
+
+        // test: {
+        //     include: ['src/**/*.{test,spec}.{js,ts}']
+        // }
     }
 })

@@ -1,5 +1,5 @@
-import { decrypt } from '$lib/server/crypto.js'
-import { createPublicAccountClient } from '$lib/server/appwrite.js'
+import { decrypt } from '$lib/server/auth/crypto.js'
+import { createPublicAccountClient } from '$lib/server/auth/appwrite.js'
 import { MY_SALT } from '$env/static/private'
 
 import type { PageServerLoadEvent } from './$types'

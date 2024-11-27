@@ -2,7 +2,7 @@
 <script lang="ts">
     import { onMount } from 'svelte'
     import { goto } from '$app/navigation'
-    import { enhance, applyAction, deserialize } from '$app/forms'
+    import { enhance, deserialize } from '$app/forms'
     import { startRegistration, startAuthentication } from '@simplewebauthn/browser'
 
     import type { ActionResult } from '@sveltejs/kit'
@@ -12,7 +12,7 @@
 
     let { form, data } = $props()
 
-    const challengeId = data?.challengeId
+    // const challengeId = data?.challengeId
     const optionsJSON = data?.options
 
     /**
@@ -43,7 +43,8 @@
                         await fetch('/user/signin?/verifyPasskey', {
                             method: 'post',
                             body: JSON.stringify({
-                                challengeId,
+                                challenge: optionsJSON?.challenge,
+                                credentialID: authentication?.id,
                                 authentication
                             })
                         })
@@ -54,18 +55,13 @@
                     return goto(response.location)
                 }
             } catch {
-                // Sentry error later
+                // Do nothing
             }
         }
     })
 
     const handleSignupChallenge = () => {
         return async ({ result }: { result: ActionResult<NonNullableActionData> }) => {
-            console.log('result', result)
-            if (result?.type === 'redirect') {
-                return goto(result?.location)
-            }
-
             if (result?.type === 'success' && result?.data?.success) {
                 const registration = await startRegistration({
                     optionsJSON: result?.data?.body?.options
@@ -87,10 +83,17 @@
                     ).text()
                 )
 
-                return applyAction(deserializedResult)
-            }
+                if (deserializedResult?.type === 'success' && registration?.id) {
+                    await fetch('/api/v1/cookie/set-cookie', {
+                        method: 'post',
+                        body: JSON.stringify({
+                            'device-id': registration?.id
+                        })
+                    })
 
-            return applyAction(result)
+                    return goto('/user/signin')
+                }
+            }
         }
     }
 </script>

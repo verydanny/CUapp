@@ -2,7 +2,7 @@
 
 import { SESSION_COOKIE_NAME } from '$env/static/private'
 
-import { createSessionClient } from '$lib/server/appwrite.js'
+import { createSessionClient } from '$lib/server/auth/appwrite.js'
 import { redirect } from '@sveltejs/kit'
 
 export async function load({ locals }) {

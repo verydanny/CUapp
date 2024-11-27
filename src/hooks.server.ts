@@ -1,5 +1,5 @@
 // src/hooks.server.js
-import { createSessionClient } from '$lib/server/appwrite'
+import { createSessionClient } from '$lib/server/auth/appwrite'
 
 export async function handle({ event, resolve }) {
     try {

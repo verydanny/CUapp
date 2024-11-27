@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit'
 import { generateAuthenticationOptions } from '@simplewebauthn/server'
 
-import { AppwriteAuth } from '$lib/server/appwrite-auth'
+import { AppwriteAuth } from '$lib/server/auth/appwrite-auth'
 import { DEVICE_ID_COOKIE } from '$lib/const'
 import { RP_ID } from '$env/static/private'
 

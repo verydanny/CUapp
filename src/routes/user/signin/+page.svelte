@@ -12,11 +12,11 @@
 
     let { form, data } = $props()
 
-    const challengeId = data?.challengeId
+    // const challengeId = data?.challengeId
     const optionsJSON = data?.options
 
     onMount(async () => {
-        if (optionsJSON) {
+        if (optionsJSON && optionsJSON?.allowCredentials?.length > 0) {
             try {
                 const authentication = await startAuthentication({
                     optionsJSON,
@@ -28,7 +28,9 @@
                         await fetch('/user/signin?/verifyPasskey', {
                             method: 'post',
                             body: JSON.stringify({
-                                challengeId,
+                                // challengeId,
+                                challenge: optionsJSON?.challenge,
+                                credentialID: authentication?.id,
                                 authentication
                             })
                         })
@@ -39,56 +41,45 @@
                     return goto(response.location)
                 }
             } catch {
-                // Delete the challenge after it's used.
-                await fetch('/user/signin?/deleteChallenge', {
-                    method: 'post',
-                    body: JSON.stringify({ challengeId })
-                })
+                // Do nothing
             }
         }
     })
 
     const handleSignupChallenge = () => {
         return async ({ result }: { result: ActionResult<NonNullableActionData> }) => {
-            console.log('result', result)
-
-            if (result?.type === 'redirect') {
-                return goto(result?.location)
-            }
-
-            if (result?.type === 'success') {
-                if (result?.data?.body && result?.data?.success) {
-                    if (result.data.body.credentialID) {
-                        await fetch('/api/v1/cookie/set-cookie', {
-                            method: 'post',
-                            body: JSON.stringify({
-                                'device-id': result.data.body.credentialID
-                            })
+            if (result?.type === 'success' && result?.data?.success) {
+                if (result.data.body.credentialID) {
+                    await fetch('/api/v1/cookie/set-cookie', {
+                        method: 'post',
+                        body: JSON.stringify({
+                            'device-id': result.data.body.credentialID
                         })
-                    }
-
-                    const authentication = await startAuthentication({
-                        useBrowserAutofill: false,
-                        optionsJSON: result.data.body.options
                     })
+                }
 
-                    try {
-                        const response = deserialize(
-                            await (
-                                await fetch('?/verifyPasskey', {
-                                    method: 'post',
-                                    body: JSON.stringify({
-                                        challengeId: result.data.body.challengeId,
-                                        authentication
-                                    })
+                const authentication = await startAuthentication({
+                    useBrowserAutofill: false,
+                    optionsJSON: result.data.body.options
+                })
+
+                try {
+                    const response = deserialize(
+                        await (
+                            await fetch('?/verifyPasskey', {
+                                method: 'post',
+                                body: JSON.stringify({
+                                    challenge: result.data.body.options?.challenge,
+                                    credentialID: result.data.body.credentialID,
+                                    authentication
                                 })
-                            ).text()
-                        )
+                            })
+                        ).text()
+                    )
 
-                        return applyAction(response)
-                    } catch (error) {
-                        console.error(`Error deserializing response: ${error}`)
-                    }
+                    return applyAction(response)
+                } catch (error) {
+                    console.error(`Error deserializing response: ${error}`)
                 }
             }
 

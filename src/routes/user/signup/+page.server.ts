@@ -1,30 +1,30 @@
 // src/routes/signup/+page.server.js
 import { fail, redirect } from '@sveltejs/kit'
-import { verifyRegistrationResponse } from '@simplewebauthn/server'
-import { isoUint8Array } from '@simplewebauthn/server/helpers'
 
-import { RP_ID } from '$env/static/private'
-
-import { expectedOrigin, REDIRECT } from '$lib/const'
-import {
-    AppwriteAuth,
-    attemptToGenerateAuthenticationOptions,
-    prepareUserAndCreateCredential
-} from '$lib/server/appwrite-auth'
+import { REDIRECT, SUCCESS } from '$lib/const'
+import { AppwriteAuth } from '$lib/server/auth/appwrite-auth'
+import { signupPasskeyAction, verifyPasskeyAction } from '$lib/server/auth/signup/actions'
+import { loadAuthenticationOptions } from '$lib/server/auth/load'
 
 import type { RequestEvent } from './$types'
 
 const auth = new AppwriteAuth()
 
 export async function load(req: RequestEvent) {
-    const options = await attemptToGenerateAuthenticationOptions(auth, req.cookies)
+    const options = await loadAuthenticationOptions(auth, req.cookies)
     // Logged out users can't access this page.
     if (req.locals.user) redirect(302, '/user/account')
 
+    if (options) {
+        return {
+            user: req.locals.user,
+            options
+        }
+    }
+
     // Pass the stored user local to the page.
     return {
-        user: req.locals.user,
-        ...options
+        user: req.locals.user
     }
 }
 
@@ -50,78 +50,36 @@ export const actions = {
                 error: 'Invalid form data'
             })
         }
+        /**
+         * @todo: Allow for magic link email signup
+         */
 
         /**
          * @todo: Move this to an Appwrite Function to avoid blocking the main thread
          */
-        const userOrErrorOrRedirect = await prepareUserAndCreateCredential(
-            auth,
-            username.toLowerCase()
-        )
+        const signupPasskeyActionResult = await signupPasskeyAction(auth, username.toLowerCase())
 
-        if (userOrErrorOrRedirect.success) {
-            return userOrErrorOrRedirect
+        if (signupPasskeyActionResult.type === SUCCESS) {
+            return signupPasskeyActionResult
         }
 
-        if (userOrErrorOrRedirect.type === REDIRECT) {
-            return redirect(userOrErrorOrRedirect?.body?.status, userOrErrorOrRedirect?.body?.url)
+        if (signupPasskeyActionResult.type === REDIRECT) {
+            return redirect(
+                signupPasskeyActionResult?.body?.status,
+                signupPasskeyActionResult?.body?.url
+            )
         }
 
-        return fail(400, userOrErrorOrRedirect.body)
+        return fail(400, signupPasskeyActionResult.body)
     },
     verifyPasskey: async (req: RequestEvent) => {
-        const { challengeId, registration } = await req.request.json()
+        const verifyPasskeyResult = await verifyPasskeyAction(auth, req)
 
-        try {
-            const challenge = await auth.getChallenge(challengeId)
-
-            try {
-                const verification = await verifyRegistrationResponse({
-                    response: registration,
-                    expectedChallenge: challenge?.token,
-                    expectedOrigin,
-                    expectedRPID: RP_ID
-                })
-
-                const { verified, registrationInfo } = verification
-
-                if (!verified) {
-                    return fail(400, {
-                        error: 'Registration verification failed.'
-                    })
-                }
-
-                if (registrationInfo) {
-                    await auth.createCredentials(challenge?.userId, {
-                        credentialID: registrationInfo?.credential?.id,
-                        credentialPublicKey: isoUint8Array.toHex(
-                            registrationInfo?.credential?.publicKey
-                        ),
-                        counter: registrationInfo?.credential?.counter,
-                        credentialDeviceType: registrationInfo?.credentialDeviceType,
-                        credentialBackedUp: registrationInfo?.credentialBackedUp,
-                        transports: registrationInfo?.credential?.transports
-                    })
-                    await auth.deleteChallenge(challenge.$id)
-
-                    return {
-                        success: true
-                    }
-                }
-            } catch {
-                return fail(400, {
-                    error: 'Registration verification failed.'
-                })
-            }
-        } catch {
-            return fail(400, {
-                error: 'Challenge not found. Please start over.'
-            })
+        if (verifyPasskeyResult.type === SUCCESS) {
+            return verifyPasskeyResult
         }
 
-        return fail(400, {
-            error: 'Registration verification failed.'
-        })
+        return fail(400, verifyPasskeyResult.body)
     }
 }
 // Old flow
