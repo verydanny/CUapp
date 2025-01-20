@@ -24,7 +24,11 @@ export class AppwriteAuth {
         this.databases = new Databases(client)
     }
 
-    async prepareUser(email: string) {
+    async prepareUser(email?: string) {
+        if (!email) {
+            return null
+        }
+
         const reponse = await this.users.list([Query.equal('email', email), Query.limit(1)])
         const user = reponse.users[0] ?? null
 
@@ -81,9 +85,11 @@ export class AppwriteAuth {
             credentialID: string | undefined
             credentialPublicKey: string | undefined
             counter: number | undefined
+            attestationObject?: string | undefined
             credentialDeviceType: string | undefined
             credentialBackedUp: boolean | undefined
             transports: AuthenticatorTransportFuture[] | undefined
+            extensions: unknown | undefined
         }
     ) {
         return await this.databases.createDocument('main', 'credentials', ID.unique(), {
@@ -92,7 +98,11 @@ export class AppwriteAuth {
         })
     }
 
-    async getCredential(userId: string) {
+    async getCredential(userId?: string) {
+        if (!userId) {
+            return null
+        }
+
         const documents = (
             await this.databases.listDocuments('main', 'credentials', [
                 Query.equal('userId', userId),

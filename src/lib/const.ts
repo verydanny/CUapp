@@ -11,16 +11,15 @@ export interface ActionResultRedirect {
 }
 
 export interface ActionResultError {
-    success: false
     type: typeof ERROR
     body: {
         error: string
     }
 }
 
-export type ActionResultSuccess<T> = {
-    success: true
+export type ActionResultSuccess<T0, T> = {
     type: typeof SUCCESS
+    name: T0
     body: T
 }
 

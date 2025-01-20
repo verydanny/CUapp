@@ -5,31 +5,29 @@ import { createAdminClient } from '$lib/server/auth/appwrite'
 import { RP_ID, SESSION_COOKIE_NAME, ORIGIN } from '$env/static/private'
 
 import { AppwriteAuth } from '$lib/server/auth/appwrite-auth'
-import {
-    ERROR,
-    REDIRECT,
-    SUCCESS,
-    type ActionResultError,
-    type ActionResultRedirect,
-    type ActionResultSuccess
-} from '$lib/const'
+import { ERROR, SUCCESS, type ActionResultError, type ActionResultSuccess } from '$lib/const'
+import type { RequestEvent } from '@sveltejs/kit'
+import type { EmptyObject } from '$lib/types'
 
 export async function signinPasskeyAction(
     auth: AppwriteAuth,
-    username: string
+    username?: string,
+    userId?: string
 ): Promise<
     | ActionResultError
-    | ActionResultSuccess<{
-          credentialID: string
-          options: PublicKeyCredentialRequestOptionsJSON
-      }>
+    | ActionResultSuccess<
+          'signinPasskeyAction',
+          {
+              credentialID: string
+              options: PublicKeyCredentialRequestOptionsJSON
+          }
+      >
 > {
-    const user = await auth.prepareUser(username.toLowerCase())
-    const credentials = await auth.getCredential(user?.$id)
+    const user = await auth.prepareUser(username?.toLowerCase())
+    const credentials = await auth.getCredential(userId || user?.$id)
 
     if (!credentials) {
         return {
-            success: false,
             type: ERROR,
             body: {
                 error: 'You do not have passkey yet. Please sign up.'
@@ -38,9 +36,12 @@ export async function signinPasskeyAction(
     }
 
     const authenticator = JSON.parse(credentials.credentials)
+
+    console.log('authenticator', authenticator)
     const options = await generateAuthenticationOptions({
         rpID: RP_ID,
         // userVerification: 'preferred',
+        extensions: authenticator?.extensions,
         allowCredentials: [
             {
                 id: authenticator?.credentialID,
@@ -50,8 +51,8 @@ export async function signinPasskeyAction(
     })
 
     return {
-        success: true,
         type: SUCCESS,
+        name: 'signinPasskeyAction',
         body: {
             credentialID: authenticator?.credentialID,
             options
@@ -59,10 +60,10 @@ export async function signinPasskeyAction(
     }
 }
 
-export async function verifyPasskeyAction(
+export async function verifySigninPasskeyAction(
     auth: AppwriteAuth,
-    req: import('../../../../routes/user/signin/$types').RequestEvent
-): Promise<ActionResultError | ActionResultRedirect> {
+    req: RequestEvent
+): Promise<ActionResultError | ActionResultSuccess<'verifySigninPasskeyAction', EmptyObject>> {
     try {
         const {
             authentication = null,
@@ -80,7 +81,6 @@ export async function verifyPasskeyAction(
 
         if (!credentials) {
             return {
-                success: false,
                 type: ERROR,
                 body: {
                     error: 'You do not have passkey yet. Please sign up.'
@@ -105,7 +105,6 @@ export async function verifyPasskeyAction(
         const { verified } = verification
         if (!verified) {
             return {
-                success: false,
                 type: ERROR,
                 body: {
                     error: 'Authentication failed. Incorrect passkey?'
@@ -124,15 +123,12 @@ export async function verifyPasskeyAction(
         })
 
         return {
-            type: REDIRECT,
-            body: {
-                status: 302,
-                url: '/user/account'
-            }
+            type: SUCCESS,
+            name: 'verifySigninPasskeyAction',
+            body: {}
         }
     } catch {
         return {
-            success: false,
             type: ERROR,
             body: {
                 error: 'Authentication verification failed.'

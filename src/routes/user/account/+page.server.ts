@@ -7,7 +7,7 @@ import { redirect } from '@sveltejs/kit'
 
 export async function load({ locals }) {
     // Logged out users can't access this page.
-    if (!locals.user) redirect(302, '/user/signup')
+    if (!locals.user) redirect(302, '/user/signin')
 
     // Pass the stored user local to the page.
     return {
@@ -26,6 +26,6 @@ export const actions = {
         event.cookies.delete(SESSION_COOKIE_NAME, { path: '/' })
 
         // Redirect to the sign up page.
-        redirect(302, '/user/signup')
+        redirect(302, '/user/signin')
     }
 }
