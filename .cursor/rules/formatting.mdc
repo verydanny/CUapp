@@ -1,0 +1,7 @@
+---
+description: Formatting and styliing rules
+globs: 
+---
+
+- Use DaisyUI5
+- Use TailwindCSS4

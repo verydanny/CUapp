@@ -1,5 +1,6 @@
 // src/routes/user/account/+page.server.ts
-
+import { Query } from 'node-appwrite'
+import { createAdminClient } from '$lib/server/auth/appwrite.js'
 import { SESSION_COOKIE_NAME } from '$env/static/private'
 
 import { createSessionClient } from '$lib/server/auth/appwrite.js'
@@ -7,11 +8,18 @@ import { redirect } from '@sveltejs/kit'
 
 export async function load({ locals }) {
     // Logged out users can't access this page.
-    if (!locals.user) redirect(302, '/user/signin')
+    if (!locals.user) redirect(302, '/')
+
+    const { databases } = createAdminClient()
+    const userExisting = await databases.listDocuments('main', 'profiles', [
+        Query.equal('userId', locals.user.$id)
+    ])
+    const currentUser = userExisting.documents[0]
 
     // Pass the stored user local to the page.
     return {
-        user: locals.user
+        user: locals.user,
+        currentUser
     }
 }
 

@@ -1,6 +1,7 @@
 <script lang="ts">
     let { data } = $props()
     let user = data?.user
+    let currentUser = data?.currentUser
 </script>
 
 <ul>
@@ -11,6 +12,10 @@
     <li>
         <strong>Name:</strong>
         {user?.name}
+    </li>
+    <li>
+        <strong>Username:</strong>
+        {currentUser?.username}
     </li>
     <li>
         <strong>ID: </strong>

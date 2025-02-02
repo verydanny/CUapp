@@ -1,0 +1,13 @@
+---
+description: Programming rules
+globs: 
+---
+
+# Typescript Rules
+
+- Use Typescript for all of my SvelteKit files
+- Use <script lang="ts"> for .svelte Files
+
+# Databse Rules
+
+- Use Appwrite for database updates/saving

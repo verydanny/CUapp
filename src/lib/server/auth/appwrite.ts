@@ -1,5 +1,5 @@
 import { type RequestEvent } from '@sveltejs/kit'
-import { Client, Account } from 'node-appwrite'
+import { Client, Account, Databases, Users } from 'node-appwrite'
 import { APPWRITE_KEY, SESSION_COOKIE_NAME } from '$env/static/private'
 import { PUBLIC_APPWRITE_ENDPOINT, PUBLIC_APPWRITE_PROJECT } from '$env/static/public'
 
@@ -25,6 +25,12 @@ export function createAdminClient() {
     return {
         get account() {
             return new Account(client)
+        },
+        get databases() {
+            return new Databases(client)
+        },
+        get users() {
+            return new Users(client)
         }
     }
 }
