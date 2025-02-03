@@ -3,6 +3,8 @@
 
     let { form, data }: PageProps = $props()
     let { pageType, messaging } = data
+
+    console.log('form', pageType)
 </script>
 
 <form action={`?/${pageType}`} method="post">

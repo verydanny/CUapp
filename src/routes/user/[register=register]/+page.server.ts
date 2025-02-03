@@ -1,6 +1,6 @@
 import { fail } from '@sveltejs/kit'
 import { createAdminClient } from '$lib/server/auth/appwrite.js'
-import { SESSION_COOKIE_NAME } from '$env/static/private'
+import { PUBLIC_SESSION_COOKIE_NAME } from '$env/static/public'
 import { redirect } from '@sveltejs/kit'
 import {
     ID,
@@ -12,6 +12,7 @@ export const load = async ({ url, locals }) => {
     const pageType = url.pathname.split('/').pop()
 
     if (pageType === 'signupusername') {
+        console.log('locals', locals)
         if (!locals.user) {
             return redirect(302, '/user/signin')
         }
@@ -47,8 +48,9 @@ export const actions = {
         }
 
         try {
+            const userId = ID.unique()
             // Create the session using the client
-            await account.create(ID.unique(), email, password)
+            await account.create(userId, email, password)
         } catch {
             return fail(400, {
                 success: false,
@@ -57,7 +59,8 @@ export const actions = {
         }
 
         const session = await account.createEmailPasswordSession(email, password)
-        cookies.set(SESSION_COOKIE_NAME, session.secret, {
+
+        cookies.set(PUBLIC_SESSION_COOKIE_NAME, session.secret, {
             sameSite: 'strict',
             expires: new Date(session.expire),
             secure: true,
@@ -117,10 +120,14 @@ export const actions = {
 
         // Create the session using the client
         const session = await account.createEmailPasswordSession(email, password)
-        cookies.set(SESSION_COOKIE_NAME, session.secret, {
+
+        console.log('session', session)
+
+        cookies.set(PUBLIC_SESSION_COOKIE_NAME, session.secret, {
+            httpOnly: true,
+            secure: true,
             sameSite: 'strict',
             expires: new Date(session.expire),
-            secure: true,
             path: '/'
         })
 
