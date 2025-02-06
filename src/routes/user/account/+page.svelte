@@ -1,22 +1,18 @@
 <script lang="ts">
-    import { ID, Permission, Role, Storage } from 'appwrite'
+    import { ID } from 'appwrite'
     import { createSessionClient } from '$lib/browser/auth/appwrite'
     import Cropper from 'cropperjs'
     import mime2ext from 'mime2ext'
     import 'cropperjs/dist/cropper.css'
 
     let { data } = $props()
-    let user = data?.user
-    let currentUser = data?.currentUser
-    let session = data.session
+    let { user, currentUser, profileImageUrl, session } = data
+
     let selectedFile: File | null = null
     let previewUrl: string | null = $state(null)
     let cropper: Cropper | null = $state(null)
-    let profileUrl: string | null = $state(null)
 
-    const { client } = createSessionClient()
-    const theSession = client.setSession(session)
-    const storage = new Storage(theSession)
+    const { storage } = createSessionClient(session)
 
     // Handle file selection
     const handleFileSelect = (event: Event) => {
@@ -60,36 +56,26 @@
             .toBlob(async (blob) => {
                 // // Upload to server
                 if (blob) {
-                    const file = await storage.createFile(
-                        'profileImages',
-                        ID.unique(),
-                        new File([blob], `profile-${ID.unique()}.${mime2ext(blob.type)}`, {
+                    const _blobToFile = new File(
+                        [blob],
+                        `profile-${ID.unique()}.${mime2ext(blob.type)}`,
+                        {
                             type: blob.type
-                        }),
-                        [
-                            Permission.read(Role.user(currentUser.userId)),
-                            Permission.update(Role.user(currentUser.userId)),
-                            Permission.delete(Role.user(currentUser.userId)),
-                            Permission.read(Role.users())
-                        ]
+                        }
                     )
 
-                    if (file.$id) {
-                        try {
-                            const formData = new FormData()
-                            formData.append('userId', currentUser.userId)
-                            formData.append('file', file.$id)
+                    const file = await storage.getFile('profile-images', currentUser?.profileImage)
 
-                            const updatedProfile = await fetch('?/upload', {
-                                method: 'POST',
-                                body: formData
-                            })
-
-                            console.log(updatedProfile)
-                        } catch (e) {
-                            console.log('Error uploading profile image:', e)
-                        }
+                    // @ts-expect-error: if empty, Storage.getFile has a `total` property
+                    if (file.total === 0) {
+                        console.log('No file found')
                     }
+
+                    // We should use WASM file converter to convert the file to AVIF and store so we can just use storage.getFileView
+
+                    // Then we use storage.createFile to upload the file
+
+                    // Once file is created, we goto('/account') again to show the new avatar
                 }
             })
     }
@@ -99,7 +85,7 @@
     <li>
         <strong>Profile Image:</strong>
         {#if currentUser?.profileImage}
-            <img src={profileUrl} alt="Profile" class="profile-image" />
+            <img src={profileImageUrl} alt="Profile" class="profile-image" />
         {:else}
             <div class="image-placeholder">No image uploaded</div>
         {/if}
