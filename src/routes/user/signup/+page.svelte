@@ -1,10 +1,11 @@
 <script lang="ts">
+    import { enhance } from '$app/forms'
     import type { PageProps } from './$types'
 
     let { form }: PageProps = $props()
 </script>
 
-<form action="?/signup" method="post">
+<form action="?/signup" method="post" use:enhance>
     <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
         <legend class="prose lg:prose-md fieldset-legend mb-0 pb-0">Sign up</legend>
         {#if form?.success === false}

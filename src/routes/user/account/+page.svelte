@@ -1,104 +1,102 @@
 <script lang="ts">
-    import { ID } from 'appwrite'
-    import { createSessionClient } from '$lib/browser/auth/appwrite'
-    import Cropper from 'cropperjs'
+    import type { ComponentProps } from 'svelte'
+    import { ID, type Models } from 'appwrite'
     import mime2ext from 'mime2ext'
-    import 'cropperjs/dist/cropper.css'
+
+    import { createUserSessionClient } from '$lib/client/auth/appwrite.js'
+    import Cropper from '$lib/client/components/cropper/cropper.svelte'
 
     let { data } = $props()
-    let { user, currentUser, profileImageUrl, session } = data
+    let { user, profileImageUrls, session } = data
 
-    let selectedFile: File | null = null
-    let previewUrl: string | null = $state(null)
-    let cropper: Cropper | null = $state(null)
+    const { storage, database } = createUserSessionClient(session)
 
-    const { storage } = createSessionClient(session)
+    const deleteFiles = async () => {
+        const { files } = await storage.listFiles('profile-images', [], user?.$id)
 
-    // Handle file selection
-    const handleFileSelect = (event: Event) => {
-        const input = event.target as HTMLInputElement
-        if (input.files?.[0]) {
-            selectedFile = input.files[0]
-            previewUrl = URL.createObjectURL(selectedFile)
-
-            // Wait for next tick to ensure DOM updates
-            setTimeout(() => {
-                const image = document.getElementById('profile-image') as HTMLImageElement
-                if (!image) return
-
-                if (cropper) cropper.destroy()
-
-                cropper = new Cropper(image, {
-                    aspectRatio: 1,
-                    viewMode: 1,
-                    dragMode: 'move',
-                    autoCropArea: 1,
-                    minContainerWidth: 500,
-                    minContainerHeight: 500
-                })
-            }, 0)
+        if (files) {
+            await Promise.allSettled(
+                files
+                    .filter((result): result is Models.File => Boolean(result.$id))
+                    .map((result) => storage.deleteFile('profile-images', result.$id))
+            )
         }
     }
 
-    // Handle form submission
-    const handleUpload: HTMLButtonElement['onclick'] = async (e) => {
-        e.preventDefault()
-
-        if (!cropper || !selectedFile) return
-
-        // Get cropped data
-        cropper
-            .getCroppedCanvas({
-                width: 500,
-                height: 500,
-                imageSmoothingQuality: 'high'
+    const updateProfileImageDocument = async (userId: string, fileId: string | null) => {
+        try {
+            await database.updateDocument('main', 'profiles', userId, {
+                profileImage: fileId
             })
-            .toBlob(async (blob) => {
-                // // Upload to server
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    // Handle form submission.
+    const handleUpload: ComponentProps<typeof Cropper>['onCrop'] = async (blobs) => {
+        await Promise.all([deleteFiles(), updateProfileImageDocument(user?.$id, null)])
+        await Promise.all(
+            Object.keys(blobs).map((key) => {
+                const blob = blobs[key as keyof typeof blobs]
+
                 if (blob) {
-                    const _blobToFile = new File(
-                        [blob],
-                        `profile-${ID.unique()}.${mime2ext(blob.type)}`,
-                        {
-                            type: blob.type
-                        }
+                    const fileExtension = mime2ext(blob.type)
+                    const uniqueFilename = `profile-${ID.unique()}.${fileExtension}`
+
+                    const fileToUpload = new File([blob], uniqueFilename, {
+                        type: blob.type
+                    })
+
+                    return storage.createFile(
+                        'profile-images',
+                        `${user?.profileId}-${key}`,
+                        fileToUpload
                     )
-
-                    const file = await storage.getFile('profile-images', currentUser?.profileImage)
-
-                    // @ts-expect-error: if empty, Storage.getFile has a `total` property
-                    if (file.total === 0) {
-                        console.log('No file found')
-                    }
-
-                    // We should use WASM file converter to convert the file to AVIF and store so we can just use storage.getFileView
-
-                    // Then we use storage.createFile to upload the file
-
-                    // Once file is created, we goto('/account') again to show the new avatar
                 }
             })
+        )
+        await updateProfileImageDocument(user?.$id, user?.$id)
+
+        window.location.reload()
+    }
+
+    // Local state to control whether the Cropper is active.
+    let cropping = $state(false)
+    let cropperSrc = $state<string | null>(null)
+
+    // When the user clicks their profile image, set the cropper source.
+    function handleImageClick() {
+        if (profileImageUrls && profileImageUrls.length > 0) {
+            cropperSrc = profileImageUrls[0].url
+            cropping = true
+        }
     }
 </script>
 
 <ul>
     <li>
         <strong>Profile Image:</strong>
-        {#if currentUser?.profileImage}
-            <img src={profileImageUrl} alt="Profile" class="profile-image" />
-        {:else}
-            <div class="image-placeholder">No image uploaded</div>
-        {/if}
-
-        <div class="image-upload">
-            <input type="file" accept="image/*" onchange={handleFileSelect} id="fileInput" />
-            {#if previewUrl}
-                <div class="crop-container">
-                    <img id="profile-image" src={previewUrl} alt="Preview" />
-                </div>
-                <button onclick={handleUpload}>Upload</button>
+        {#if !cropping}
+            {#if profileImageUrls?.[0]?.url}
+                <picture>
+                    {#each profileImageUrls as image}
+                        <source srcset={image.url} type={`image/${image.mimeType}`} />
+                    {/each}
+                    <!-- The profile image now has an on:click handler -->
+                    <img src={profileImageUrls[0].url} alt="Profile" class="profile-image" />
+                    <button type="button" onclick={handleImageClick}>Edit</button>
+                </picture>
+            {:else}
+                <button class="image-placeholder" onclick={() => (cropping = true)}>
+                    No image uploaded
+                </button>
             {/if}
-        </div>
+        {/if}
+        {#if cropping}
+            <!-- Pass the existing profile image URL as the "src" prop -->
+            <Cropper onCrop={handleUpload} size={150} src={cropperSrc} useCredentials={true} />
+        {/if}
     </li>
     <li>
         <strong>Email:</strong>
@@ -110,7 +108,7 @@
     </li>
     <li>
         <strong>Username:</strong>
-        {currentUser?.username}
+        {user?.username}
     </li>
     <li>
         <strong>ID: </strong>
@@ -129,16 +127,6 @@
         height: 150px;
         border-radius: 50%;
         object-fit: cover;
-    }
-
-    .crop-container {
-        width: 500px;
-        height: 500px;
-        overflow: hidden;
-        margin: 1rem 0;
-    }
-
-    .image-upload {
-        margin: 1rem 0;
+        cursor: pointer;
     }
 </style>

@@ -11,7 +11,7 @@ import {
 export const COOKIE_NAME = PUBLIC_SESSION_COOKIE_PREFIX + PUBLIC_APPWRITE_PROJECT
 export const COOKIE_NAME_LEGACY = COOKIE_NAME + '_legacy'
 
-export const setSessionCookie = (cookies: Cookies, session: Models.Session) =>
+export const setSessionCookies = (cookies: Cookies, session: Models.Session) =>
     [COOKIE_NAME, COOKIE_NAME_LEGACY].forEach((cookieName) =>
         cookies.set(cookieName, session.secret, {
             httpOnly: true,
@@ -22,6 +22,14 @@ export const setSessionCookie = (cookies: Cookies, session: Models.Session) =>
             domain: PUBLIC_ORIGIN
         })
     )
+
+export const deleteSessionCookies = (cookies: Cookies) =>
+    [COOKIE_NAME, COOKIE_NAME_LEGACY].forEach((cookieName) =>
+        cookies.delete(cookieName, { path: '/' })
+    )
+
+export const getSessionCookie = (cookies: Cookies) =>
+    cookies.get(COOKIE_NAME) || cookies.get(COOKIE_NAME_LEGACY) || ''
 
 export function createPublicAccountClient() {
     const client = new Client()
@@ -76,7 +84,7 @@ export function accountClient() {
     }
 }
 
-export function createSessionClient({ cookies }: { cookies: Cookies }) {
+export function createUserSessionClient({ cookies }: { cookies: Cookies }) {
     const client = new Client()
         .setEndpoint(PUBLIC_APPWRITE_ENDPOINT)
         .setProject(PUBLIC_APPWRITE_PROJECT)

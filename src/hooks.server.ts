@@ -1,10 +1,10 @@
 // src/hooks.server.js
-import { createSessionClient } from '$lib/server/auth/appwrite'
+import { createUserSessionClient } from '$lib/server/auth/appwrite'
 
 export async function handle({ event, resolve }) {
     try {
         // Use our helper function to create the Appwrite client.
-        const { account } = createSessionClient(event)
+        const { account } = createUserSessionClient(event)
 
         // Store the current logged in user in locals,
         // for easy access in our other routes.

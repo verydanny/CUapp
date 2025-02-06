@@ -1,5 +1,5 @@
 import { fail } from '@sveltejs/kit'
-import { createAdminClient, setSessionCookie } from '$lib/server/auth/appwrite.js'
+import { createAdminClient, setSessionCookies } from '$lib/server/auth/appwrite.js'
 import { redirect } from '@sveltejs/kit'
 import { ID } from 'node-appwrite'
 
@@ -39,7 +39,7 @@ export const actions = {
                     account.createEmailPasswordSession(email, password)
                 ])
 
-                setSessionCookie(cookies, session)
+                setSessionCookies(cookies, session)
 
                 return {
                     success: true

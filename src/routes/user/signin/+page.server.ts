@@ -1,5 +1,5 @@
 import { fail } from '@sveltejs/kit'
-import { createAdminClient, setSessionCookie } from '$lib/server/auth/appwrite.js'
+import { createAdminClient, setSessionCookies } from '$lib/server/auth/appwrite.js'
 import { redirect } from '@sveltejs/kit'
 
 export const load = async ({ locals }) => {
@@ -28,7 +28,7 @@ export const actions = {
         const trySignin = async () => {
             try {
                 const session = await account.createEmailPasswordSession(email, password)
-                setSessionCookie(cookies, session)
+                setSessionCookies(cookies, session)
 
                 return {
                     success: true
