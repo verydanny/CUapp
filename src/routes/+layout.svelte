@@ -1,23 +1,22 @@
 <script lang="ts">
     import '../app.css'
-    let { children } = $props()
+    import Navbar from './(layout)/components/navbar.svelte'
+
+    let { children, data } = $props()
 </script>
 
-<div class="text-base-content container mx-auto min-h-screen p-4 md:p-6">
+<svelte:head>
+    <title>CUApp - Open Source Social Media Platform</title>
+    <meta
+        name="description"
+        content="CUApp is an open source social media platform that allows you to connect with your friends and family."
+    />
+</svelte:head>
+
+<Navbar profile={data.profile} />
+
+<div class="container mx-auto min-h-screen p-4">
     <main class="prose max-w-none">
         {@render children()}
     </main>
 </div>
-
-<style lang="css">
-    :global(*) {
-        box-sizing: border-box;
-    }
-
-    :global(body) {
-        font-family:
-            system-ui,
-            -apple-system,
-            sans-serif;
-    }
-</style>

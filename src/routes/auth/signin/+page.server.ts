@@ -43,8 +43,9 @@ export const actions = {
 
         const result = await trySignin()
 
+        // In the future, we should redirect to the feed.
         if (result.success) {
-            redirect(302, '/user/account')
+            redirect(302, '/')
         }
 
         return fail(400, result)

@@ -1,5 +1,7 @@
 // src/hooks.server.js
-import { createUserSessionClient } from '$lib/server/auth/appwrite'
+import { createAdminClient, createUserSessionClient } from '$lib/server/auth/appwrite'
+
+const { databases } = createAdminClient()
 
 export async function handle({ event, resolve }) {
     try {
@@ -9,6 +11,11 @@ export async function handle({ event, resolve }) {
         // Store the current logged in user in locals,
         // for easy access in our other routes.
         event.locals.user = await account.get()
+        event.locals.profile = await databases.getDocument(
+            'main',
+            'profiles',
+            event.locals.user.$id
+        )
     } catch {
         // Do nothing
     }

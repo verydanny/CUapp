@@ -3,14 +3,18 @@
     import type { PageProps } from './$types'
 
     let { form }: PageProps = $props()
+
+    $effect(() => {
+        console.log(form)
+    })
 </script>
 
-<form action="?/signin" method="post" use:enhance>
+<form action="?/signup" method="post" class="flex justify-center" use:enhance>
     <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
-        <legend class="prose lg:prose-md fieldset-legend mb-0 pb-0">Sign in</legend>
-        {#if form?.success === false}
+        <legend class="prose lg:prose-md fieldset-legend mb-0 pb-0">Sign up</legend>
+        {#if form?.type === 'failure'}
             <p class="text-error">
-                {form?.message}
+                {form?.data?.message}
             </p>
         {/if}
         <label class="fieldset-label" for="email">Email</label>
@@ -55,9 +59,14 @@
                 title="Must be more than 8 characters, including number, lowercase letter, uppercase letter"
             />
         </label>
-        <p class="validator-hint mb-2 hidden">Enter your password please</p>
+        <p class="validator-hint mb-2 hidden">
+            Must be more than 8 characters, including
+            <br />At least one number
+            <br />At least one lowercase letter
+            <br />At least one uppercase letter
+        </p>
 
-        <button type="submit" class="btn btn-primary mt-4">Sign in</button>
+        <button type="submit" class="btn btn-primary mt-4">Sign up</button>
     </fieldset>
 </form>
 

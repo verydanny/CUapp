@@ -4,7 +4,7 @@
     let { form }: PageProps = $props()
 </script>
 
-<form action="?/setUsername" method="post">
+<form action="?/setUsername" class="flex justify-center" method="post">
     <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
         <legend class="prose lg:prose-md fieldset-legend mb-0 pb-0">Set username</legend>
         {#if form?.success === false}

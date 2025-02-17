@@ -31,7 +31,7 @@ export const actions: ActionsExport = {
         const password = form.get('password')
 
         // Create the Appwrite client.
-        const { account, databases } = createAdminClient()
+        const { account, databases, users } = createAdminClient()
 
         if (typeof email !== 'string' || typeof password !== 'string') {
             return {
@@ -57,7 +57,7 @@ export const actions: ActionsExport = {
                 // Parallelize account creation and profile creation
                 const [, getSession] = await Promise.all([
                     databases.createDocument('main', 'profiles', userId, {
-                        userId
+                        permissions: []
                     }),
                     account.createEmailPasswordSession(email, password)
                 ])
@@ -67,17 +67,18 @@ export const actions: ActionsExport = {
                 return {
                     type: 'redirect',
                     status: 302,
-                    location: '/user/account'
+                    location: '/'
                 }
             } catch (err: unknown) {
                 deleteSessionCookies(cookies)
+                await users.delete(userId)
 
                 if (err instanceof AppwriteException) {
                     return {
                         type: 'failure',
                         status: 400,
                         data: {
-                            message: err.message
+                            message: 'Error creating account, user might already exist?'
                         }
                     }
                 }
