@@ -26,10 +26,10 @@ APPWRITE_KEY=your-secret-key
 **Sync the Appwrite collections with the following command:**
 
 ```bash
-bun run appwrite:push
+bun run appwrite:import
 ```
 
-
+**Install dependencies and run the development server:**
 
 ```bash
 bun install
