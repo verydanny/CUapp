@@ -70,9 +70,6 @@ export const actions: ActionsExport = {
                     location: '/'
                 }
             } catch (err: unknown) {
-                deleteSessionCookies(cookies)
-                await users.delete(userId)
-
                 if (err instanceof AppwriteException) {
                     return {
                         type: 'failure',
@@ -82,6 +79,9 @@ export const actions: ActionsExport = {
                         }
                     }
                 }
+
+                deleteSessionCookies(cookies)
+                await users.delete(userId)
 
                 return {
                     type: 'failure',

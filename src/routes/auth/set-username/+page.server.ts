@@ -30,6 +30,6 @@ export const actions = {
             username: username
         })
 
-        return redirect(302, '/user/account')
+        return redirect(302, '/')
     }
 }

@@ -1,5 +1,5 @@
 import { type Models, Query } from 'node-appwrite'
-import type { RequestEvent } from '@sveltejs/kit'
+import { redirect, type RequestEvent } from '@sveltejs/kit'
 import { createAdminClient } from './server/auth/appwrite'
 import { getProfileImageUrls } from './utils/imageUtils'
 
@@ -43,7 +43,9 @@ export async function fetchParamProfileData(
     const { profile: profileLocals, user } = locals
     const { profile: profileParam } = routeParams
 
-    if (profileParam === profileLocals?.username) {
+    if (!profileLocals?.username) redirect(302, '/auth/set-username')
+
+    if (profileLocals?.username === profileParam) {
         const profileData = await normalizeProfileData(profileLocals)
 
         return {
@@ -62,7 +64,7 @@ export async function fetchParamProfileData(
     )?.documents?.[0]
 
     const profileData = await normalizeProfileData(profile)
-    const canViewProfile = !profile?.permissions.includes('isPrivateProfile')
+    const canViewProfile = Boolean(!profile?.permissions.includes('isPrivateProfile'))
 
     return {
         ...profileData,
