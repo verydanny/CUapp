@@ -23,10 +23,26 @@ PUBLIC_APPWRITE_PROJECT=your-project-id
 APPWRITE_KEY=your-secret-key
 ```
 
-**Sync the Appwrite collections with the following command:**
+**Install Appwrite CLI:**
 
 ```bash
-bun run appwrite:import
+bun add -g appwrite-cli
+```
+
+**Modify the `.appwrite/appwrite.json` file to match your project.**
+
+```json
+{
+    "projectId": "your-project-id",
+    ...rest of the file
+}
+```
+
+**Sync the Appwrite project with the following command:**
+
+```bash
+cd .appwrite
+appwrite push all
 ```
 
 **Install dependencies and run the development server:**
