@@ -1,16 +1,30 @@
-import { fail } from '@sveltejs/kit'
-import { createAdminClient, setSessionCookies } from '$lib/server/auth/appwrite.js'
+import { type ActionResult, type RequestEvent } from '@sveltejs/kit'
+import {
+    createAdminClient,
+    deleteSessionCookies,
+    setSessionCookies
+} from '$lib/server/auth/appwrite.js'
 import { redirect } from '@sveltejs/kit'
-import { ID } from 'node-appwrite'
+import { AppwriteException, ID } from 'node-appwrite'
 
-export const load = async ({ locals }) => {
+import type { RouteParams, ActionsExport } from './$types'
+import { normalizeRedirect } from '$lib/utils/redirect'
+
+export const load = async ({
+    locals
+}: RequestEvent<RouteParams, '/user/signup'>): Promise<void> => {
     if (locals.user) {
         redirect(302, '/user/account')
     }
 }
 
-export const actions = {
-    signup: async ({ request, cookies }) => {
+export const actions: ActionsExport = {
+    signup: async ({
+        request,
+        cookies
+    }: RequestEvent<RouteParams, '/user/signup'>): Promise<
+        ActionResult<undefined, { message: string }>
+    > => {
         // Extract the form data.
         const form = await request.formData()
         const email = form.get('email')
@@ -20,44 +34,62 @@ export const actions = {
         const { account, databases } = createAdminClient()
 
         if (typeof email !== 'string' || typeof password !== 'string') {
-            return fail(400, {
-                success: false,
-                message: 'Missing email or password'
-            })
+            return {
+                type: 'failure',
+                status: 400,
+                data: {
+                    message: 'Missing email or password'
+                }
+            }
         }
 
-        const trySignup = async () => {
+        /**
+         * Try to sign up the user.
+         * @todo SCALING: Move this into Appwrite functions later, but no big deal until scaling.
+         * @returns {Promise<{ success: boolean, message?: string }>}
+         */
+        const trySignup = async (): Promise<ActionResult<undefined, { message: string }>> => {
+            const userId = ID.unique()
+
             try {
-                const userId = ID.unique()
                 await account.create(userId, email, password)
 
-                // Parallelize document creation and session creation
-                const [, session] = await Promise.all([
+                // Parallelize account creation and profile creation
+                const [, getSession] = await Promise.all([
                     databases.createDocument('main', 'profiles', userId, {
                         userId
                     }),
                     account.createEmailPasswordSession(email, password)
                 ])
 
-                setSessionCookies(cookies, session)
+                setSessionCookies(cookies, getSession)
 
                 return {
-                    success: true
+                    type: 'redirect',
+                    status: 302,
+                    location: '/user/account'
                 }
-            } catch {
+            } catch (err: unknown) {
+                deleteSessionCookies(cookies)
+
+                if (err instanceof AppwriteException) {
+                    return {
+                        type: 'failure',
+                        status: 400,
+                        data: {
+                            message: err.message
+                        }
+                    }
+                }
+
                 return {
-                    success: false,
-                    message: 'Failed to register user, sorry about that'
+                    type: 'failure',
+                    status: 500,
+                    data: { message: 'Internal server error' }
                 }
             }
         }
 
-        const result = await trySignup()
-
-        if (result.success) {
-            redirect(302, '/user/set-username')
-        }
-
-        return fail(400, result)
+        return normalizeRedirect(await trySignup())
     }
 }

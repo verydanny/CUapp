@@ -1,19 +1,11 @@
 @import 'tailwindcss';
 @plugin "@tailwindcss/typography";
 @plugin "@tailwindcss/aspect-ratio";
+
 @plugin 'daisyui' {
     themes:
-        cupcake --default,
-        dark --prefersdark,
-        night,
-        dracula,
-        synthwave,
-        dim,
-        abyss,
-        sunset;
+        light --default,
+        night --prefersdark;
     root: ':root';
-    /* include:;
-    exclude:;
-    prefix:; */
     logs: true;
 }

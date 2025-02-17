@@ -3,14 +3,18 @@
     import type { PageProps } from './$types'
 
     let { form }: PageProps = $props()
+
+    $effect(() => {
+        console.log(form)
+    })
 </script>
 
 <form action="?/signup" method="post" use:enhance>
     <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
         <legend class="prose lg:prose-md fieldset-legend mb-0 pb-0">Sign up</legend>
-        {#if form?.success === false}
+        {#if form?.type === 'failure'}
             <p class="text-error">
-                {form?.message}
+                {form?.data?.message}
             </p>
         {/if}
         <label class="fieldset-label" for="email">Email</label>
