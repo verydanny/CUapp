@@ -1,5 +1,6 @@
 <script lang="ts">
     import { enhance } from '$app/forms'
+    import { routes } from '$lib/const'
     import type { PageProps } from './$types'
 
     let { form }: PageProps = $props()
@@ -56,8 +57,9 @@
             />
         </label>
         <p class="validator-hint mb-2 hidden">Enter your password please</p>
-
         <button type="submit" class="btn btn-primary mt-4">Sign in</button>
+        <a href={routes?.auth?.signup} class="btn btn-link btn-sm">Don't have an account? Sign up</a
+        >
     </fieldset>
 </form>
 

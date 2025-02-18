@@ -7,7 +7,6 @@ declare global {
         // interface Error {}
         interface Locals {
             user: Models.User<Models.Preferences> | undefined
-            profile: Models.Document | undefined
         }
         // interface PageData {}
         // interface PageState {}

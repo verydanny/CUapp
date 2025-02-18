@@ -1,8 +1,17 @@
 // src/hooks.server.js
-import { createAdminClient, createUserSessionClient } from '$lib/server/auth/appwrite'
+import { createUserSessionClient } from '$lib/server/auth/appwrite'
 
-const { databases } = createAdminClient()
-
+/**
+ * This hook is used to create the Appwrite client and store the current logged in user in locals,
+ * for easy access in our other routes.
+ *
+ * WARNING: Please do not add lots of querying here because this is run on every request.
+ *          We want to keep the hooks as light as possible.
+ *
+ * @param event - The event object.
+ * @param resolve - The resolve function.
+ * @returns The event object.
+ */
 export async function handle({ event, resolve }) {
     try {
         // Use our helper function to create the Appwrite client.
@@ -11,11 +20,6 @@ export async function handle({ event, resolve }) {
         // Store the current logged in user in locals,
         // for easy access in our other routes.
         event.locals.user = await account.get()
-        event.locals.profile = await databases.getDocument(
-            'main',
-            'profiles',
-            event.locals.user.$id
-        )
     } catch {
         // Do nothing
     }

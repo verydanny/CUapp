@@ -1,11 +1,14 @@
-import { redirect } from '@sveltejs/kit'
-import { deleteSessionCookies } from '$lib/server/auth/appwrite.js'
+import { redirect, type RequestEvent } from '@sveltejs/kit'
+import { cleanupUserSession } from '$lib/server/auth/appwrite.js'
 
 import { createUserSessionClient } from '$lib/server/auth/appwrite.js'
 import { fetchParamProfileData } from '$lib/profile.js'
 
-export async function load({ params, locals }) {
-    return fetchParamProfileData(params, locals)
+import type { RouteParams } from './$types'
+import { routes } from '$lib/const'
+
+export async function load(event: RequestEvent<RouteParams, '/user/[profile]'>) {
+    return fetchParamProfileData(event)
 }
 
 // Define our log out endpoint/server action.
@@ -13,12 +16,9 @@ export const actions = {
     logout: async (event) => {
         // Create the Appwrite client.
         const { account } = createUserSessionClient(event)
-
-        // Delete the session on Appwrite, and delete the session cookie.
-        await account.deleteSession('current')
-        deleteSessionCookies(event.cookies)
+        await cleanupUserSession(event.cookies, account)
 
         // Redirect to the sign up page.
-        redirect(302, '/auth/signin')
+        redirect(302, routes?.auth?.signup)
     }
 }

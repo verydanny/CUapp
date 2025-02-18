@@ -6,8 +6,7 @@
     // import Cropper from '$lib/client/components/cropper/cropper.svelte'
 
     let { data } = $props()
-    let { user, profile, profileImageUrlsArray, canViewProfile } = data
-    let profileImageUrl = profileImageUrlsArray?.[0]
+    let { user, profile, canViewProfile } = data
 
     // const { storage, database } = createUserSessionClient(session)
 
@@ -64,13 +63,8 @@
     {#if canViewProfile}
         <figure class="relative">
             <picture>
-                {#if profileImageUrlsArray}
-                    {#each profileImageUrlsArray as image}
-                        <source srcset={image?.url} type={image?.mimeType} />
-                    {/each}
-                {/if}
                 <img
-                    src={profileImageUrl?.url}
+                    src={profile?.profileImage}
                     alt="Profile"
                     class="mx-auto mt-4 h-32 w-32 cursor-pointer rounded-full object-cover"
                 />

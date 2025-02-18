@@ -13,7 +13,7 @@
     />
 </svelte:head>
 
-<Navbar profile={data.profile} />
+<Navbar profile={data.profile} wasLoggedIn={data.wasLoggedIn} />
 
 <div class="container mx-auto min-h-screen p-4">
     <main class="prose max-w-none">

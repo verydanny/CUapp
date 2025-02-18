@@ -1,19 +1,7 @@
-import { normalizeProfileData } from '$lib/profile.js'
+import { fetchProfileFromLocals } from '$lib/profile.js'
 
-export async function load({ locals }) {
-    if (!locals.user) {
-        return {
-            profile: null,
-            profileImage: null
-        }
-    }
+import type { RequestEvent } from './$types'
 
-    const { profile, profileImageUrlsArray } = await normalizeProfileData(locals.profile)
-
-    return {
-        profile: {
-            username: profile?.username,
-            profileImage: profileImageUrlsArray?.[0]
-        }
-    }
+export async function load(requestEvent: RequestEvent) {
+    return fetchProfileFromLocals(requestEvent)
 }

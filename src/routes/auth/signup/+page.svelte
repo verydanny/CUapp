@@ -1,12 +1,9 @@
 <script lang="ts">
     import { enhance } from '$app/forms'
+    import { routes } from '$lib/const'
     import type { PageProps } from './$types'
 
     let { form }: PageProps = $props()
-
-    $effect(() => {
-        console.log(form)
-    })
 </script>
 
 <form action="?/signup" method="post" class="flex justify-center" use:enhance>
@@ -65,8 +62,10 @@
             <br />At least one lowercase letter
             <br />At least one uppercase letter
         </p>
-
         <button type="submit" class="btn btn-primary mt-4">Sign up</button>
+        <a href={routes?.auth?.signin} class="btn btn-link btn-sm"
+            >Already have an account? Sign in</a
+        >
     </fieldset>
 </form>
 

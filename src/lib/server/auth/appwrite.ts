@@ -23,13 +23,27 @@ export const setSessionCookies = (cookies: Cookies, session: Models.Session) =>
         })
     )
 
-export const deleteSessionCookies = (cookies: Cookies) =>
-    [COOKIE_NAME, COOKIE_NAME_LEGACY].forEach((cookieName) =>
-        cookies.delete(cookieName, { path: '/' })
-    )
+export const deleteSessionCookies = (cookies: Cookies) => {
+    cookies.delete(COOKIE_NAME, { path: '/' })
+    cookies.delete(COOKIE_NAME_LEGACY, { path: '/' })
+}
 
 export const getSessionCookie = (cookies: Cookies) =>
     cookies.get(COOKIE_NAME) || cookies.get(COOKIE_NAME_LEGACY) || ''
+
+export const cleanupUserSession = async (cookies: Cookies, account: Account) => {
+    await account.deleteSession('current')
+    deleteSessionCookies(cookies)
+
+    cookies.set('was_logged_in', 'true', {
+        httpOnly: true,
+        sameSite: 'strict',
+        // 10 Day expiration
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 10),
+        secure: true,
+        path: '/'
+    })
+}
 
 export function createPublicAccountClient() {
     const client = new Client()
