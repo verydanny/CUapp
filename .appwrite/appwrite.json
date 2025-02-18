@@ -10,11 +10,7 @@
     "collections": [
         {
             "$id": "profiles",
-            "$permissions": [
-                "create(\"users\")",
-                "read(\"users\")",
-                "update(\"users\")"
-            ],
+            "$permissions": ["create(\"users\")", "read(\"users\")", "update(\"users\")"],
             "databaseId": "main",
             "name": "profiles",
             "enabled": true,
@@ -37,15 +33,75 @@
                     "default": null
                 },
                 {
+                    "key": "permissions",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "elements": ["is_private_profile"],
+                    "format": "enum",
+                    "default": null
+                },
+                {
                     "key": "profileImage",
                     "type": "string",
                     "required": false,
-                    "array": false,
-                    "size": 32,
+                    "array": true,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "followers",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 120,
+                    "default": null
+                },
+                {
+                    "key": "following",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 120,
                     "default": null
                 }
             ],
-            "indexes": []
+            "indexes": [
+                {
+                    "key": "username_index",
+                    "type": "unique",
+                    "status": "available",
+                    "attributes": ["username"],
+                    "orders": ["ASC"]
+                }
+            ]
+        },
+        {
+            "$id": "profiles_username_map",
+            "$permissions": ["create(\"users\")", "read(\"users\")", "update(\"users\")"],
+            "databaseId": "main",
+            "name": "profiles_username_map",
+            "enabled": true,
+            "documentSecurity": true,
+            "attributes": [
+                {
+                    "key": "username",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                }
+            ],
+            "indexes": [
+                {
+                    "key": "username_index",
+                    "type": "unique",
+                    "status": "available",
+                    "attributes": ["username"],
+                    "orders": ["ASC"]
+                }
+            ]
         }
     ],
     "buckets": [
@@ -54,7 +110,8 @@
             "$permissions": [
                 "create(\"users\")",
                 "read(\"users\")",
-                "update(\"users\")"
+                "update(\"users\")",
+                "read(\"guests\")"
             ],
             "fileSecurity": true,
             "name": "profile-images",
@@ -64,6 +121,23 @@
             "compression": "none",
             "encryption": false,
             "antivirus": false
+        },
+        {
+            "$id": "documents_main",
+            "$permissions": [
+                "read(\"any\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")"
+            ],
+            "fileSecurity": false,
+            "name": "main Storage",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
         }
     ]
 }
