@@ -1,14 +1,10 @@
 import { type ActionResult, type RequestEvent } from '@sveltejs/kit'
-import {
-    cleanupUserSession,
-    createAdminClient,
-    setSessionCookies
-} from '$lib/server/auth/appwrite.js'
+import { cleanupUserSession, createAdminClient, setSessionCookies } from '$lib/server/appwrite.js'
 import { redirect } from '@sveltejs/kit'
 import { AppwriteException, ID, Permission, Role } from 'node-appwrite'
 
-import type { RouteParams, ActionsExport } from './$types'
-import { normalizeRedirect } from '$lib/utils/redirect'
+import type { RouteParams, ActionsExport } from './$types.ts'
+import { normalizeRedirect } from '$lib/utils/redirect.js'
 
 export const load = async ({
     locals

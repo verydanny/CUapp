@@ -1,4 +1,4 @@
-import { createBucketUrl } from './storageUtils'
+import { createBucketUrl } from './storageUtils.js'
 
 const priorityMap = {
     'image/avif': 'highest',

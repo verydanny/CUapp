@@ -1,5 +1,5 @@
 import { fail } from '@sveltejs/kit'
-import { createAdminClient, setSessionCookies } from '$lib/server/auth/appwrite.js'
+import { createAdminClient, setSessionCookies } from '$lib/server/appwrite.js'
 import { redirect } from '@sveltejs/kit'
 
 export const load = async ({ locals }) => {

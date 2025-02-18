@@ -1,7 +1,7 @@
 <script lang="ts">
     import { enhance } from '$app/forms'
     import { routes } from '$lib/const'
-    import type { PageProps } from './$types'
+    import type { PageProps } from './$types.ts'
 
     let { form }: PageProps = $props()
 </script>
@@ -58,7 +58,8 @@
         </label>
         <p class="validator-hint mb-2 hidden">Enter your password please</p>
         <button type="submit" class="btn btn-primary mt-4">Sign in</button>
-        <a href={routes?.auth?.signup} class="btn btn-link btn-sm">Don't have an account? Sign up</a
+        <a class="btn btn-link btn-sm" href={routes?.auth?.signup} data-sveltekit-preload-data
+            >Don't have an account? Sign up</a
         >
     </fieldset>
 </form>

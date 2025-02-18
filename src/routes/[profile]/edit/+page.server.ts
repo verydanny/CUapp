@@ -1,7 +1,7 @@
 import { redirect, type RequestEvent } from '@sveltejs/kit'
-import { fetchParamProfileData } from '$lib/profile.js'
+import { fetchParamProfileData } from '$lib/server/profile.js'
 
-import type { RouteParams } from './$types'
+import type { RouteParams } from './$types.ts'
 
 export async function load(event: RequestEvent<RouteParams, '/[profile]'>) {
     if (!event.locals.user) {

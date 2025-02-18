@@ -63,7 +63,7 @@
             <br />At least one uppercase letter
         </p>
         <button type="submit" class="btn btn-primary mt-4">Sign up</button>
-        <a href={routes?.auth?.signin} class="btn btn-link btn-sm"
+        <a class="btn btn-link btn-sm" href={routes?.auth?.signin} data-sveltekit-preload-data
             >Already have an account? Sign in</a
         >
     </fieldset>

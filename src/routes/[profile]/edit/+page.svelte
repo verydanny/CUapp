@@ -1,5 +1,5 @@
 <script lang="ts">
-    import ProfileImage from '$routes/(layout)/components/profileImage.svelte'
+    import ProfileImage from '$layout/components/profileImage.svelte'
 
     let { data } = $props()
     let { user, profile } = $derived(data)
@@ -15,8 +15,11 @@
             <form method="post" action="edit?/save">
                 <button type="submit" class="btn btn-outline btn-neutral">Save</button>
             </form>
-            <a role="button" href="/{profile?.username}" class="btn btn-outline btn-secondary"
-                >Cancel</a
+            <a
+                class="btn btn-outline btn-secondary"
+                role="button"
+                href="/{profile?.username}"
+                data-sveltekit-preload-data>Cancel</a
             >
         </div>
     </div>

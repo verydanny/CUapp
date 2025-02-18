@@ -1,5 +1,5 @@
 <script lang="ts">
-    import ProfileImage from '$routes/(layout)/components/profileImage.svelte'
+    import ProfileImage from '$layout/components/profileImage.svelte'
     // import type { ComponentProps } from 'svelte'
     // import { ID, type Models } from 'appwrite'
 
@@ -68,8 +68,10 @@
             <p class="text-sm text-gray-500">{user?.email}</p>
             {#if isUserCurrentlyLoggedIn}
                 <div class="card-actions mt-4 justify-end">
-                    <a href="/{profile?.username}/edit" class="btn btn-outline btn-neutral"
-                        >Settings</a
+                    <a
+                        class="btn btn-outline btn-neutral"
+                        href="/{profile?.username}/edit"
+                        data-sveltekit-preload-data>Settings</a
                     >
                     <form method="post" action="[profile]?/logout">
                         <button type="submit" class="btn btn-outline btn-secondary">Log out</button>

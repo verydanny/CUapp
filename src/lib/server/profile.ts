@@ -1,9 +1,9 @@
 import { Query } from 'node-appwrite'
 import { type RequestEvent } from '@sveltejs/kit'
-import { createAdminClient } from './server/auth/appwrite'
-import { getSingleProfileImageUrl } from './utils/imageUtils'
-import { getSingleDocumentByQuery } from './server/databaseHelpers'
-import { ADMIN_LABEL, IS_PRIVATE_PROFILE } from './const'
+import { createAdminClient } from './appwrite.js'
+import { getSingleProfileImageUrl } from '../appwrite-utils/imageUtils.js'
+import { getSingleDocumentByQuery } from '../appwrite-utils/databaseHelpers.js'
+import { ADMIN_LABEL, IS_PRIVATE_PROFILE } from '../const.js'
 
 const { databases } = createAdminClient()
 
@@ -46,7 +46,7 @@ export async function fetchProfileFromLocals({ locals, cookies }: RequestEvent) 
 export async function fetchParamProfileData({
     params,
     locals
-}: RequestEvent<import('../routes/[profile]/$types').RouteParams, '/[profile]'>) {
+}: RequestEvent<import('../../routes/[profile]/$types').RouteParams, '/[profile]'>) {
     const { user: loggedInUser } = locals
     const { profile: profileUsername } = params
 

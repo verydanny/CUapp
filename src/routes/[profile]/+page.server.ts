@@ -1,11 +1,11 @@
 import { redirect, type RequestEvent } from '@sveltejs/kit'
-import { cleanupUserSession } from '$lib/server/auth/appwrite.js'
+import { cleanupUserSession } from '$lib/server/appwrite.js'
 
-import { createUserSessionClient } from '$lib/server/auth/appwrite.js'
-import { fetchParamProfileData } from '$lib/profile.js'
+import { createUserSessionClient } from '$lib/server/appwrite.js'
+import { fetchParamProfileData } from '$lib/server/profile.js'
 
-import type { RouteParams } from './$types'
-import { routes } from '$lib/const'
+import type { RouteParams } from './$types.ts'
+import { routes } from '$lib/const.js'
 
 export async function load(event: RequestEvent<RouteParams, '/[profile]'>) {
     return fetchParamProfileData(event)

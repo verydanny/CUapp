@@ -11,6 +11,15 @@ export default defineConfig(({ mode }) => {
 
     return {
         plugins: [sveltekit(), tailwindcss()],
+        esbuild: {
+            target: 'esnext'
+        },
+        build: {
+            target: 'esnext',
+            modulePreload: {
+                polyfill: false
+            }
+        },
 
         // server: {
         //     hmr: {

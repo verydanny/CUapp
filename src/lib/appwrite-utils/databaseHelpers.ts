@@ -1,4 +1,4 @@
-import { createAdminClient } from '$lib/server/auth/appwrite.js'
+import { createAdminClient } from '$lib/server/appwrite.js'
 import { Databases, Query } from 'node-appwrite'
 
 export const isNotUniqueAttribute = async (

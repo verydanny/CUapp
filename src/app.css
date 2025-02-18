@@ -42,5 +42,5 @@
         dingus --default,
         night --prefersdark;
     root: ':root';
-    logs: true;
+    logs: false;
 }

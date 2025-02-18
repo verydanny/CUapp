@@ -1,5 +1,5 @@
 // src/hooks.server.js
-import { createUserSessionClient } from '$lib/server/auth/appwrite'
+import { createUserSessionClient } from '$lib/server/appwrite'
 
 /**
  * This hook is used to create the Appwrite client and store the current logged in user in locals,
