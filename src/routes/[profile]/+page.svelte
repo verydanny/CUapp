@@ -1,4 +1,5 @@
 <script lang="ts">
+    import ProfileImage from '$routes/(layout)/components/profileImage.svelte'
     // import type { ComponentProps } from 'svelte'
     // import { ID, type Models } from 'appwrite'
 
@@ -6,7 +7,7 @@
     // import Cropper from '$lib/client/components/cropper/cropper.svelte'
 
     let { data } = $props()
-    let { user, profile, canViewProfile } = data
+    let { user, profile, canViewProfile, isUserCurrentlyLoggedIn } = data
 
     // const { storage, database } = createUserSessionClient(session)
 
@@ -61,23 +62,20 @@
 <!-- User Profile Card using DaisyUI -->
 <div class="card bg-base-100">
     {#if canViewProfile}
-        <figure class="relative">
-            <picture>
-                <img
-                    src={profile?.profileImage}
-                    alt="Profile"
-                    class="mx-auto mt-4 h-32 w-32 cursor-pointer rounded-full object-cover"
-                />
-            </picture>
-        </figure>
+        <ProfileImage imageUrl={profile?.profileImage} />
         <div class="card-body">
             <h2 class="card-title mb-0">@{profile?.username}</h2>
             <p class="text-sm text-gray-500">{user?.email}</p>
-            <div class="card-actions mt-4 justify-end">
-                <form method="post" action="[profile]?/logout">
-                    <button type="submit" class="btn btn-primary">Log out</button>
-                </form>
-            </div>
+            {#if isUserCurrentlyLoggedIn}
+                <div class="card-actions mt-4 justify-end">
+                    <a href="/{profile?.username}/edit" class="btn btn-outline btn-neutral"
+                        >Settings</a
+                    >
+                    <form method="post" action="[profile]?/logout">
+                        <button type="submit" class="btn btn-outline btn-secondary">Log out</button>
+                    </form>
+                </div>
+            {/if}
         </div>
     {:else}
         <div class="card-body">

@@ -7,7 +7,7 @@ import { fetchParamProfileData } from '$lib/profile.js'
 import type { RouteParams } from './$types'
 import { routes } from '$lib/const'
 
-export async function load(event: RequestEvent<RouteParams, '/user/[profile]'>) {
+export async function load(event: RequestEvent<RouteParams, '/[profile]'>) {
     return fetchParamProfileData(event)
 }
 
