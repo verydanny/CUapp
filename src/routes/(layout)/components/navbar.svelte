@@ -1,8 +1,8 @@
 <script lang="ts">
     import { routes } from '$lib/const'
 
-    let { profileUI, wasLoggedIn } = $props<{
-        profileUI: {
+    let { profile, wasLoggedIn } = $props<{
+        profile: {
             username: string | null
             profileImage: string | null
         } | null
@@ -12,12 +12,12 @@
 
 <div class="navbar bg-base-100 relative">
     <!-- Left: User Profile Photo -->
-    {#if profileUI}
+    {#if profile}
         <div class="flex md:flex md:flex-3">
             <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
                 <div class="w-10 rounded-full">
-                    <a href={`/${profileUI?.username}`} data-sveltekit-preload-code="viewport">
-                        <img alt="Tailwind CSS Navbar component" src={profileUI?.profileImage} />
+                    <a href={`/${profile?.username}`} data-sveltekit-preload-code="viewport">
+                        <img alt="Tailwind CSS Navbar component" src={profile?.profileImage} />
                     </a>
                 </div>
             </div>
@@ -30,7 +30,7 @@
     </div>
 
     <!-- Right: Search Bar (takes remaining space) -->
-    {#if profileUI}
+    {#if profile}
         <div class="hidden justify-end md:flex md:flex-1">
             <input
                 type="text"

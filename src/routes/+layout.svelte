@@ -1,6 +1,6 @@
 <script lang="ts">
     import '../app.css'
-    import Navbar from './(layout)/components/navbar.svelte'
+    import Navbar from '$layout/components/navbar.svelte'
 
     let { children, data } = $props()
 </script>
@@ -13,7 +13,7 @@
     />
 </svelte:head>
 
-<Navbar profileUI={data.profileUI} wasLoggedIn={data.wasLoggedIn} />
+<Navbar profile={data.localsProfile} wasLoggedIn={data.wasLoggedIn} />
 
 <div class="container mx-auto min-h-screen p-4">
     <main class="max-w-none">

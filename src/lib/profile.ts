@@ -7,7 +7,11 @@ import { ADMIN_LABEL, IS_PRIVATE_PROFILE } from './const'
 
 const { databases } = createAdminClient()
 
-export async function getProfileById(id?: string) {
+export async function getProfileById(id?: string): Promise<{
+    username: string | null
+    profileImage: string | null
+    permissions: string[]
+}> {
     if (!id) {
         return {
             username: null,
@@ -34,7 +38,7 @@ export async function fetchProfileFromLocals({ locals, cookies }: RequestEvent) 
     const profile = await getProfileById(user?.$id)
 
     return {
-        profileUI: user ? profile : null,
+        localsProfile: user ? profile : null,
         wasLoggedIn
     }
 }

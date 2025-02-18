@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => {
     const _host = env?.VITE_HOST
 
     return {
-        plugins: [sveltekit(), tailwindcss()]
+        plugins: [sveltekit(), tailwindcss()],
 
         // server: {
         //     hmr: {
@@ -23,5 +23,8 @@ export default defineConfig(({ mode }) => {
         // test: {
         //     include: ['src/**/*.{test,spec}.{js,ts}']
         // }
+        optimizeDeps: {
+            include: ['clsx']
+        }
     }
 })
