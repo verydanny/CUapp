@@ -1,16 +1,29 @@
 import { type ActionResult, type RequestEvent } from '@sveltejs/kit'
-import { cleanupUserSession, createAdminClient, setSessionCookies } from '$lib/server/appwrite.js'
+import {
+    cleanupUserSession,
+    createAdminClient,
+    setSessionCookies
+} from '$lib/server/appwrite-utils/appwrite.js'
 import { redirect } from '@sveltejs/kit'
-import { AppwriteException, ID, Permission, Role } from 'node-appwrite'
+import { AppwriteException, ID } from 'node-appwrite'
 
 import type { RouteParams, ActionsExport } from './$types.ts'
 import { normalizeRedirect } from '$lib/utils/redirect.js'
+import {
+    adminCreateDocumentWithUserPermissions,
+    adminDeleteDocument
+} from '$lib/server/appwrite-utils/databaseHelpers.js'
+import { adminDeleteUser } from '$lib/server/appwrite-utils/userHelpers.js'
+import {
+    adminCreateEmailPasswordAccount,
+    adminCreateEmailPasswordSession
+} from '$lib/server/appwrite-utils/accountHelpers.js'
 
 export const load = async ({
     locals
 }: RequestEvent<RouteParams, '/user/signup'>): Promise<void> => {
     if (locals.user) {
-        redirect(302, '/user/account')
+        redirect(302, `/${locals?.profile?.username}`)
     }
 }
 
@@ -27,7 +40,7 @@ export const actions: ActionsExport = {
         const password = form.get('password')
 
         // Create the Appwrite client.
-        const { account, databases, users } = createAdminClient()
+        const { account } = createAdminClient()
 
         if (typeof email !== 'string' || typeof password !== 'string') {
             return {
@@ -48,43 +61,28 @@ export const actions: ActionsExport = {
             const userId = ID.unique()
 
             try {
-                await account.create(userId, email, password)
+                await adminCreateEmailPasswordAccount(userId, email, password)
 
                 // Parallelize account creation and profile creation
                 // When user first signs up, we create a profile for them. The username is the same as the userId initially.
                 const [, , getSession] = await Promise.all([
-                    databases.createDocument(
-                        'main',
-                        'profiles',
-                        userId,
-                        {
-                            username: userId,
-                            bio: null,
-                            permissions: [],
-                            profileImage: [],
-                            followers: [],
-                            following: [userId]
-                        },
-                        [
-                            Permission.read(Role.user(userId)),
-                            Permission.update(Role.user(userId)),
-                            Permission.delete(Role.user(userId))
-                        ]
-                    ),
-                    databases.createDocument(
+                    adminCreateDocumentWithUserPermissions('main', 'profiles', userId, {
+                        username: userId,
+                        bio: null,
+                        permissions: [],
+                        profileImage: [],
+                        followers: [],
+                        following: [userId]
+                    }),
+                    adminCreateDocumentWithUserPermissions(
                         'main',
                         'profiles_username_map',
                         userId,
                         {
                             username: userId
-                        },
-                        [
-                            Permission.read(Role.user(userId)),
-                            Permission.update(Role.user(userId)),
-                            Permission.delete(Role.user(userId))
-                        ]
+                        }
                     ),
-                    account.createEmailPasswordSession(email, password)
+                    adminCreateEmailPasswordSession(email, password)
                 ])
 
                 setSessionCookies(cookies, getSession)
@@ -95,12 +93,25 @@ export const actions: ActionsExport = {
                     location: '/'
                 }
             } catch (err: unknown) {
-                await Promise.allSettled([
+                Promise.allSettled([
                     cleanupUserSession(cookies, account),
-                    users.delete(userId)
+                    adminDeleteDocument('main', 'profiles', userId),
+                    adminDeleteDocument('main', 'profiles_username_map', userId),
+                    adminDeleteUser(userId)
                 ])
 
                 if (err instanceof AppwriteException) {
+                    if (err.code === 409 || err.type === 'user_already_exists') {
+                        return {
+                            type: 'failure',
+                            status: 400,
+                            data: {
+                                message:
+                                    'This email might already be in use, or the password is not secure enough'
+                            }
+                        }
+                    }
+
                     return {
                         type: 'failure',
                         status: 400,

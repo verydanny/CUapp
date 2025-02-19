@@ -24,14 +24,14 @@ export const getProfileImageUrls = (
             return {
                 ...acc,
                 [priority]: {
-                    url: file?.$id ? createBucketUrl('profile-images', file.$id) : null,
+                    url: file?.$id ? createBucketUrl('profile-images', file.$id) : undefined,
                     mimeType: file.mimeType
                 }
             }
         },
         {} as Record<
             'highest' | 'high' | 'medium' | 'low',
-            { url: string | null; mimeType: string }
+            { url: string | undefined; mimeType: string }
         >
     )
 

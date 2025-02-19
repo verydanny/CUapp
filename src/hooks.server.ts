@@ -1,5 +1,7 @@
 // src/hooks.server.js
-import { createUserSessionClient } from '$lib/server/appwrite'
+import { ADMIN_LABEL } from '$lib/const'
+import { createUserSessionClient } from '$lib/server/appwrite-utils/appwrite'
+import { getProfileById } from '$lib/server/profile'
 
 /**
  * This hook is used to create the Appwrite client and store the current logged in user in locals,
@@ -16,10 +18,23 @@ export async function handle({ event, resolve }) {
     try {
         // Use our helper function to create the Appwrite client.
         const { account } = createUserSessionClient(event)
+        const user = await account.get()
+        const profile = await getProfileById(user.$id)
+        const isProfileOwner = Boolean(event.params?.profile === profile?.username)
+        const userIsAdmin = Boolean(user?.labels?.includes(ADMIN_LABEL))
 
-        // Store the current logged in user in locals,
-        // for easy access in our other routes.
-        event.locals.user = await account.get()
+        event.locals.user = {
+            $id: user.$id,
+            name: user.name,
+            email: user.email,
+            phone: user.phone,
+            labels: user.labels,
+            userIsAdmin
+        }
+        event.locals.profile = {
+            ...profile,
+            isProfileOwner
+        }
     } catch {
         // Do nothing
     }
