@@ -1,7 +1,11 @@
-import { fetchProfileFromLocals } from '$lib/server/profile.js'
+import { fetchProfileFromLocals, type ProfileFromLocals } from '$lib/server/profile.js'
+import type { ServerLoadEvent } from '@sveltejs/kit'
+import type { LayoutRouteId } from './$types'
 
-import type { RequestEvent } from './$types.ts'
+import type { EmptyObject } from '$root/lib/types.d.ts'
 
-export async function load(requestEvent: RequestEvent) {
+export function load(
+    requestEvent: ServerLoadEvent<{ profile?: string }, EmptyObject, LayoutRouteId>
+): ProfileFromLocals {
     return fetchProfileFromLocals(requestEvent)
 }

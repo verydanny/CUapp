@@ -1,8 +1,10 @@
 <script lang="ts">
     import '../app.css'
-    import Navbar from '$layout/components/navbar.svelte'
+    import Navbar from './(layout)/components/navbar.svelte'
+    import type { Snippet } from 'svelte'
+    import type { ProfileFromLocals } from '$root/lib/server/profile'
 
-    let { children, data } = $props()
+    let { children, data }: { children: Snippet; data: ProfileFromLocals } = $props()
 </script>
 
 <svelte:head>
@@ -13,10 +15,10 @@
     />
 </svelte:head>
 
-<Navbar profile={data.loggedInProfile} wasLoggedIn={data.wasLoggedIn} />
+<Navbar {data} />
 
 <div class="container mx-auto min-h-screen p-4">
-    <main class="max-w-none">
+    <main class="mx-auto flex min-h-screen flex-col">
         {@render children()}
     </main>
 </div>

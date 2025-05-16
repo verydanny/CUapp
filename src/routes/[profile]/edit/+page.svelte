@@ -2,7 +2,7 @@
     import ProfileImage from '$layout/components/profileImage.svelte'
 
     let { data } = $props()
-    let { user, profile } = $derived(data)
+    let { profile, loggedInUser } = $derived(data)
 </script>
 
 <!-- User Profile Card using DaisyUI -->
@@ -10,7 +10,7 @@
     <ProfileImage imageUrl={profile?.profileImage} />
     <div class="card-body">
         <h2 class="card-title mb-0">@{profile?.username}</h2>
-        <p class="text-sm text-gray-500">{user?.email}</p>
+        <p class="text-sm text-gray-500">{loggedInUser?.email}</p>
         <div class="card-actions mt-4 justify-end">
             <form method="post" action="edit?/save">
                 <button type="submit" class="btn btn-outline btn-neutral">Save</button>

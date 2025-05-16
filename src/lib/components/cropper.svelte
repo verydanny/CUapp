@@ -1,19 +1,16 @@
 <script lang="ts">
     import { onMount } from 'svelte'
 
-    // Add 'src' to the component props.
-    const {
-        onCrop,
-        size = 300,
-        src = null,
-        useCredentials = false
-    } = $props<{
+    interface Props {
         // onCrop now receives an object whose keys are the format strings and values are Blobs.
         onCrop: (blobs: { avif?: Blob; webp?: Blob; png?: Blob }) => void | Promise<void>
         size?: number
         src?: string | null
         useCredentials?: boolean
-    }>()
+    }
+
+    // Add 'src' to the component props.
+    const { onCrop, size = 300, src = null, useCredentials = false }: Props = $props()
 
     let fileInput: HTMLInputElement
     let canvas: HTMLCanvasElement

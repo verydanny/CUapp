@@ -5,17 +5,17 @@ import { getSingleProfileImageUrl } from './appwrite-utils/imageUtils.js'
 import { adminGetSingleDocumentByQuery } from './appwrite-utils/databaseHelpers.js'
 import { routes, IS_PRIVATE_PROFILE } from '$lib/const.js'
 
-import type { BasicProfile } from '../../app.d.ts'
+import type { BasicProfile, UserWithAdmin } from '$root/app.d.ts'
 
 const { databases } = createAdminClient()
 
 export async function getProfileById(id?: string): Promise<BasicProfile> {
     if (!id) {
-        return {
+        throw {
             $id: undefined,
             username: undefined,
             profileImage: undefined,
-            isPrivateProfile: false
+            isPrivateProfile: undefined
         }
     }
 
@@ -23,23 +23,27 @@ export async function getProfileById(id?: string): Promise<BasicProfile> {
     const profileImage = getSingleProfileImageUrl(
         profile?.profileImage as (string | { $id: string; mimeType: string })[]
     )
+    const isPrivateProfile = profile?.permissions.includes(IS_PRIVATE_PROFILE)
 
     return {
         $id: profile?.$id,
         username: profile?.username,
         profileImage,
-        isPrivateProfile: profile?.permissions.includes(IS_PRIVATE_PROFILE)
+        isPrivateProfile
     }
 }
 
-export async function fetchProfileFromLocals({ locals, cookies }: RequestEvent) {
+export interface ProfileFromLocals {
+    loggedInUser: UserWithAdmin
+    loggedInProfile: BasicProfile
+}
+
+export function fetchProfileFromLocals({ locals }: RequestEvent): ProfileFromLocals {
     const { profile, user } = locals
-    const wasLoggedIn = Boolean(cookies.get('was_logged_in') === 'true')
 
     return {
-        loggedInProfile: profile ?? undefined,
-        loggedInUser: user ?? undefined,
-        wasLoggedIn
+        loggedInUser: user,
+        loggedInProfile: profile
     }
 }
 
@@ -67,10 +71,23 @@ const unpackSettledPromise = <T>(
     return null
 }
 
-export async function fetchParamProfileData({
+export interface ProfileData {
+    profile: {
+        isProfileOwner: boolean
+        followStatus: 'pending' | 'following' | null
+        canViewProfileDetails: boolean
+    } & BasicProfile
+}
+
+export async function fetchProfileData({
     params,
     locals
-}: RequestEvent<import('../../routes/[profile]/$types').RouteParams, '/[profile]'>) {
+}: RequestEvent<
+    | import('../../routes/[profile]/$types.d.ts').RouteParams
+    | import('../../routes/[profile]/edit/$types.d.ts').RouteParams,
+    '/[profile]' | '/[profile]/edit'
+>): Promise<ProfileData> {
+    console.log('fetchProfileData', locals, params)
     const { profile: loggedInProfile, user: loggedInUser } = locals ?? {}
     const { profile: profileParameter } = params
 
@@ -101,6 +118,7 @@ export async function fetchParamProfileData({
 
     const profile = unpackSettledPromise(profilePromise)
     const followStatus = getFollowStatus(followStatusPromise)
+    const canViewProfileDetails = isProfileOwner || userIsAdmin || followStatus === 'following'
 
     if (!profile) {
         return redirect(302, routes?.feed)
@@ -113,9 +131,11 @@ export async function fetchParamProfileData({
      */
 
     return {
-        profile,
-        canViewProfile: isProfileOwner || userIsAdmin || followStatus === 'following',
-        isProfileOwner,
-        followStatus
+        profile: {
+            ...profile,
+            isProfileOwner,
+            followStatus,
+            canViewProfileDetails
+        }
     }
 }

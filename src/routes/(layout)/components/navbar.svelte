@@ -1,52 +1,45 @@
 <script lang="ts">
     import { routes } from '$lib/const.js'
+    import type { ProfileFromLocals } from '$root/lib/server/profile'
 
-    let { profile, wasLoggedIn } = $props<{
-        profile: {
-            username: string | null
-            profileImage: string | null
-        } | null
-        wasLoggedIn: boolean
-    }>()
+    const { data }: { data: ProfileFromLocals } = $props()
+    const { loggedInProfile, loggedInUser } = $derived(data)
 </script>
 
-<div class="navbar bg-base-100 relative">
-    <!-- Left: User Profile Photo -->
-    {#if profile}
-        <div class="flex md:flex md:flex-3">
-            <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-                <div class="w-10 rounded-full">
-                    <a href={`/${profile?.username}`} data-sveltekit-preload-data>
-                        <img alt="Tailwind CSS Navbar component" src={profile?.profileImage} />
-                    </a>
+{#if loggedInProfile?.$id}
+    <div class="navbar bg-base-100 relative">
+        <!-- Left: User Profile Photo -->
+        {#if loggedInProfile?.$id}
+            <div class="flex flex-1">
+                <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+                    <div class="w-10 rounded-full">
+                        <a href={`/${loggedInProfile?.username}`} data-sveltekit-preload-data>
+                            <img
+                                alt="Tailwind CSS Navbar component"
+                                src={loggedInProfile?.profileImage}
+                            />
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
-    {/if}
+        {/if}
 
-    <!-- Center: Logo (absolutely centered) -->
-    <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <a class="btn btn-ghost pointer-events-auto text-xl" href="/" data-sveltekit-preload-data
-            >CUApp</a
-        >
-    </div>
-
-    <!-- Right: Search Bar (takes remaining space) -->
-    {#if profile}
-        <div class="hidden justify-end md:flex md:flex-1">
-            <input
-                type="text"
-                placeholder="Search"
-                class="input input-bordered w-full max-w-xs md:max-w-sm"
-            />
-        </div>
-    {:else}
+        <!-- Right: Search Bar (takes remaining space) -->
         <div class="flex flex-1 justify-end">
-            <a
-                class="btn btn-ghost pointer-events-auto text-sm"
-                href={wasLoggedIn ? routes?.auth?.signin : routes?.auth?.signup}
-                data-sveltekit-preload-data>{wasLoggedIn ? 'Sign In' : 'Sign Up'}</a
-            >
+            {#if loggedInProfile?.$id}
+                <input
+                    type="text"
+                    placeholder="Search"
+                    class="input input-bordered w-full max-w-xs md:max-w-sm"
+                />
+            {:else}
+                <a
+                    class="btn btn-ghost pointer-events-auto text-sm"
+                    href={loggedInUser?.wasLoggedIn ? routes?.auth?.signin : routes?.auth?.signup}
+                    data-sveltekit-preload-data
+                    >{loggedInUser?.wasLoggedIn ? 'Sign In' : 'Sign Up'}</a
+                >
+            {/if}
         </div>
-    {/if}
-</div>
+    </div>
+{/if}

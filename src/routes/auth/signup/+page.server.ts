@@ -22,7 +22,7 @@ import {
 export const load = async ({
     locals
 }: RequestEvent<RouteParams, '/user/signup'>): Promise<void> => {
-    if (locals.user) {
+    if (locals?.profile?.username) {
         redirect(302, `/${locals?.profile?.username}`)
     }
 }

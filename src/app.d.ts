@@ -4,11 +4,15 @@ import type { Models } from 'node-appwrite'
 
 export type User = Pick<User, '$id' | 'email' | 'name' | 'phone' | 'labels'>
 
+type WithUndefined<T> = {
+    [P in keyof T]: T[P] | undefined
+}
+
 export interface BasicProfile {
     $id: string | undefined
     username: string | undefined
     profileImage: string | undefined
-    isPrivateProfile: boolean
+    isPrivateProfile: boolean | undefined
 }
 
 export interface Profile extends BasicProfile {
@@ -16,16 +20,19 @@ export interface Profile extends BasicProfile {
 }
 
 export interface UserWithAdmin
-    extends Pick<Models.User<Models.Preferences>, '$id' | 'email' | 'name' | 'phone' | 'labels'> {
-    userIsAdmin: boolean
+    extends WithUndefined<
+        Pick<Models.User<Models.Preferences>, '$id' | 'email' | 'name' | 'phone' | 'labels'>
+    > {
+    userIsAdmin: boolean | undefined
+    wasLoggedIn: boolean
 }
 
 declare global {
     namespace App {
         // interface Error {}
         interface Locals {
-            user?: UserWithAdmin
-            profile?: Profile
+            user: UserWithAdmin
+            profile: Profile
         }
 
         interface Params {
@@ -36,5 +43,3 @@ declare global {
         // interface Platform {}
     }
 }
-
-export {}

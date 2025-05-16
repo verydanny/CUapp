@@ -18,7 +18,8 @@ const config = {
 
     kit: {
         alias: {
-            $layout: './src/routes/(layout)'
+            $layout: './src/routes/(layout)',
+            $root: './src'
         },
         // adapter-auto only supports some environments, see https://svelte.dev/docs/kit/adapter-auto for a list.
         // If your environment is not supported, or you settled on a specific environment, switch out the adapter.
@@ -30,13 +31,10 @@ const config = {
         //     }
         // })
 
-        adapter: adapter(),
-        csrf: {
-            checkOrigin: process.env.NODE_ENV === 'production'
-        }
+        adapter: adapter()
     },
 
-    extensions: ['.svelte', '.svx']
+    extensions: ['.svelte']
 }
 
 export default config

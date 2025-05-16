@@ -1,8 +1,9 @@
 @import 'tailwindcss';
-@plugin "@tailwindcss/typography";
-@plugin "@tailwindcss/aspect-ratio";
 
-@plugin "daisyui/theme" {
+/* @plugin "@tailwindcss/typography"; */
+/* @plugin "@tailwindcss/aspect-ratio"; */
+
+/* @plugin "daisyui/theme" {
     name: 'dingus';
     default: true;
     prefersdark: false;
@@ -35,11 +36,11 @@
     --border: 1px;
     --depth: 1;
     --noise: 0;
-}
+} */
 
 @plugin 'daisyui' {
     themes:
-        dingus --default,
+        light --default,
         night --prefersdark;
     root: ':root';
     logs: false;

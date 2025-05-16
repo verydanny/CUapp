@@ -4,7 +4,7 @@ import { redirect } from '@sveltejs/kit'
 import { adminCreateEmailPasswordSession } from '$lib/server/appwrite-utils/accountHelpers.js'
 
 export const load = async ({ locals }) => {
-    if (locals.user) {
+    if (locals?.profile?.username) {
         redirect(302, `/${locals?.profile?.username}`)
     }
 }

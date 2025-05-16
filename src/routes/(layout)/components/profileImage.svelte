@@ -1,16 +1,15 @@
 <script lang="ts">
-    let { imageUrl } = $props<{ imageUrl: string | undefined }>()
+    interface Props {
+        imageUrl?: string | undefined
+    }
+
+    let { imageUrl }: Props = $props()
 </script>
 
-<figure class="relative">
-    <picture>
+<div class="avatar avatar-online">
+    <div class="w-24 rounded-full">
         {#key imageUrl}
-            <img
-                src={imageUrl}
-                alt="Profile"
-                class="mx-auto mt-4 h-32 w-32 cursor-pointer rounded-full object-cover"
-                fetchpriority="high"
-            />
+            <img src={imageUrl} alt="Profile" fetchpriority="high" />
         {/key}
-    </picture>
-</figure>
+    </div>
+</div>
