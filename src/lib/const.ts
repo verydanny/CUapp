@@ -8,4 +8,4 @@ export const routes = {
     feed: '/feed'
 } as const
 
-export const ADMIN_LABEL = 'is_admin_user'
+export const ADMIN_LABEL = 'admin'

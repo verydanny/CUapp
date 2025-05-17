@@ -19,11 +19,11 @@ import {
     adminCreateEmailPasswordSession
 } from '$lib/server/appwrite-utils/accountHelpers.js'
 
-export const load = async ({
-    locals
-}: RequestEvent<RouteParams, '/user/signup'>): Promise<void> => {
-    if (locals?.profile?.username) {
-        redirect(302, `/${locals?.profile?.username}`)
+export const load = async ({ parent }) => {
+    const data = await parent()
+
+    if (data?.loggedInProfile?.username) {
+        redirect(302, `/${data?.loggedInProfile?.username}`)
     }
 }
 
@@ -65,23 +65,12 @@ export const actions: ActionsExport = {
 
                 // Parallelize account creation and profile creation
                 // When user first signs up, we create a profile for them. The username is the same as the userId initially.
-                const [, , getSession] = await Promise.all([
+                const [, getSession] = await Promise.all([
                     adminCreateDocumentWithUserPermissions('main', 'profiles', userId, {
                         username: userId,
                         bio: null,
-                        permissions: [],
-                        profileImage: [],
-                        followers: [],
-                        following: [userId]
+                        profileImage: []
                     }),
-                    adminCreateDocumentWithUserPermissions(
-                        'main',
-                        'profiles_username_map',
-                        userId,
-                        {
-                            username: userId
-                        }
-                    ),
                     adminCreateEmailPasswordSession(email, password)
                 ])
 
@@ -96,7 +85,6 @@ export const actions: ActionsExport = {
                 Promise.allSettled([
                     cleanupUserSession(cookies, account),
                     adminDeleteDocument('main', 'profiles', userId),
-                    adminDeleteDocument('main', 'profiles_username_map', userId),
                     adminDeleteUser(userId)
                 ])
 

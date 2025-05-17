@@ -12,7 +12,6 @@ export interface BasicProfile {
     $id: string | undefined
     username: string | undefined
     profileImage: string | undefined
-    isPrivateProfile: boolean | undefined
 }
 
 export interface Profile extends BasicProfile {
@@ -23,8 +22,8 @@ export interface UserWithAdmin
     extends WithUndefined<
         Pick<Models.User<Models.Preferences>, '$id' | 'email' | 'name' | 'phone' | 'labels'>
     > {
-    userIsAdmin: boolean | undefined
-    wasLoggedIn: boolean
+    userIsAdmin: boolean
+    userWasLoggedIn: boolean
 }
 
 declare global {
@@ -32,7 +31,7 @@ declare global {
         // interface Error {}
         interface Locals {
             user: UserWithAdmin
-            profile: Profile
+            // profile: Profile
         }
 
         interface Params {

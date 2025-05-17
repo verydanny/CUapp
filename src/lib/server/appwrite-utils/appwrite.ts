@@ -34,15 +34,6 @@ export const getSessionCookie = (cookies: Cookies) =>
 export const cleanupUserSession = async (cookies: Cookies, account: Account) => {
     await account.deleteSession('current')
     deleteSessionCookies(cookies)
-
-    cookies.set('was_logged_in', 'true', {
-        httpOnly: true,
-        sameSite: 'strict',
-        // 10 Day expiration
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 10),
-        secure: true,
-        path: '/'
-    })
 }
 
 export function createPublicAccountClient() {

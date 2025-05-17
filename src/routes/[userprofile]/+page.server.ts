@@ -1,20 +1,44 @@
 import { ID, Query } from 'node-appwrite'
-import { redirect, type RequestEvent } from '@sveltejs/kit'
+import { redirect } from '@sveltejs/kit'
 
 import { cleanupUserSession } from '$lib/server/appwrite-utils/appwrite.js'
 import { createUserSessionClient } from '$lib/server/appwrite-utils/appwrite.js'
-import { fetchProfileData } from '$lib/server/profile.js'
 import { routes } from '$lib/const.js'
 import {
     adminCreateDocumentWithUserPermissions,
     adminDeleteDocument,
     adminGetSingleDocumentByQuery
 } from '$lib/server/appwrite-utils/databaseHelpers.js'
+import { getProfileByUsername } from '$lib/server/profile'
 
-import type { RouteParams } from './$types.ts'
+export async function load({ parent, params }) {
+    const data = await parent()
+    /**
+     * Here we should establish permissions about viewing "this" current profile
+     *
+     * - Is there a logged in user?
+     * - Is the profile the logged in user's?
+     * - If not, is the logged in user following the profile?
+     * - Is the profile private?
+     * - Is the profile public?
+     * - Is the profile not found?
+     *
+     */
 
-export async function load(event: RequestEvent<RouteParams, '/[profile]'>) {
-    return fetchProfileData(event)
+    if (!data) {
+        const profile = await getProfileByUsername(params?.userprofile)
+
+        if (profile) {
+            return {
+                currentUserProfile: {
+                    ...profile,
+                    isProfileOwner: false
+                }
+            }
+        }
+    }
+
+    return data
 }
 
 // Define our log out endpoint/server action.

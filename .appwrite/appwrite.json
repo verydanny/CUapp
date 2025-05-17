@@ -75,33 +75,6 @@
                     "orders": ["ASC"]
                 }
             ]
-        },
-        {
-            "$id": "profiles_username_map",
-            "$permissions": ["create(\"users\")", "read(\"users\")", "update(\"users\")"],
-            "databaseId": "main",
-            "name": "profiles_username_map",
-            "enabled": true,
-            "documentSecurity": true,
-            "attributes": [
-                {
-                    "key": "username",
-                    "type": "string",
-                    "required": true,
-                    "array": false,
-                    "size": 255,
-                    "default": null
-                }
-            ],
-            "indexes": [
-                {
-                    "key": "username_index",
-                    "type": "unique",
-                    "status": "available",
-                    "attributes": ["username"],
-                    "orders": ["ASC"]
-                }
-            ]
         }
     ],
     "buckets": [

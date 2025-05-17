@@ -8,8 +8,9 @@
     // import Cropper from '$lib/client/components/cropper/cropper.svelte'
 
     const { data } = $props()
-    const { profile, loggedInUser } = $derived(data)
-    const { isProfileOwner, canViewProfileDetails, followStatus } = $derived(profile)
+    const { loggedInUser, loggedInProfile } = $derived(data)
+    // const { profile, loggedInUser } = $derived(data)
+    // const { isProfileOwner, canViewProfileDetails, followStatus } = $derived(profile)
     // const { storage, database } = createUserSessionClient(session)
 
     // const deleteFiles = async () => {
@@ -62,7 +63,7 @@
 
 <!-- User Profile Card using DaisyUI -->
 <div class="card bg-base-100 shadow-sm">
-    <div class="card-body">
+    <!-- <div class="card-body">
         <div class="flex justify-between">
             <ProfileImage imageUrl={profile?.profileImage} />
             <div class="flex flex-col justify-center">
@@ -102,5 +103,5 @@
         {:else}
             <p class="text-sm text-gray-500">This profile is private.</p>
         {/if}
-    </div>
+    </div> -->
 </div>

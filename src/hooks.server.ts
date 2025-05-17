@@ -1,7 +1,8 @@
 // src/hooks.server.js
+import { sequence } from '@sveltejs/kit/hooks'
+import type { Handle } from '@sveltejs/kit'
 import { ADMIN_LABEL } from '$lib/const'
 import { createUserSessionClient } from '$lib/server/appwrite-utils/appwrite'
-import { getProfileById } from '$lib/server/profile'
 
 /**
  * This hook is used to create the Appwrite client and store the current logged in user in locals,
@@ -14,8 +15,8 @@ import { getProfileById } from '$lib/server/profile'
  * @param resolve - The resolve function.
  * @returns The event object.
  */
-export async function handle({ event, resolve }) {
-    const wasLoggedIn = Boolean(event.cookies.get('was_logged_in') === 'true')
+export const userSessionHandler: Handle = async ({ event, resolve }) => {
+    const userWasLoggedIn = event.cookies.get('was_logged_in') === 'true'
 
     event.locals.user = {
         $id: undefined,
@@ -24,14 +25,7 @@ export async function handle({ event, resolve }) {
         phone: undefined,
         labels: undefined,
         userIsAdmin: false,
-        wasLoggedIn
-    }
-    event.locals.profile = {
-        $id: undefined,
-        username: undefined,
-        profileImage: undefined,
-        isPrivateProfile: undefined,
-        isProfileOwner: false
+        userWasLoggedIn
     }
 
     try {
@@ -39,10 +33,6 @@ export async function handle({ event, resolve }) {
         const { account } = createUserSessionClient(event)
 
         const user = await account.get()
-        const userIsAdmin = Boolean(user?.labels?.includes(ADMIN_LABEL))
-
-        const profile = await getProfileById(user.$id)
-        const isProfileOwner = Boolean(event.params?.profile === profile?.username)
 
         event.locals.user = {
             ...event.locals.user,
@@ -51,13 +41,7 @@ export async function handle({ event, resolve }) {
             email: user.email,
             phone: user.phone,
             labels: user.labels,
-            userIsAdmin,
-            wasLoggedIn
-        }
-        event.locals.profile = {
-            ...event.locals.profile,
-            ...profile,
-            isProfileOwner
+            userIsAdmin: user?.labels?.includes(ADMIN_LABEL)
         }
     } catch {
         // do nothing maybe Sentry error later
@@ -66,3 +50,15 @@ export async function handle({ event, resolve }) {
     // Continue with the request.
     return resolve(event)
 }
+
+export const chromeDevToolsSilencer: Handle = async ({ event, resolve }) => {
+    // Suppress well-known Chrome DevTools requests
+
+    if (event.url.pathname.startsWith('/.well-known/appspecific/com.chrome.devtools')) {
+        return new Response(null, { status: 204 }) // Return empty response with 204 No Content
+    }
+
+    return await resolve(event)
+}
+
+export const handle = sequence(userSessionHandler, chromeDevToolsSilencer)
