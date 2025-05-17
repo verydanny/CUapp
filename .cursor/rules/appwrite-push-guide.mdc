@@ -1,0 +1,35 @@
+---
+description: Guide interaction with appwrite push collections terminal prompt
+globs: .appwrite/appwrite.json
+tags: [appwrite, cli, deployment]
+priority: 2
+version: 1.0.0
+---
+
+# Appwrite Push Collections Guide
+
+## Context
+- This rule provides specific guidance for interacting with the `appwrite push collections` interactive terminal prompt.
+- Apply this rule when the user is performing an Appwrite collection push via the CLI.
+
+## Requirements
+- **Navigate Selection:** Instruct the user to use arrow keys to navigate the collection list.
+- **Select Collections:** Guide the user to press the spacebar to select the desired new/modified collections.
+- **Confirm:** Instruct the user to press Enter to proceed after selection.
+- **Confirm Updates:** If prompted about existing collections, guide the user to confirm the update.
+- **Verify Directory:** Crucially, remind the user to ensure they are in the `.appwrite` directory before running the command.
+
+## Examples
+<example>
+  description: AI guides user through selecting collections in the prompt
+  ```
+Okay, the appwrite push collections prompt should be showing a list of collections. Use the arrow keys to navigate and the spacebar to select your new collection(s). Press Enter when ready.
+  ```
+</example>
+
+<example type="invalid">
+  description: AI does not provide guidance on interacting with the prompt
+  ```
+Run appwrite push collections.
+  ```
+</example>
