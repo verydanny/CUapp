@@ -11,5 +11,5 @@ const config = {
         name: '@storybook/sveltekit',
         options: {}
     }
-}
-export default config
+};
+export default config;

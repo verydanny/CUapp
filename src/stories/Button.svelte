@@ -1,5 +1,5 @@
 <script>
-    import './button.css'
+    import './button.css';
 
     /**
      * @typedef {Object} Props
@@ -11,7 +11,7 @@
      */
 
     /** @type {Props} */
-    const { primary = false, backgroundColor, size = 'medium', label, onClick } = $props()
+    const { primary = false, backgroundColor, size = 'medium', label, onClick } = $props();
 </script>
 
 <button

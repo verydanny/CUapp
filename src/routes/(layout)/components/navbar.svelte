@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { routes } from '$lib/const.js'
-    import type { PageData } from '$types/routes/$types.d.ts'
+    import { routes } from '$lib/const.js';
+    import type { PageData } from '$types/routes/$types.d.ts';
 
-    const { loggedInProfile, loggedInUser }: PageData = $props()
+    const { loggedInProfile, loggedInUser }: PageData = $props();
 </script>
 
 <div class="navbar bg-base-100 relative">

@@ -1,13 +1,13 @@
-let modalState = $state<HTMLElement[]>([])
+let modalState = $state<HTMLElement[]>([]);
 
 export function setModal(modal: HTMLElement) {
-    modalState.push(modal)
+    modalState.push(modal);
 }
 
 export function getModal() {
-    return modalState
+    return modalState;
 }
 
 export function removeModal(modal: HTMLElement) {
-    modalState = modalState.filter((m) => m !== modal)
+    modalState = modalState.filter((m) => m !== modal);
 }

@@ -1,13 +1,13 @@
-import { defineConfig } from 'vite'
-import { sveltekit } from '@sveltejs/kit/vite'
-import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from 'vite';
+import { sveltekit } from '@sveltejs/kit/vite';
+import tailwindcss from '@tailwindcss/vite';
 
-import { loadEnv } from 'vite'
+import { loadEnv } from 'vite';
 
 export default defineConfig(({ mode }) => {
-    const env = loadEnv(mode, process.cwd())
-    const _clientPort = Number(env?.VITE_HMR_PORT) || 443
-    const _host = env?.VITE_HOST
+    const env = loadEnv(mode, process.cwd());
+    const _clientPort = Number(env?.VITE_HMR_PORT) || 443;
+    const _host = env?.VITE_HOST;
 
     return {
         plugins: [sveltekit(), tailwindcss()],
@@ -40,21 +40,13 @@ export default defineConfig(({ mode }) => {
             }
         },
 
-        // Faster dependency optimization
-        optimizeDeps: {
-            exclude: [], // Dependencies that should not be pre-bundled
-            esbuildOptions: {
-                target: 'esnext',
-                supported: {
-                    bigint: true,
-                    'import-meta': true
-                }
-            }
-        },
-
         // Faster resolve operations
         resolve: {
             extensions: ['.svelte', '.js', '.ts'] // Limit file extensions to search
+        },
+
+        test: {
+            include: ['src/**/*.{test,spec}.{js,ts}']
         }
 
         // server: {
@@ -64,9 +56,5 @@ export default defineConfig(({ mode }) => {
         //     },
         //     origin: `https://${host}`
         // }
-
-        // test: {
-        //     include: ['src/**/*.{test,spec}.{js,ts}']
-        // }
-    }
-})
+    };
+});

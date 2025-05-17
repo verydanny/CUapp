@@ -1,8 +1,8 @@
 <script>
-    import './page.css'
-    import Header from './Header.svelte'
+    import './page.css';
+    import Header from './Header.svelte';
 
-    let user = $state(null)
+    let user = $state(null);
 </script>
 
 <article>
@@ -47,9 +47,9 @@
                 Storybook tutorials
             </a>
             . Read more in the
-            <a href="https://storybook.js.org/docs" target="_blank" rel="noopener noreferrer"
-                >docs</a
-            >
+            <a href="https://storybook.js.org/docs" target="_blank" rel="noopener noreferrer">
+                docs
+            </a>
             .
         </p>
         <div class="tip-wrapper">
@@ -63,7 +63,7 @@
             010-1zm0-2.1h9c.3 0 .5.2.5.4v9.1a.5.5 0 01-1 0V2H1.5a.5.5 0 010-1zm4.3 5.2H2V10h3.8V6.2z"
                         id="a"
                         fill="#999"
-                    />
+                    ></path>
                 </g>
             </svg>
             Viewports addon in the toolbar

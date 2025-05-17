@@ -78,90 +78,106 @@
                     "type": "string",
                     "required": true,
                     "array": false,
-                    "size": 255
+                    "size": 255,
+                    "default": null
                 },
                 {
                     "key": "createdAt",
                     "type": "datetime",
                     "required": true,
-                    "array": false
+                    "array": false,
+                    "format": "",
+                    "default": null
                 },
                 {
                     "key": "updatedAt",
                     "type": "datetime",
                     "required": true,
-                    "array": false
+                    "array": false,
+                    "format": "",
+                    "default": null
                 },
                 {
                     "key": "type",
                     "type": "string",
                     "required": true,
                     "array": false,
-                    "size": 50,
                     "elements": ["image", "text", "blog", "video", "imessage"],
-                    "format": "enum"
+                    "format": "enum",
+                    "default": null
                 },
                 {
                     "key": "tags",
                     "type": "string",
                     "required": false,
                     "array": true,
-                    "size": 50
+                    "size": 50,
+                    "default": null
                 },
                 {
                     "key": "likesCount",
                     "type": "integer",
                     "required": true,
-                    "array": false
+                    "array": false,
+                    "min": -9223372036854775808,
+                    "max": 9223372036854775807,
+                    "default": null
                 },
                 {
                     "key": "commentsCount",
                     "type": "integer",
                     "required": true,
-                    "array": false
+                    "array": false,
+                    "min": -9223372036854775808,
+                    "max": 9223372036854775807,
+                    "default": null
                 },
                 {
                     "key": "status",
                     "type": "string",
                     "required": true,
                     "array": false,
-                    "size": 20,
                     "elements": ["published", "draft", "archived"],
-                    "format": "enum"
+                    "format": "enum",
+                    "default": null
                 },
                 {
                     "key": "accessLevel",
                     "type": "string",
                     "required": true,
                     "array": false,
-                    "size": 20,
                     "elements": ["public", "private", "followers", "mutuals", "unlisted", "team"],
-                    "format": "enum"
+                    "format": "enum",
+                    "default": null
                 },
                 {
                     "key": "contentRefId",
                     "type": "string",
                     "required": false,
                     "array": false,
-                    "size": 255
+                    "size": 255,
+                    "default": null
                 }
             ],
             "indexes": [
                 {
                     "key": "user_created_index",
                     "type": "key",
+                    "status": "available",
                     "attributes": ["userId", "createdAt"],
                     "orders": ["DESC", "DESC"]
                 },
                 {
                     "key": "type_index",
                     "type": "key",
+                    "status": "available",
                     "attributes": ["type"],
                     "orders": ["ASC"]
                 },
                 {
                     "key": "access_level_index",
                     "type": "key",
+                    "status": "available",
                     "attributes": ["accessLevel"],
                     "orders": ["ASC"]
                 }
@@ -185,29 +201,40 @@
                     "type": "string",
                     "required": true,
                     "array": false,
-                    "size": 255
+                    "size": 255,
+                    "default": null
                 },
                 {
                     "key": "name",
                     "type": "string",
                     "required": true,
                     "array": false,
-                    "size": 255
+                    "size": 255,
+                    "default": null
                 },
                 {
                     "key": "avatarFileId",
                     "type": "string",
                     "required": false,
                     "array": false,
-                    "size": 255
+                    "size": 255,
+                    "default": null
                 }
             ],
             "indexes": [
                 {
                     "key": "user_index",
                     "type": "key",
+                    "status": "available",
                     "attributes": ["userId"],
                     "orders": ["ASC"]
+                },
+                {
+                    "key": "user_name_unique_index",
+                    "type": "unique",
+                    "status": "available",
+                    "attributes": ["userId", "name"],
+                    "orders": ["ASC", "ASC"]
                 }
             ]
         },
@@ -229,40 +256,56 @@
                     "type": "string",
                     "required": true,
                     "array": false,
-                    "size": 255
+                    "size": 255,
+                    "default": null
                 },
                 {
                     "key": "participantDocRefs",
                     "type": "string",
                     "required": true,
                     "array": true,
-                    "size": 255
+                    "size": 255,
+                    "default": null
                 },
                 {
                     "key": "rightSideParticipantDocRef",
                     "type": "string",
                     "required": true,
                     "array": false,
-                    "size": 255
+                    "size": 255,
+                    "default": null
                 },
                 {
                     "key": "screenshotMessageIds",
                     "type": "string",
                     "required": true,
                     "array": true,
-                    "size": 100000
+                    "size": 100000,
+                    "default": null
                 },
                 {
                     "key": "totalScreenshots",
                     "type": "integer",
                     "required": true,
-                    "array": false
+                    "array": false,
+                    "min": -9223372036854775808,
+                    "max": 9223372036854775807,
+                    "default": null
+                },
+                {
+                    "key": "conversationId",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
                 }
             ],
             "indexes": [
                 {
                     "key": "post_id_unique_index",
                     "type": "unique",
+                    "status": "available",
                     "attributes": ["postId"],
                     "orders": ["ASC"]
                 }
@@ -286,80 +329,127 @@
                     "type": "string",
                     "required": true,
                     "array": false,
-                    "size": 255
+                    "size": 255,
+                    "default": null
                 },
                 {
                     "key": "messageId",
                     "type": "string",
                     "required": true,
                     "array": false,
-                    "size": 255
+                    "size": 255,
+                    "default": null
                 },
                 {
                     "key": "participantDocId",
                     "type": "string",
                     "required": true,
                     "array": false,
-                    "size": 255
+                    "size": 255,
+                    "default": null
                 },
                 {
                     "key": "content",
                     "type": "string",
                     "required": true,
                     "array": false,
-                    "size": 10000
+                    "size": 10000,
+                    "default": null
                 },
                 {
                     "key": "timestamp",
                     "type": "datetime",
                     "required": true,
-                    "array": false
+                    "array": false,
+                    "format": "",
+                    "default": null
                 },
                 {
                     "key": "timestampDisplay",
                     "type": "string",
                     "required": false,
                     "array": false,
-                    "size": 50
+                    "size": 50,
+                    "default": null
                 },
                 {
                     "key": "isEdited",
                     "type": "boolean",
                     "required": true,
-                    "array": false
+                    "array": false,
+                    "default": null
                 },
                 {
                     "key": "screenshotIndex",
                     "type": "integer",
                     "required": true,
-                    "array": false
+                    "array": false,
+                    "min": -9223372036854775808,
+                    "max": 9223372036854775807,
+                    "default": null
                 },
                 {
                     "key": "deliveryStatus",
                     "type": "string",
                     "required": false,
                     "array": false,
-                    "size": 20,
                     "elements": ["sent", "delivered", "read"],
-                    "format": "enum"
+                    "format": "enum",
+                    "default": null
+                },
+                {
+                    "key": "messageType",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "elements": ["text", "image"],
+                    "format": "enum",
+                    "default": "text"
+                },
+                {
+                    "key": "imageUrl",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 2048,
+                    "default": null
+                },
+                {
+                    "key": "imageFileId",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "imageAltText",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 500,
+                    "default": null
                 }
             ],
             "indexes": [
                 {
                     "key": "conversation_screenshot_index",
                     "type": "key",
+                    "status": "available",
                     "attributes": ["conversationId", "screenshotIndex"],
                     "orders": ["ASC", "ASC"]
                 },
                 {
                     "key": "conversation_timestamp_index",
                     "type": "key",
+                    "status": "available",
                     "attributes": ["conversationId", "timestamp"],
                     "orders": ["ASC", "ASC"]
                 },
                 {
                     "key": "conversation_message_unique_index",
                     "type": "unique",
+                    "status": "available",
                     "attributes": ["conversationId", "messageId"],
                     "orders": ["ASC", "ASC"]
                 }

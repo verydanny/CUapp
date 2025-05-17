@@ -1,7 +1,7 @@
-import { createAdminClient } from '$lib/server/appwrite-utils/appwrite.js'
-import { Permission, Query, Role, type Models } from 'node-appwrite'
+import { createAdminClient } from '$lib/server/appwrite-utils/appwrite.js';
+import { Permission, Query, Role, type Models } from 'node-appwrite';
 
-const { databases } = createAdminClient()
+const { databases } = createAdminClient();
 
 export const isNotUniqueAttribute = async (
     database: string,
@@ -11,10 +11,10 @@ export const isNotUniqueAttribute = async (
 ): Promise<boolean> => {
     const existingUsers = await databases.listDocuments(database, collection, [
         Query.equal(attribute, value)
-    ])
+    ]);
 
-    return existingUsers?.documents?.length > 0
-}
+    return existingUsers?.documents?.length > 0;
+};
 
 export const isUniqueAttribute = async (
     database: string,
@@ -22,18 +22,18 @@ export const isUniqueAttribute = async (
     attribute: string,
     value: string
 ): Promise<boolean> => {
-    return !isNotUniqueAttribute(database, collection, attribute, value)
-}
+    return !isNotUniqueAttribute(database, collection, attribute, value);
+};
 
 export const adminGetSingleDocumentByQuery = async (
     databaseId: string,
     collectionId: string,
     queries: string[]
 ): Promise<Models.Document | null> => {
-    const singleDocument = await databases.listDocuments(databaseId, collectionId, queries)
+    const singleDocument = await databases.listDocuments(databaseId, collectionId, queries);
 
-    return singleDocument?.documents?.[0] || null
-}
+    return singleDocument?.documents?.[0] || null;
+};
 
 export const adminCreateDocumentWithUserPermissions = async (
     databaseId: string,
@@ -47,23 +47,23 @@ export const adminCreateDocumentWithUserPermissions = async (
             Permission.read(Role.user(userId)),
             Permission.update(Role.user(userId)),
             Permission.delete(Role.user(userId))
-        ])
+        ]);
     }
 
     return databases.createDocument(databaseId, collectionId, documentId, document, [
         Permission.read(Role.user(documentId)),
         Permission.update(Role.user(documentId)),
         Permission.delete(Role.user(documentId))
-    ])
-}
+    ]);
+};
 
 export const adminDeleteDocument = async (
     databaseId: string,
     collectionId: string,
     documentId: string
 ) => {
-    return databases.deleteDocument(databaseId, collectionId, documentId)
-}
+    return databases.deleteDocument(databaseId, collectionId, documentId);
+};
 
 export const adminUpdateDocument = async (
     databaseId: string,
@@ -71,5 +71,5 @@ export const adminUpdateDocument = async (
     documentId: string,
     document: Record<string, unknown>
 ) => {
-    return databases.updateDocument(databaseId, collectionId, documentId, document)
-}
+    return databases.updateDocument(databaseId, collectionId, documentId, document);
+};

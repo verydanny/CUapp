@@ -1,4 +1,4 @@
-import { type ActionResult, redirect } from '@sveltejs/kit'
+import { type ActionResult, redirect } from '@sveltejs/kit';
 
 export const normalizeRedirect = <
     SuccessMessage extends Record<string, unknown> | undefined,
@@ -7,8 +7,8 @@ export const normalizeRedirect = <
     action: ActionResult<SuccessMessage, ErrorMessage>
 ): ActionResult<SuccessMessage, ErrorMessage> => {
     if (action.type === 'redirect') {
-        return redirect(action.status, action.location)
+        return redirect(action.status, action.location);
     }
 
-    return action
-}
+    return action;
+};

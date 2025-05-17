@@ -1,0 +1,201 @@
+---
+description: Enforce Svelte 5 runes best practices for clarity, performance, and correctness.
+globs: **/*.svelte, **/+page.svelte, **/+layout.svelte
+tags: [svelte, runes, reactivity, best-practices, linting]
+priority: 1
+version: 1.0.1 
+alwaysApply: false
+---
+
+# Svelte 5 Runes Usage Standards
+
+## Context
+
+- This rule defines best practices for using Svelte 5 runes (`$state`, `$props`, `$derived`, `$effect`, etc.) to ensure code clarity, maintainability, performance, and correctness across the project.
+- Apply this rule when writing or reviewing any Svelte component files (`.svelte`).
+
+## Requirements
+
+### 1. Project Configuration
+
+- If the project uses `compilerOptions: { runes: true }` in `svelte.config.js` (global runes mode):
+    - Props **must** be declared using `$props()`.
+    - `export let` for props is **disallowed**.
+    - `<svelte:options runes={false} />` **cannot** be used to opt-out individual components.
+
+### 2. Props Declaration
+
+- Always use `const { /* prop names */ } = $props<PropType>();` for prop declaration.
+- Provide clear TypeScript types for props, adhering to `typescript-typing-standards.mdc`. Avoid `any` where possible.
+
+### 3. Local Reactive State
+
+- Use `let myValue = $state(initialValue);` for component-level mutable state that should trigger reactivity.
+
+### 4. Derived State (`$derived` and `$derived.by()`)
+
+- **Simple Expressions:** For straightforward, single-expression derivations, `$derived(expression)` is acceptable.
+    - Example: `let double = $derived(count * 2);`
+    - The expression must be free of side-effects. State changes (e.g., `count++`) are disallowed directly within `$derived(expression)`.
+- **Complex Derivations (CRITICAL):** For any derived state that requires multiple statements, conditional logic (`if/else`, `switch`), loops, or calls to helper functions to compute its value, **MUST use `$derived.by(() => { ... });`**.
+    - This provides a more robust execution context for the Svelte compiler.
+    - Example:
+        ```typescript
+        // Assume someState and otherState are $state variables
+        // Assume computeA and computeB are well-typed functions
+        let complexValue = $derived.by(() => {
+            if (someCondition) {
+                // someCondition could be derived from props or state
+                return computeA(someState);
+            } else {
+                let temp = computeB(otherState);
+                return temp + 10;
+            }
+        });
+        ```
+
+### 5. Side Effects (`$effect()`)
+
+- Use `$effect(() => { ... });` for code with side effects reacting to state changes (DOM manipulation, logging, data fetching, event listener setup/teardown).
+- Effects run _after_ DOM updates. Return a cleanup function if needed: `$effect(() => { /* setup */; return () => { /* cleanup */ }; });`
+- Use `$effect.pre()` for effects that must run _before_ DOM updates.
+
+### 6. Event Handlers
+
+- Event handlers in Svelte 5 (when runes are enabled) should use the lowercase, colon-less syntax.
+    - **Correct:** `onclick={handler}`, `onmousedown={handler}`
+    - **Incorrect (Legacy):** `on:click={handler}`, `on:mousedown={handler}`
+- Ensure handler functions are well-typed.
+
+### 7. Commenting
+
+- **Script Block (`<script>` tag):**
+    - Use JSDoc-style comments (`/** ... */`) for documenting functions, interfaces, types, and complex logic blocks.
+    - Use single-line comments (`// ...`) for short explanations on their own dedicated line(s).
+    - Inline comments (`// comment after code`) should be used sparingly and only for very brief annotations.
+- **Template/Markup (`.svelte` file outside script tag):**
+    - Use HTML-style comments (`<!-- ... -->`).
+    - **Disallowed:** Avoid Svelte-specific block comments like `{/* ... */}` as they can be confused with Svelte logic blocks and are not standard HTML comments.
+
+### 8. Dependency Tracking
+
+- Svelte automatically tracks dependencies read synchronously within `$derived` or `$effect`.
+- Use `$untrack(value)` to read a reactive value without establishing it as a dependency.
+
+### 9. Reactivity with Proxies (Caution)
+
+- When iterating over or performing complex operations on reactive arrays/objects (from `$state` or `$props`) within reactive computations (`$derived`, `$derived.by`, `$effect`):
+    - If encountering unexpected behavior or performance issues, consider creating a shallow, non-proxied copy for the operation: `const localArray = [...reactiveArray];`. This is a fallback, as direct use of proxies is generally expected to work.
+
+### 10. Debugging Runes
+
+- Utilize `$inspect(...).with(label)` for reactive debugging in the console. Prefer this over manual `console.log` in `$effect` for observing state changes during development.
+- Use `$state.snapshot(value)` to get a plain, non-proxied version of reactive state for logging or comparison.
+
+### 11. Troubleshooting Compilation/HMR Issues
+
+- If components render raw JavaScript (uncompiled runes) or fail to update despite seemingly correct code:
+    1. Perform a full restart of the SvelteKit/Vite development server.
+    2. If issues persist, stop the server, delete the `.svelte-kit` directory, and restart.
+    3. As a last resort, delete `node_modules`, the lockfile (`bun.lockb`, `package-lock.json`, etc.), reinstall dependencies (e.g., `bun install`), and restart the server.
+
+### 12. `$host` Rune
+
+- Relevant for Custom Elements; provides a reference to the host element.
+
+## Examples
+
+<example>
+  description: Correct use of $props, $derived.by(), and onclick event handler
+
+```svelte
+<script lang="ts">
+    // Assumes User type is defined elsewhere and imported with `import type`
+    interface User {
+        name: string;
+        age: number;
+        isActive: boolean;
+    }
+
+    const { user } = $props<{ user: User | null }>();
+
+    /**
+     * Generates a greeting message based on the user's status.
+     */
+    let greeting = $derived.by(() => {
+        if (!user) return 'Hello, guest!';
+
+        let baseGreeting = `Hello, ${user.name}!`;
+        if (user.isActive) {
+            return `${baseGreeting} Welcome back.`;
+        }
+        return `${baseGreeting} Please activate your account.`;
+    });
+
+    let count = $state(0);
+    function increment() {
+        count++;
+    }
+</script>
+
+<p>{greeting}</p>
+<button onclick={increment}>Count is {count}</button>
+<!-- This is an HTML-style comment in the template -->
+```
+
+</example>
+
+<example type="invalid">
+  description: Incorrect use of $derived for multi-statement logic (should use $derived.by()) and legacy event handler
+
+```svelte
+<script lang="ts">
+    let count = $state(0);
+
+    // BAD: Complex logic directly in $derived(...)
+    let message = $derived(() => {
+        if (count > 5) {
+            return "Count is large";
+        }
+        return "Count is small";
+    });
+
+    function handleClick() {
+        // ...
+    }
+</script>
+
+<p>{message}</p>
+<button on:click={handleClick}>Legacy Click</button> {/* BAD: on:click */}
+{/* BAD SVELTE COMMENT: This style is disallowed */}
+```
+
+</example>
+
+<example>
+  description: Correct use of $effect for logging (use $inspect for debugging state)
+
+```svelte
+<script lang="ts">
+    let count = $state(0);
+
+    // For debugging reactive changes, $inspect is preferred:
+    $inspect(count).with('Current count');
+
+    // If $effect is used for other side effects (e.g., imperative DOM):
+    $effect(() => {
+        // Example: document.title = `Count: ${count}`;
+        // Avoid console.log for simple state tracking here; use $inspect.
+        // If logging for other reasons (e.g., specific event, complex calculation result):
+        // console.log("Effect ran, count is:", count); // Use judiciously
+    });
+
+    function increment() {
+        count++;
+    }
+</script>
+
+<button onclick={increment}>Increment</button>
+```
+
+</example>

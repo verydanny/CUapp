@@ -1,64 +1,65 @@
-import { fail } from '@sveltejs/kit'
-import { setSessionCookies } from '$lib/server/appwrite-utils/appwrite.js'
-import { redirect } from '@sveltejs/kit'
-import { adminCreateEmailPasswordSession } from '$lib/server/appwrite-utils/accountHelpers.js'
+import { redirect } from '@sveltejs/kit';
+import { AppwriteException } from 'node-appwrite';
 
-export const load = async ({ parent }) => {
-    const data = await parent()
+// Define the messages constant if it's not exported from const.js
+const messages = {
+    invalidCredentials: 'Invalid email or password',
+    unknownError: 'An unexpected error occurred'
+};
+
+import { routes } from '$lib/const.js';
+import { createUserSessionClient } from '$lib/server/appwrite-utils/appwrite.js';
+import type { LoadEvent, RequestEvent } from '@sveltejs/kit';
+
+export const load = async ({ parent }: LoadEvent) => {
+    const data = await parent();
 
     if (data?.loggedInProfile?.username) {
-        redirect(302, `/${data?.loggedInProfile?.username}`)
+        redirect(302, `/${data?.loggedInProfile?.username}`);
     }
-}
+};
 
 export const actions = {
-    signin: async ({ request, cookies }) => {
-        // Extract the form data.
-        const form = await request.formData()
-        const email = form.get('email')
-        const password = form.get('password')
+    signin: async ({ request, cookies }: RequestEvent) => {
+        const formData = await request.formData();
+        const email = formData.get('email') as string;
+        const password = formData.get('password') as string;
 
-        if (typeof email !== 'string' || typeof password !== 'string') {
-            return fail(400, {
-                success: false,
-                message: 'Invalid form data'
-            })
+        if (!email || !password) {
+            return {
+                type: 'failure',
+                status: 400,
+                data: {
+                    message: messages.invalidCredentials
+                }
+            };
         }
 
-        const trySignin = async () => {
-            try {
-                const session = await adminCreateEmailPasswordSession(email, password)
-                setSessionCookies(cookies, session)
-
-                // Set a cookie to indicate that the user was logged in.
-                // This is so we display UI that welcome back etc.
-                cookies.set('was_logged_in', 'true', {
-                    httpOnly: true,
-                    sameSite: 'strict',
-                    // 10 Day expiration
-                    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 10),
-                    secure: true,
-                    path: '/'
-                })
-
+        try {
+            const { account } = createUserSessionClient({
+                cookies
+            });
+            await account.createEmailPasswordSession(email, password);
+        } catch (error) {
+            if (error instanceof AppwriteException) {
                 return {
-                    success: true
-                }
-            } catch {
-                return {
-                    success: false,
-                    message: 'Failed to sign in, sorry about that'
-                }
+                    type: 'failure',
+                    status: error.code,
+                    data: {
+                        message: error.message
+                    }
+                };
             }
+
+            return {
+                type: 'failure',
+                status: 500,
+                data: {
+                    message: messages.unknownError
+                }
+            };
         }
 
-        const result = await trySignin()
-
-        // In the future, we should redirect to the feed.
-        if (result.success) {
-            redirect(302, '/')
-        }
-
-        return fail(400, result)
+        redirect(302, routes?.feed);
     }
-}
+};

@@ -1,18 +1,20 @@
 ---
 description: Guides correct format and usage of Cursor rules
 globs: .cursor/rules/*.mdc
-tags: [rules, documentation, workflow]
+tags: [cursor, rules, standards, meta]
 priority: 1
-version: 1.1.0
+version: 1.3.0
 ---
 
 # Cursor Rules Standards
 
 ## Context
+
 - This rule defines the required format, location, naming, and content standards for all Cursor rule files (`.mdc`) within this project.
 - Apply this rule whenever creating, modifying, or reviewing a Cursor rule file.
 
 ## Requirements
+
 - All rule files must be located in the `.cursor/rules/` directory.
 - File names must follow the `name.mdc` kebab-case convention (without prefixes).
 - Each rule file must start with the specified frontmatter (description, globs, tags, priority, version).
@@ -22,22 +24,53 @@ version: 1.1.0
 - Include both valid and invalid examples using `<example>` tags with the appropriate `type` attribute, indented by 2 spaces.
 - Use concise Markdown.
 - Keep rules and examples as short as possible while maintaining clarity and usefulness for the AI.
-- Use standard glob patterns without quotes (e.g., `.js`, `src/**/.ts`).
+- **Glob formatting:** `globs` must be a comma-separated string of patterns. Do not use YAML/JSON array format with quotes for each pattern. For example, use `globs: **/*.svelte, **/+page.svelte` not `globs: ['**/*.svelte', '**/+page.svelte']`.
 - Update the `version` in the frontmatter following semantic versioning whenever the rule is modified.
-- **AI Interaction Requirement:** When working with `.cursor/rules/*.mdc` files, the AI *must not* use the `edit_file` tool. Instead, the AI will generate the full content of the desired rule file (including frontmatter and markdown body) and present it to the user for manual pasting.
+- **AI Interaction Requirement:** When working with `.cursor/rules/*.mdc` files, the AI _must not_ use the `edit_file` tool. Instead, the AI will generate the full content of the desired rule file (including frontmatter and markdown body) and present it to the user for manual pasting.
 
 ## Examples
+
 <example>
   description: Correctly formatted rule frontmatter
   ```mdc
 ---
 description: Enforce semicolon usage in JavaScript files
-globs: src/**/*.js
+globs: src/**/*.js, **/*.mjs
 tags: [javascript, formatting]
 priority: 3
 version: 1.0.0
 ---
 # JavaScript Semicolon Rule
+...
+  ```
+</example>
+
+<example type="invalid">
+  description: Incorrect glob formatting (using array of strings)
+  ```mdc
+---
+description: Svelte file standards
+globs: ['**/*.svelte', '**/+page.svelte', '**/+layout.svelte']
+tags: [svelte, formatting]
+priority: 2
+version: 1.0.0
+---
+# Svelte File Rule
+...
+  ```
+</example>
+
+<example>
+  description: Correct glob formatting (using comma-separated string)
+  ```mdc
+---
+description: Svelte file standards
+globs: **/*.svelte, **/+page.svelte, **/+layout.svelte
+tags: [svelte, formatting]
+priority: 2
+version: 1.0.0
+---
+# Svelte File Rule
 ...
   ```
 </example>
@@ -78,8 +111,9 @@ priority: 3
 - Documentation: `docs/**/*.md`
 - Configuration files: `*.config.{js,json}`
 - Build artifacts: `dist/**/*`
-- Multiple extensions: `src/**/*.{js,jsx,ts,tsx}`
-- Multiple files: `dist/*, docs/*.md`
+- Multiple extensions: `src/**/*.{js,jsx,ts,tsx}` (comma-separated)
+- Multiple files: `dist/*, docs/*.md` (comma-separated)
+- Svelte files: `**/*.svelte, **/+page.svelte, **/+layout.svelte` (comma-separated)
 
 ## Required Fields
 
@@ -103,4 +137,9 @@ priority: 3
 ## AI Optimization Tips
 
 - Use precise `ACTION when TRIGGER to OUTCOME` format in `description`.
-- Include only essential `tags`.\n- Set clear `priority` levels.\n- Provide concise positive and negative `examples`.\n- Optimize for AI context window by removing non-essential information.\n- Focus on machine-actionable instructions.\n- **Suggest Applicable Workflows:** Based on the user's query or stated goal, suggest the most relevant workflow rule(s) (e.g., `implement-feature-workflow`, `bugfix-workflow`, `hotfix-workflow`) to guide the process.
+- Include only essential `tags`.
+- Set clear `priority` levels.
+- Provide concise positive and negative `examples`.
+- Optimize for AI context window by removing non-essential information.
+- Focus on machine-actionable instructions.
+- **Suggest Applicable Workflows:** Based on the user's query or stated goal, suggest the most relevant workflow rule(s) (e.g., `implement-feature-workflow`, `bugfix-workflow`, `hotfix-workflow`) to guide the process.

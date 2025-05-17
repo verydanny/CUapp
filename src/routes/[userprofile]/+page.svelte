@@ -1,12 +1,12 @@
 <script lang="ts">
-    import ProfileImage from '$layout/components/profileImage.svelte'
-    import { formOutlineButton } from '$layout/snippets/miniForm.svelte'
+    import ProfileImage from '$layout/components/profileImage.svelte';
+    import { formOutlineButton } from '$layout/snippets/miniForm.svelte';
 
-    const { data } = $props()
-    const { loggedInUser, profile } = $derived(data)
+    const { data } = $props();
+    const { loggedInUser, profile } = $derived(data);
 
-    const canViewProfileDetails = $derived(!profile?.permissions.includes('private'))
-    const viewingOwnProfile = $derived(profile?.viewingOwnProfile)
+    const canViewProfileDetails = $derived(!profile?.permissions.includes('private'));
+    const viewingOwnProfile = $derived(profile?.viewingOwnProfile);
 </script>
 
 <!-- User Profile Card using DaisyUI -->
