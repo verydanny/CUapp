@@ -10,11 +10,14 @@ const config = {
     // Consult https://svelte.dev/docs/kit/integrations
     // for more information about preprocessors
     preprocess: [vitePreprocess()],
+
     compilerOptions: {
-        runes: true
+        runes: true,
+        css: 'external'
     },
 
     kit: {
+        env: { dir: '.' },
         alias: {
             $root: 'src',
             $layout: 'src/routes/(layout)',
