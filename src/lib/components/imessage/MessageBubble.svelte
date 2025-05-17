@@ -99,16 +99,20 @@
             ${isLastInGroup && !isRight ? 'rounded-bl-md' : ''}
         `}
         >
-            <img
-                src={message.imageUrl || `/api/imageProxy?fileId=${message.imageFileId}`}
-                alt={message.imageAltText || 'iMessage image'}
-                class="block h-auto max-w-full cursor-pointer object-cover"
+            <button
                 onclick={() =>
                     window.open(
                         message.imageUrl || `/api/imageProxy?fileId=${message.imageFileId}`,
                         '_blank'
                     )}
-            />
+                target="_blank"
+            >
+                <img
+                    src={message.imageUrl || `/api/imageProxy?fileId=${message.imageFileId}`}
+                    alt={message.imageAltText || 'iMessage image'}
+                    class="block h-auto max-w-full cursor-pointer object-cover"
+                />
+            </button>
             <!-- iOS style: Images do not have separate caption text within the same bubble -->
         </div>
     {:else}
