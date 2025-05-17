@@ -10,11 +10,7 @@
     "collections": [
         {
             "$id": "profiles",
-            "$permissions": [
-                "create(\"users\")",
-                "read(\"users\")",
-                "update(\"users\")"
-            ],
+            "$permissions": ["create(\"users\")", "read(\"users\")", "update(\"users\")"],
             "databaseId": "main",
             "name": "profiles",
             "enabled": true,
@@ -49,9 +45,7 @@
                     "type": "string",
                     "required": false,
                     "array": true,
-                    "elements": [
-                        "private"
-                    ],
+                    "elements": ["private"],
                     "format": "enum",
                     "default": null
                 }
@@ -61,12 +55,115 @@
                     "key": "username_index",
                     "type": "unique",
                     "status": "available",
-                    "attributes": [
-                        "username"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
+                    "attributes": ["username"],
+                    "orders": ["ASC"]
+                }
+            ]
+        },
+        {
+            "$id": "posts",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"any\")",
+                "update(\"users\")",
+                "delete(\"users\")"
+            ],
+            "databaseId": "main",
+            "name": "posts",
+            "enabled": true,
+            "documentSecurity": true,
+            "attributes": [
+                {
+                    "key": "userId",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255
+                },
+                {
+                    "key": "createdAt",
+                    "type": "datetime",
+                    "required": true,
+                    "array": false
+                },
+                {
+                    "key": "updatedAt",
+                    "type": "datetime",
+                    "required": true,
+                    "array": false
+                },
+                {
+                    "key": "type",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 50,
+                    "elements": ["image", "text", "blog", "video", "imessage"],
+                    "format": "enum"
+                },
+                {
+                    "key": "tags",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 50
+                },
+                {
+                    "key": "likesCount",
+                    "type": "integer",
+                    "required": true,
+                    "array": false
+                },
+                {
+                    "key": "commentsCount",
+                    "type": "integer",
+                    "required": true,
+                    "array": false
+                },
+                {
+                    "key": "status",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 20,
+                    "elements": ["published", "draft", "archived"],
+                    "format": "enum"
+                },
+                {
+                    "key": "accessLevel",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 20,
+                    "elements": ["public", "private", "followers", "mutuals", "unlisted", "team"],
+                    "format": "enum"
+                },
+                {
+                    "key": "contentRefId",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 255
+                }
+            ],
+            "indexes": [
+                {
+                    "key": "user_created_index",
+                    "type": "key",
+                    "attributes": ["userId", "createdAt"],
+                    "orders": ["DESC", "DESC"]
+                },
+                {
+                    "key": "type_index",
+                    "type": "key",
+                    "attributes": ["type"],
+                    "orders": ["ASC"]
+                },
+                {
+                    "key": "access_level_index",
+                    "type": "key",
+                    "attributes": ["accessLevel"],
+                    "orders": ["ASC"]
                 }
             ]
         }
