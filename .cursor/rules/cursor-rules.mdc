@@ -3,7 +3,7 @@ description: Guides correct format and usage of Cursor rules
 globs: .cursor/rules/*.mdc
 tags: [rules, documentation, workflow]
 priority: 1
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Cursor Rules Standards
@@ -96,6 +96,11 @@ priority: 3
 
 ## Version Control
 
-- Follow semantic versioning (MAJOR.MINOR.PATCH), starting at 1.0.0.\n- Document changes in commit messages.\n- Always update the version when modifying a rule based on the change impact.\n\n## AI Optimization Tips\n\n- Use precise `ACTION when TRIGGER to OUTCOME` format in `description`.\n- Include only essential `tags`.\n- Set clear `priority` levels.\n- Provide concise positive and negative `examples`.\n- Optimize for AI context window by removing non-essential information.\n- Focus on machine-actionable instructions.\n```
+- Follow semantic versioning (MAJOR.MINOR.PATCH), starting at 1.0.0.
+- Document changes in commit messages.
+- Always update the version when modifying a rule based on the change impact.
 
-Please confirm once you have manually updated the `cursor-rules.mdc` file. Then I will provide the content for the other rule files in the correct format for you to paste.
+## AI Optimization Tips
+
+- Use precise `ACTION when TRIGGER to OUTCOME` format in `description`.
+- Include only essential `tags`.\n- Set clear `priority` levels.\n- Provide concise positive and negative `examples`.\n- Optimize for AI context window by removing non-essential information.\n- Focus on machine-actionable instructions.\n- **Suggest Applicable Workflows:** Based on the user's query or stated goal, suggest the most relevant workflow rule(s) (e.g., `implement-feature-workflow`, `bugfix-workflow`, `hotfix-workflow`) to guide the process.

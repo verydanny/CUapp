@@ -5,7 +5,7 @@ globs: |
   .changeset/*
 tags: [workflow, feature, changeset, git]
 priority: 2
-version: 1.3.0
+version: 1.5.0
 ---
 
 # Implement Feature Workflow
@@ -23,9 +23,11 @@ version: 1.3.0
   - Based on the nature of the feature work (informed by the conversation context and potentially code analysis), the AI should suggest whether the change is a `patch`, `minor`, or `major` version bump according to semantic versioning principles.
   - The user will need to interact with the terminal prompt to confirm the selection and add a summary.
 - **Commit:** The AI will stage all relevant changes (including the `.changeset` file(s)) and create a descriptive commit message following Conventional Commits.
-- **Push:** Guide the user to push the feature branch to the remote.
+  - The AI will write the commit message to a temporary file (e.g., `.git/COMMIT_EDITMSG`) using `echo -e` with `\n` for newlines.
+  - The AI will then create the commit using `git commit -F .git/COMMIT_EDITMSG`.
+- **Push:** The AI will push the feature branch to the remote repository.
 - **PR:** Instruct the user to open a pull request for the feature branch.
-- Ensure the AI initiates the `bun x changeset` command, provides guidance during the interactive process, and handles the staging and committing of changes.
+- Ensure the AI initiates the `bun x changeset` command, provides guidance during the interactive process, handles the staging and committing of changes using the described method, and pushes the branch.
 
 ## Examples
 <example>
@@ -42,14 +44,26 @@ Okay, I'm running bun x changeset. Please interact with the terminal.
   ```
 </example>
 <example>
-  description: AI stages and commits changes
+  description: AI stages and commits changes using temporary file
   ```
-Okay, I have staged all the relevant changes, including the new changeset file. I will now create the commit with a descriptive message.
+Okay, I have staged all the relevant changes, including the new changeset file. I will now write the commit message to a temporary file and create the commit.
   ```
 </example>
 <example type="invalid">
   description: AI tells the user to stage and commit changes
   ```
 Okay, the changeset is created. Please stage your changes and commit them.
+  ```
+</example>
+<example>
+  description: AI pushes the branch
+  ```
+Okay, the changes have been committed. I will now push the branch to the remote repository.
+  ```
+</example>
+<example type="invalid">
+  description: AI tells the user to push the branch
+  ```
+Okay, the changes are committed. Please push the branch.
   ```
 </example>
