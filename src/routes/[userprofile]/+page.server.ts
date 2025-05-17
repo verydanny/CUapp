@@ -25,15 +25,29 @@ export async function load({ parent, params }) {
      *
      */
 
-    if (!data) {
-        const profile = await getProfileByUsername(params?.userprofile)
+    const isTheProfileTheLoggedInUser =
+        params?.userprofile === data?.loggedInProfile?.username &&
+        data?.loggedInProfile?.$id === data?.loggedInUser?.$id
 
-        if (profile) {
-            return {
-                currentUserProfile: {
-                    ...profile,
-                    isProfileOwner: false
-                }
+    if (isTheProfileTheLoggedInUser) {
+        return {
+            ...data,
+            profile: {
+                ...data?.loggedInProfile,
+                permissions: [],
+                viewingOwnProfile: true
+            }
+        }
+    }
+
+    const profile = await getProfileByUsername(params?.userprofile)
+
+    if (profile) {
+        return {
+            ...data,
+            profile: {
+                ...profile,
+                viewingOwnProfile: false
             }
         }
     }

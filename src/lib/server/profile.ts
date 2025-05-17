@@ -13,7 +13,7 @@ export async function getProfileById(id?: string): Promise<BasicProfile> {
             $id: undefined,
             username: undefined,
             profileImage: undefined,
-            isPrivateProfile: undefined
+            permissions: []
         }
     }
 
@@ -25,7 +25,8 @@ export async function getProfileById(id?: string): Promise<BasicProfile> {
     return {
         $id: profile?.$id,
         username: profile?.username,
-        profileImage
+        profileImage,
+        permissions: profile?.permissions ?? []
     }
 }
 
@@ -34,7 +35,8 @@ export async function getProfileByUsername(username?: string): Promise<BasicProf
         throw {
             $id: undefined,
             username: undefined,
-            profileImage: undefined
+            profileImage: undefined,
+            permissions: []
         }
     }
 
@@ -48,8 +50,7 @@ export async function getProfileByUsername(username?: string): Promise<BasicProf
             $id: undefined,
             username: undefined,
             profileImage: undefined,
-            isPrivateProfile: undefined,
-            isProfileOwner: false
+            permissions: []
         }
     }
 
@@ -58,7 +59,8 @@ export async function getProfileByUsername(username?: string): Promise<BasicProf
         username: profile.documents[0].username,
         profileImage: getSingleProfileImageUrl(
             profile.documents[0].profileImage as (string | { $id: string; mimeType: string })[]
-        )
+        ),
+        permissions: profile.documents[0].permissions ?? []
     }
 }
 

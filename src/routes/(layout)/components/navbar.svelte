@@ -3,8 +3,6 @@
     import type { PageData } from '$types/routes/$types.d.ts'
 
     const { loggedInProfile, loggedInUser }: PageData = $props()
-
-    console.log('loggedInUser', loggedInUser)
 </script>
 
 <div class="navbar bg-base-100 relative">

@@ -29,6 +29,9 @@ export const actions = {
             try {
                 const session = await adminCreateEmailPasswordSession(email, password)
                 setSessionCookies(cookies, session)
+
+                // Set a cookie to indicate that the user was logged in.
+                // This is so we display UI that welcome back etc.
                 cookies.set('was_logged_in', 'true', {
                     httpOnly: true,
                     sameSite: 'strict',

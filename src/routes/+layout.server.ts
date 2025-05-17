@@ -3,13 +3,13 @@ import type { LayoutServerLoad } from './$types'
 import type { BasicProfile } from '$root/app'
 
 export const load: LayoutServerLoad = async ({ locals, depends }) => {
-    // depends() will invalidate the data when the specified dependencies change
     depends('app:user-profile')
 
     const loggedInProfile: BasicProfile = {
         $id: undefined,
         username: undefined,
-        profileImage: undefined
+        profileImage: undefined,
+        permissions: []
     }
 
     if (locals?.user?.$id) {

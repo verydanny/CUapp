@@ -12,6 +12,7 @@ export interface BasicProfile {
     $id: string | undefined
     username: string | undefined
     profileImage: string | undefined
+    permissions: string[]
 }
 
 export interface Profile extends BasicProfile {
