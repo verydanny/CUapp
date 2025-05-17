@@ -1,0 +1,101 @@
+---
+description: Guides correct format and usage of Cursor rules
+globs: .cursor/rules/*.mdc
+tags: [rules, documentation, workflow]
+priority: 1
+version: 1.0.0
+---
+
+# Cursor Rules Standards
+
+## Context
+- This rule defines the required format, location, naming, and content standards for all Cursor rule files (`.mdc`) within this project.
+- Apply this rule whenever creating, modifying, or reviewing a Cursor rule file.
+
+## Requirements
+- All rule files must be located in the `.cursor/rules/` directory.
+- File names must follow the `name.mdc` kebab-case convention (without prefixes).
+- Each rule file must start with the specified frontmatter (description, globs, tags, priority, version).
+- The frontmatter description must be concise (under ~120 characters) and follow the `ACTION when TRIGGER to OUTCOME` format.
+- The file body must include sections for `# Rule Title`, `## Context`, `## Requirements`, and `## Examples` (as outlined in the Formatting Guidelines).
+- Requirements must be concise, actionable, and testable.
+- Include both valid and invalid examples using `<example>` tags with the appropriate `type` attribute, indented by 2 spaces.
+- Use concise Markdown.
+- Keep rules and examples as short as possible while maintaining clarity and usefulness for the AI.
+- Use standard glob patterns without quotes (e.g., `.js`, `src/**/.ts`).
+- Update the `version` in the frontmatter following semantic versioning whenever the rule is modified.
+- **AI Interaction Requirement:** When working with `.cursor/rules/*.mdc` files, the AI *must not* use the `edit_file` tool. Instead, the AI will generate the full content of the desired rule file (including frontmatter and markdown body) and present it to the user for manual pasting.
+
+## Examples
+<example>
+  description: Correctly formatted rule frontmatter
+  ```mdc
+---
+description: Enforce semicolon usage in JavaScript files
+globs: src/**/*.js
+tags: [javascript, formatting]
+priority: 3
+version: 1.0.0
+---
+# JavaScript Semicolon Rule
+...
+  ```
+</example>
+
+<example type="invalid">
+  description: Incorrect rule location
+  ```
+rules/my-rule.mdc
+  ```
+</example>
+
+<example type="invalid">
+  description: Missing required frontmatter field (version)
+  ```mdc
+---
+description: Enforce semicolon usage in JavaScript files
+globs: src/**/*.js
+tags: [javascript, formatting]
+priority: 3
+---
+# JavaScript Semicolon Rule
+...
+  ```
+</example>
+
+## File Organization
+
+- **Location:** `.cursor/rules/`
+- **Extension:** `.mdc`
+- **Naming Convention:** `name.mdc` (kebab-case)
+
+## Glob Pattern Examples
+
+- Core standards: `.cursor/rules/*.mdc`
+- Language rules: `src/**/*.{js,ts}`
+- Testing standards: `**/*.test.{js,ts}`
+- React components: `src/components/**/*.tsx`
+- Documentation: `docs/**/*.md`
+- Configuration files: `*.config.{js,json}`
+- Build artifacts: `dist/**/*`
+- Multiple extensions: `src/**/*.{js,jsx,ts,tsx}`
+- Multiple files: `dist/*, docs/*.md`
+
+## Required Fields
+
+- **Frontmatter:** `description`, `globs`, `tags`, `priority`, `version`
+- **Body:** `# Rule Title`, `## Context`, `## Requirements`, `## Examples`
+
+## Formatting Guidelines
+
+- Use Concise Markdown.
+- Indent content within XML or nested XML tags by 2 spaces.
+- Keep rules and examples as short as possible.
+- Use Mermaid syntax for complex rules if clearer.
+- Use Emojis where appropriate to improve AI understanding.
+
+## Version Control
+
+- Follow semantic versioning (MAJOR.MINOR.PATCH), starting at 1.0.0.\n- Document changes in commit messages.\n- Always update the version when modifying a rule based on the change impact.\n\n## AI Optimization Tips\n\n- Use precise `ACTION when TRIGGER to OUTCOME` format in `description`.\n- Include only essential `tags`.\n- Set clear `priority` levels.\n- Provide concise positive and negative `examples`.\n- Optimize for AI context window by removing non-essential information.\n- Focus on machine-actionable instructions.\n```
+
+Please confirm once you have manually updated the `cursor-rules.mdc` file. Then I will provide the content for the other rule files in the correct format for you to paste.

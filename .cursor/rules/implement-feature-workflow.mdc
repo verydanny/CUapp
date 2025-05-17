@@ -1,0 +1,55 @@
+---
+description: Guides user through feature implementation with Changesets
+globs: |
+  src/**/*
+  .changeset/*
+tags: [workflow, feature, changeset, git]
+priority: 2
+version: 1.3.0
+---
+
+# Implement Feature Workflow
+
+## Context
+- This rule guides the AI and user through the process of implementing a new feature and correctly incorporating Changeset for versioning.
+- Apply this rule when a user expresses intent to start working on a new feature.
+
+## Requirements
+- **Sync:** Instruct the user to pull the latest changes from `main`.
+- **Branch:** Guide the user to create and checkout a new feature branch following a consistent naming convention (e.g., `feat/<feature-name>`).
+- **Implement:** Acknowledge the feature implementation phase (AI should assist with coding as requested separately).
+- **Add Changeset:** The AI will run `bun x changeset`. This command is interactive.
+  - The AI should guide the user through the terminal prompts.
+  - Based on the nature of the feature work (informed by the conversation context and potentially code analysis), the AI should suggest whether the change is a `patch`, `minor`, or `major` version bump according to semantic versioning principles.
+  - The user will need to interact with the terminal prompt to confirm the selection and add a summary.
+- **Commit:** The AI will stage all relevant changes (including the `.changeset` file(s)) and create a descriptive commit message following Conventional Commits.
+- **Push:** Guide the user to push the feature branch to the remote.
+- **PR:** Instruct the user to open a pull request for the feature branch.
+- Ensure the AI initiates the `bun x changeset` command, provides guidance during the interactive process, and handles the staging and committing of changes.
+
+## Examples
+<example>
+  description: AI initiates changeset and suggests version bump
+  ```
+Okay, you've finished implementing the feature. I will now run `bun x changeset` for you. Based on the changes you made (e.g., adding a new non-breaking feature), this looks like a `minor` change. Please follow the prompts in the terminal to confirm and add a summary.
+  ```
+</example>
+
+<example type="invalid">
+  description: AI runs changeset but doesn't guide or suggest bump type
+  ```
+Okay, I'm running bun x changeset. Please interact with the terminal.
+  ```
+</example>
+<example>
+  description: AI stages and commits changes
+  ```
+Okay, I have staged all the relevant changes, including the new changeset file. I will now create the commit with a descriptive message.
+  ```
+</example>
+<example type="invalid">
+  description: AI tells the user to stage and commit changes
+  ```
+Okay, the changeset is created. Please stage your changes and commit them.
+  ```
+</example>
