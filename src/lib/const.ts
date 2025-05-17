@@ -1,4 +1,4 @@
-export const IS_PRIVATE_PROFILE = 'is_private_profile'
+export const IS_PRIVATE_PROFILE = 'is_private_profile';
 
 export const routes = {
     auth: {
@@ -6,6 +6,6 @@ export const routes = {
         signup: '/auth/signup'
     },
     feed: '/feed'
-} as const
+} as const;
 
-export const ADMIN_LABEL = 'admin'
+export const ADMIN_LABEL = 'admin';

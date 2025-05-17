@@ -1,35 +1,37 @@
 ---
 description: Guides user through feature implementation with Changesets
-globs: |
-  src/**/*
-  .changeset/*
+# globs: src/**/*, .changeset/*
 tags: [workflow, feature, changeset, git]
 priority: 2
 version: 1.5.0
+alwaysApply: false
 ---
 
 # Implement Feature Workflow
 
 ## Context
+
 - This rule guides the AI and user through the process of implementing a new feature and correctly incorporating Changeset for versioning.
 - Apply this rule when a user expresses intent to start working on a new feature.
 
 ## Requirements
+
 - **Sync:** Instruct the user to pull the latest changes from `main`.
 - **Branch:** Guide the user to create and checkout a new feature branch following a consistent naming convention (e.g., `feat/<feature-name>`).
 - **Implement:** Acknowledge the feature implementation phase (AI should assist with coding as requested separately).
 - **Add Changeset:** The AI will run `bun x changeset`. This command is interactive.
-  - The AI should guide the user through the terminal prompts.
-  - Based on the nature of the feature work (informed by the conversation context and potentially code analysis), the AI should suggest whether the change is a `patch`, `minor`, or `major` version bump according to semantic versioning principles.
-  - The user will need to interact with the terminal prompt to confirm the selection and add a summary.
+    - The AI should guide the user through the terminal prompts.
+    - Based on the nature of the feature work (informed by the conversation context and potentially code analysis), the AI should suggest whether the change is a `patch`, `minor`, or `major` version bump according to semantic versioning principles.
+    - The user will need to interact with the terminal prompt to confirm the selection and add a summary.
 - **Commit:** The AI will stage all relevant changes (including the `.changeset` file(s)) and create a descriptive commit message following Conventional Commits.
-  - The AI will write the commit message to a temporary file (e.g., `.git/COMMIT_EDITMSG`) using `echo -e` with `\n` for newlines.
-  - The AI will then create the commit using `git commit -F .git/COMMIT_EDITMSG`.
+    - The AI will write the commit message to a temporary file (e.g., `.git/COMMIT_EDITMSG`) using `echo -e` with `\n` for newlines.
+    - The AI will then create the commit using `git commit -F .git/COMMIT_EDITMSG`.
 - **Push:** The AI will push the feature branch to the remote repository.
 - **PR:** Instruct the user to open a pull request for the feature branch.
 - Ensure the AI initiates the `bun x changeset` command, provides guidance during the interactive process, handles the staging and committing of changes using the described method, and pushes the branch.
 
 ## Examples
+
 <example>
   description: AI initiates changeset and suggests version bump
   ```

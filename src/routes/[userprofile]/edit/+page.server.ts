@@ -1,5 +1,5 @@
+import { type RequestEvent } from '@sveltejs/kit';
+
 export const actions = {
-    save: async (event) => {
-        const { user } = event.locals
-    }
-}
+    save: async (_event: RequestEvent) => {}
+};

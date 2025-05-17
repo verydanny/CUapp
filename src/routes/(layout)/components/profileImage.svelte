@@ -1,9 +1,9 @@
 <script lang="ts">
     interface Props {
-        imageUrl?: string | undefined
+        imageUrl?: string | undefined;
     }
 
-    let { imageUrl }: Props = $props()
+    let { imageUrl }: Props = $props();
 </script>
 
 <div class="avatar avatar-online">

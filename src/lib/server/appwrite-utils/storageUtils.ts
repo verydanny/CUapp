@@ -1,4 +1,4 @@
-import { PUBLIC_APPWRITE_PROJECT, PUBLIC_APPWRITE_ENDPOINT } from '$env/static/public'
+import { PUBLIC_APPWRITE_PROJECT, PUBLIC_APPWRITE_ENDPOINT } from '$env/static/public';
 
 export const createBucketUrl = (bucketId: string, fileId: string) => {
     return (
@@ -9,5 +9,5 @@ export const createBucketUrl = (bucketId: string, fileId: string) => {
         fileId +
         '/view?project=' +
         PUBLIC_APPWRITE_PROJECT
-    )
-}
+    );
+};

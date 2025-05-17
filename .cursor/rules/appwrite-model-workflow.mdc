@@ -1,7 +1,6 @@
 ---
 description: Guides user when adding Appwrite database models
-globs: |
-  {.appwrite/appwrite.json,features/*-model-ai-context.md}
+globs: .appwrite/appwrite.json, features/*-model-ai-context.md
 tags: [appwrite, database, workflow, model]
 priority: 2
 version: 1.0.0
@@ -10,23 +9,25 @@ version: 1.0.0
 # Add Appwrite Database Model Workflow
 
 ## Context
+
 - This rule guides the AI and user through the process of adding a new collection or set of related collections to the Appwrite database.
 - It focuses on deliberation, implementation in `appwrite.json`, deployment via CLI, and comprehensive documentation.
 - Apply this rule when the user indicates they are adding or modifying Appwrite database models.
 
 ## Requirements
+
 - **Sync:** Instruct the user to pull the latest changes from `main`.
 - **Branch:** Guide the user to create and checkout a new feature branch for the model (e.g., `feat-model-<model_name>`).
 - **Deliberation:** Assist the user in defining the data model, considering attributes, types, validation, interaction with `posts` via `contentRefId`, splitting data based on access/reusability, indexes, and permissions.
 - **Implement `appwrite.json`:** Guide the user to add the collection definition(s) to `.appwrite/appwrite.json`.
-  - Require strict adherence to JSON syntax with no comments.
-  - Require required fields to have no default values.
+    - Require strict adherence to JSON syntax with no comments.
+    - Require required fields to have no default values.
 - **Push to Appwrite:** Instruct the user to use the Appwrite CLI (`cd .appwrite && appwrite push collections`).
-  - Require referencing the `@appwrite-push-guide` rule for interactive prompt guidance.
-  - Require ensuring only new/modified collections are selected during the push.
+    - Require referencing the `@appwrite-push-guide` rule for interactive prompt guidance.
+    - Require ensuring only new/modified collections are selected during the push.
 - **Create AI Context:** Guide the user to create a markdown file in `features/` for AI reference, detailing design decisions and relationships.
 - **Create Human Documentation:** Guide the user to create a markdown file in `docs/database/` for human-readable documentation.
-- **Commit:** Instruct the user to stage *all* relevant changes and commit using Conventional Commits (e.g., `feat(<model_name>-model): add <model_name> data model and documentation`) with a detailed body.
+- **Commit:** Instruct the user to stage _all_ relevant changes and commit using Conventional Commits (e.g., `feat(<model_name>-model): add <model_name> data model and documentation`) with a detailed body.
 - **Push:** Guide the user to push the feature branch.
 - The AI should follow these steps sequentially, confirming completion of major steps.
 - The AI should act as a data modeling and database performance professional during deliberation.
@@ -37,6 +38,7 @@ version: 1.0.0
 - The AI must use Conventional Commits rigorously.
 
 ## Examples
+
 <example>
   description: AI reminds user to check appwrite.json for comments
   ```

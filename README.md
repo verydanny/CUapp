@@ -59,3 +59,63 @@ bun run build
 bun run preview # for local testing
 ```
 
+## iMessage Posts Feature
+
+The iMessage post type feature allows users to create and display iMessage-style conversations in posts. This simulates text message conversations with the familiar blue/gray bubble UI.
+
+### Features
+
+- Create conversations with multiple participants
+- Display messages in a realistic iMessage-style interface
+- Support for message timestamps and delivery status indicators
+- Responsive design for mobile and desktop
+- Fully integrated with Appwrite backend
+
+### Using the iMessage Feature
+
+1. Visit `/imessage/create` to create a new iMessage post
+2. Add participants and specify which one represents "you" (right side of conversation)
+3. Add messages from each participant in the order they should appear
+4. You can preview your conversation before saving it to the database
+5. Once created, the conversation can be viewed as a standalone post or embedded in other content
+
+### API Endpoints
+
+- `POST /api/imessage` - Create a new iMessage conversation
+    - Request body:
+        ```json
+        {
+            "participants": [
+                { "$id": "unique-id-1", "name": "Alice", "isRightSide": true },
+                { "$id": "unique-id-2", "name": "Bob" }
+            ],
+            "messages": [
+                { "participantId": "unique-id-1", "content": "Hello", "index": 0 },
+                { "participantId": "unique-id-2", "content": "Hi there", "index": 1 }
+            ],
+            "postId": "optional-post-id"
+        }
+        ```
+
+### Components
+
+- `IMessagePost` - Main component that displays a complete iMessage conversation
+- `Conversation` - Displays the message bubbles for a conversation
+- `MessageBubble` - Individual message bubble component
+- `ConversationHeader` - Shows the participants and conversation info
+- `MessageComposer` - Form for creating a new iMessage conversation
+
+### Example Usage
+
+```svelte
+<script>
+    import IMessagePost from '$lib/components/imessage/IMessagePost.svelte';
+
+    // Fetch your conversation data from the server
+    export let conversation;
+    export let messages;
+    export let participants;
+</script>
+
+<IMessagePost {conversation} {messages} {participants} timestampISO={new Date().toISOString()} />
+```

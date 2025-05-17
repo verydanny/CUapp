@@ -1,0 +1,179 @@
+---
+description: Guide Svelte 5 component development with DaisyUI, emphasizing runes best practices and accessibility.
+globs: src/lib/components/**/*.svelte, src/routes/**/*.svelte
+tags: [svelte, daisyui, component, ui, accessibility, runes]
+priority: 2
+version: 1.1.0
+alwaysApply: false
+---
+
+# Svelte 5 and DaisyUI Component Standards
+
+## Context
+
+- This rule provides specific guidelines for developing Svelte 5 components that integrate DaisyUI and Tailwind CSS, building upon general Svelte 5 runes best practices.
+- Apply when creating or modifying Svelte components intended to use DaisyUI's component library and styling conventions.
+- Focus on maintaining accessibility, performance, modern UI/UX, and consistency with DaisyUI's theming.
+- **Note:** For comprehensive Svelte 5 runes usage, TypeScript standards, event handlers, and commenting, refer to `svelte-runes-standards.mdc` and `typescript-typing-standards.mdc`.
+
+## Requirements
+
+### Svelte 5 Runes & General Practices
+
+- Adhere to all guidelines in `svelte-runes-standards.mdc`. This includes:
+    - Props declaration with `$props()` and strong typing (see `typescript-typing-standards.mdc`).
+    - State management with `$state()`.
+    - Derived state with `$derived()` for simple expressions and `$derived.by()` for complex logic.
+    - Side effects with `$effect()`.
+    - **Event Handlers**: Use the lowercase, colon-less syntax (e.g., `onclick={handler}`).
+    - **Commenting**:
+        - Script: JSDoc (`/** ... */`) or dedicated line `//` comments.
+        - Template: HTML-style comments (`<!-- ... -->`).
+        - Avoid `{/* ... */}` comments.
+- Leverage Svelte 5's snippet pattern for component composition where appropriate.
+
+### DaisyUI Components & Theming
+
+- **Prefer DaisyUI:** Utilize DaisyUI components (e.g., `btn`, `card`, `modal`) over custom styling where available and appropriate for the desired UI.
+- **Theming:** Strictly follow DaisyUI's theming system.
+    - Use DaisyUI theme variables (e.g., `bg-primary`, `text-base-content`, `border-neutral`) for colors and styling.
+    - Avoid hardcoding color values. If custom colors are needed, they should be defined as part of a custom DaisyUI theme extension.
+- **Responsiveness:** Apply responsive design using Tailwind CSS breakpoint utilities (e.g., `md:flex`, `lg:text-xl`) in conjunction with DaisyUI components.
+- **Spacing:** Use Tailwind's spacing utilities (e.g., `p-4`, `m-2`, `space-y-2`) for consistent padding, margins, and layout spacing.
+
+### Accessibility (A11y)
+
+- **Semantic HTML:** Use appropriate HTML5 elements (e.g., `<nav>`, `<button>`, `<article>`) for their semantic meaning.
+- **ARIA Attributes:** Include ARIA (Accessible Rich Internet Applications) attributes (e.g., `aria-label`, `aria-hidden`, `role`) where necessary to enhance accessibility, especially for custom or complex components.
+- **Keyboard Navigation:** Ensure all interactive elements are focusable and operable via keyboard.
+- **Focus Management:** Implement logical focus order and manage focus for dynamic elements like modals and dropdowns.
+- **Labels & Alt Text:** Provide clear labels for form controls and descriptive alt text for images.
+- **Contrast:** Adhere to WCAG contrast guidelines by using DaisyUI's color system appropriately.
+
+### Performance
+
+- Follow general Svelte performance best practices (see `svelte-runes-standards.mdc`).
+- Use `{#key}` blocks for list rendering to ensure efficient updates.
+- Consider lazy loading for components or images that are off-screen or not immediately needed.
+
+### Testing
+
+- **Unit Tests (Vitest):** Write unit tests for component logic, especially for Svelte runes interactions and any complex utility functions within components.
+- **E2E Tests (Playwright):** Create end-to-end tests for critical user flows involving new UI components or features.
+- **Storybook Stories:** Develop Storybook stories for UI components to allow for isolated development, visual testing, and documentation.
+
+## Examples
+
+<example>
+  description: Proper use of Svelte 5 runes with DaisyUI, including $derived.by() and onclick event handler
+
+```svelte
+<script lang="ts">
+    // Assumes SomeItemType is defined, e.g., in $lib/types
+    import type { SomeItemType } from '$lib/types';
+
+    const {
+        items = [] as SomeItemType[], // Default to typed empty array
+        title,
+        initialCount = 0
+    } = $props<{
+        items?: SomeItemType[]; // Assuming SomeItemType has id and name
+        title: string;
+        initialCount?: number;
+    }>();
+
+    let count = $state(initialCount);
+
+    /**
+     * Filters items based on their name length relative to the current count.
+     */
+    let filteredItems = $derived.by(() => {
+        // Ensure items is not undefined before filtering
+        if (!items) return [];
+        return items.filter((item) => item.name.length > count);
+    });
+
+    // Example of an effect (use $inspect for state debugging)
+    $effect(() => {
+        // This is a side effect, e.g., logging to an external service or imperative DOM manipulation
+        // For simply inspecting state changes during dev, $inspect(count) is better.
+        // console.log(`Effect: Filtered items count changed to ${filteredItems.length} based on count ${count}`);
+    });
+
+    function increment() {
+        count++;
+    }
+</script>
+
+<div class="card bg-base-100 w-full max-w-md shadow-xl">
+    <!-- This is an HTML-style comment -->
+    <div class="card-body">
+        <h2 class="card-title text-accent">{title}</h2>
+        <p>Current count: {count}</p>
+        {#if items && items.length > 0}
+            <ul class="mt-2 mb-4 list-disc pl-5">
+                {#each filteredItems as item (item.id)}
+                    <!-- Assuming item has an id for keying -->
+                    <li class="py-1">{item.name}</li>
+                {/each}
+            </ul>
+        {:else}
+            <p class="text-base-content/70 italic">No items to display.</p>
+        {/if}
+        <div class="card-actions justify-end">
+            <button class="btn btn-primary" onclick={increment} <!-- Correct event handler -->
+                aria-label="Increment filter count" > Increment Count ({count})
+            </button>
+        </div>
+    </div>
+</div>
+```
+
+</example>
+
+<example type="invalid">
+  description: Incorrect use of $derived for potentially complex filter (should use $derived.by()) and legacy event handler
+
+```svelte
+<script lang="ts">
+  interface Item { id: string; name: string; }
+  // ... props ...
+  let items = $state<Item[]>([{name: 'short', id: '1'}, {name: 'loooong', id: '2'}]);
+  let threshold = $state(5);
+
+  // BAD: Potentially problematic if filter logic becomes complex.
+  // Should use $derived.by() for clarity and robustness here.
+  let longItems = $derived(items.filter(item => item.name.length > threshold));
+
+  function doSomething() { /* ... */ }
+
+</script>
+<p>Long items: {longItems.length}</p>
+<button on:click={doSomething}>Do Something</button> {/* BAD: on:click should be onclick */}
+{/* BAD SVELTE COMMENT: This style is disallowed in templates */}
+```
+
+</example>
+
+<example>
+  description: Using DaisyUI theme variables for a button
+
+```svelte
+<button class="btn btn-secondary hover:btn-accent focus:ring-secondary-focus focus:ring-2">
+    Themed Button
+</button>
+```
+
+</example>
+
+<example type="invalid">
+  description: Hard-coding styles instead of using DaisyUI classes or theme variables
+
+```svelte
+<!-- Manually styled button, less maintainable and inconsistent with DaisyUI -->
+<button style="background-color: #FF00FF; color: white; padding: 10px 20px; border-radius: 5px;">
+    Styled Manually
+</button>
+```
+
+</example>

@@ -1,0 +1,109 @@
+---
+description: Guide user/AI on writing Vitest unit tests following TDD and best practices
+globs: **/*.test.ts, **/*.spec.ts
+tags: [testing, vitest, tdd, mock]
+priority: 4
+version: 1.2.0 
+---
+
+# Test File Workflow
+
+## Context
+
+- This rule guides the process of writing and maintaining test files, particularly unit tests with Vitest, following TDD principles and best practices for mocking.
+- Apply this rule when creating, modifying, or reviewing test files using Vitest.
+
+## Requirements
+
+- Use Vitest for unit tests (`import { describe, it, expect, vi, beforeEach } from 'vitest'`).
+- Name test files using `.test.ts` or `.spec.ts` convention.
+- Follow TDD (Red-Green-Refactor): Write a failing test, write code to pass it, refactor.
+- Define reusable mock data/fixtures (e.g., using `const` or factory functions) where appropriate to keep tests DRY.
+- Use descriptive `describe` blocks to group related tests and `it` blocks to describe individual test cases.
+- **Mocking:** If using `vi.fn()` for mocks within a test suite, ensure mocks are cleared before each test using `beforeEach(() => { vi.clearAllMocks(); });` for test isolation.
+- **Linting/Typing:** Ensure no lint or typing errors exist in test files or related implementation files before running tests.
+- Only run tests (`bun test`) after confirming there are no linting or typing errors in any relevant files.
+
+## Examples
+
+<example>
+  description: Basic Vitest test structure with describe, it, and mock clearing
+  ```typescript
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+
+// Mock a function if needed for the component/module being tested
+const mockUtilityFunction = vi.fn();
+
+describe('ComponentName', () => {
+beforeEach(() => {
+vi.clearAllMocks(); // Clear mocks before each test
+});
+
+it('should render correctly and call utility', () => {
+// Assuming ComponentName calls mockUtilityFunction
+// ... test logic ...
+mockUtilityFunction();
+expect(mockUtilityFunction).toHaveBeenCalled();
+});
+});
+
+````
+</example>
+
+<example>
+description: Using a reusable mock object (fixture)
+```typescript
+import { describe, it, expect } from 'vitest'
+
+interface MockDataType {
+id: string;
+name: string;
+}
+
+const baseMockData: MockDataType = {
+id: '123',
+name: 'Test Item'
+};
+
+describe('DataProcessing', () => {
+it('should process the mock data', () => {
+  // Assuming a function `processData` exists and is being tested
+  // const processedData = processData(baseMockData);
+  // expect(processedData.name).toBe('Processed Test Item');
+  expect(true).toBe(true); // Placeholder for actual test
+});
+});
+````
+
+</example>
+
+<example>
+  description: Command to run Vitest tests
+  ```
+bun test
+  ```
+</example>
+
+<example type="invalid">
+  description: Test file without descriptive describe or it blocks, or forgetting to clear mocks
+  ```typescript
+import { it, expect, vi } from 'vitest'
+
+const someGlobalMock = vi.fn();
+
+it('test one', () => {
+someGlobalMock();
+expect(someGlobalMock).toHaveBeenCalledTimes(1);
+});
+
+// Forgetting beforeEach(() => { vi.clearAllMocks(); });
+// someGlobalMock will have a call count of 1 from the previous test.
+it('test two', () => {
+someGlobalMock();
+// This might unexpectedly fail or pass based on previous test state if mocks aren't cleared.
+expect(someGlobalMock).toHaveBeenCalledTimes(1); // Could be 2 if not cleared
+});
+
+```
+</example>
+```

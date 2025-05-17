@@ -1,9 +1,9 @@
-import { redirect } from '@sveltejs/kit'
-import { getProfileByUsername } from '$lib/server/profile'
-import { routes } from '$root/lib/const.js'
+import { redirect, type LoadEvent } from '@sveltejs/kit';
+import { getProfileByUsername } from '$lib/server/profile';
+import { routes } from '$root/lib/const.js';
 
-export async function load({ parent, params }) {
-    const data = await parent()
+export async function load({ parent, params }: LoadEvent) {
+    const data = await parent();
     /**
      * Here we should establish permissions about viewing "this" current profile
      *
@@ -18,7 +18,7 @@ export async function load({ parent, params }) {
 
     const isTheProfileTheLoggedInUser =
         params?.userprofile === data?.loggedInProfile?.username &&
-        data?.loggedInProfile?.$id === data?.loggedInUser?.$id
+        data?.loggedInProfile?.$id === data?.loggedInUser?.$id;
 
     if (isTheProfileTheLoggedInUser) {
         return {
@@ -28,11 +28,11 @@ export async function load({ parent, params }) {
                 permissions: [],
                 viewingOwnProfile: true
             }
-        }
+        };
     }
 
     try {
-        const profile = await getProfileByUsername(params?.userprofile)
+        const profile = await getProfileByUsername(params?.userprofile);
 
         return {
             ...data,
@@ -40,10 +40,10 @@ export async function load({ parent, params }) {
                 ...profile,
                 viewingOwnProfile: false
             }
-        }
+        };
     } catch {
         // There is no profile with this username
 
-        redirect(302, routes?.feed)
+        redirect(302, routes?.feed);
     }
 }

@@ -1,8 +1,8 @@
 <script lang="ts">
-    import ProfileImage from '$layout/components/profileImage.svelte'
+    import ProfileImage from '$layout/components/profileImage.svelte';
 
-    let { data } = $props()
-    let { profile, loggedInUser } = $derived(data)
+    let { data } = $props();
+    let { profile, loggedInUser } = $derived(data);
 </script>
 
 <!-- User Profile Card using DaisyUI -->
