@@ -13,10 +13,11 @@
     />
 </svelte:head>
 
-<Navbar loggedInProfile={data.loggedInProfile} loggedInUser={data.loggedInUser} />
-
-<div class="container mx-auto min-h-screen p-4">
-    <main class="mx-auto flex min-h-screen flex-col">
-        {@render children()}
-    </main>
+<div id="root">
+    <Navbar loggedInProfile={data.loggedInProfile} loggedInUser={data.loggedInUser} />
+    <div class="container mx-auto min-h-screen p-4">
+        <main class="mx-auto flex min-h-screen flex-col">
+            {@render children()}
+        </main>
+    </div>
 </div>

@@ -6,10 +6,14 @@
     "tabWidth": 4,
     "semi": false,
     "plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
+    "svelteBracketNewLine": true,
+    "svelteIndentScriptAndStyle": true,
+    "svelteStrictMode": true,
     "overrides": [
         {
             "files": "*.svelte",
             "options": {
+                "htmlWhitespaceSensitivity": "ignore",
                 "parser": "svelte"
             }
         }

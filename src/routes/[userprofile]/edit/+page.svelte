@@ -19,8 +19,10 @@
                 class="btn btn-outline btn-secondary"
                 role="button"
                 href="/{profile?.username}"
-                data-sveltekit-preload-data>Cancel</a
+                data-sveltekit-preload-data
             >
+                Cancel
+            </a>
         </div>
     </div>
 </div>

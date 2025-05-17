@@ -9,12 +9,7 @@ const { databases } = createAdminClient()
 
 export async function getProfileById(id?: string): Promise<BasicProfile> {
     if (!id) {
-        throw {
-            $id: undefined,
-            username: undefined,
-            profileImage: undefined,
-            permissions: []
-        }
+        throw new Error('ID is required')
     }
 
     const profile = await databases.getDocument('main', 'profiles', id)
@@ -32,12 +27,7 @@ export async function getProfileById(id?: string): Promise<BasicProfile> {
 
 export async function getProfileByUsername(username?: string): Promise<BasicProfile> {
     if (!username) {
-        throw {
-            $id: undefined,
-            username: undefined,
-            profileImage: undefined,
-            permissions: []
-        }
+        throw new Error('Username is required')
     }
 
     const profile = await databases.listDocuments('main', 'profiles', [
@@ -46,12 +36,14 @@ export async function getProfileByUsername(username?: string): Promise<BasicProf
     ])
 
     if (profile.documents.length === 0) {
-        throw {
-            $id: undefined,
-            username: undefined,
-            profileImage: undefined,
-            permissions: []
-        }
+        throw new Error('Profile not found', {
+            cause: {
+                $id: undefined,
+                username: undefined,
+                profileImage: undefined,
+                permissions: []
+            }
+        })
     }
 
     return {
@@ -104,10 +96,7 @@ export interface ProfileData {
 export async function fetchProfileData({
     params,
     locals
-}: RequestEvent<
-    import('../../routes/[profile]/$types.d.ts').RouteParams,
-    '/[profile]'
->): Promise<ProfileData> {
+}: RequestEvent<import('../../routes/[userprofile]/$types.d.ts').RouteParams, '/[userprofile]'>) {
     // const userProfileId = await adminGetSingleDocumentByQuery('main', 'profiles_username_map', [
     //     Query.equal('username', profileParameter)
     // ])

@@ -9,55 +9,14 @@ import {
     adminDeleteDocument,
     adminGetSingleDocumentByQuery
 } from '$lib/server/appwrite-utils/databaseHelpers.js'
-import { getProfileByUsername } from '$lib/server/profile'
-
-export async function load({ parent, params }) {
-    const data = await parent()
-    /**
-     * Here we should establish permissions about viewing "this" current profile
-     *
-     * - Is there a logged in user?
-     * - Is the profile the logged in user's?
-     * - If not, is the logged in user following the profile?
-     * - Is the profile private?
-     * - Is the profile public?
-     * - Is the profile not found?
-     *
-     */
-
-    const isTheProfileTheLoggedInUser =
-        params?.userprofile === data?.loggedInProfile?.username &&
-        data?.loggedInProfile?.$id === data?.loggedInUser?.$id
-
-    if (isTheProfileTheLoggedInUser) {
-        return {
-            ...data,
-            profile: {
-                ...data?.loggedInProfile,
-                permissions: [],
-                viewingOwnProfile: true
-            }
-        }
-    }
-
-    const profile = await getProfileByUsername(params?.userprofile)
-
-    if (profile) {
-        return {
-            ...data,
-            profile: {
-                ...profile,
-                viewingOwnProfile: false
-            }
-        }
-    }
-
-    return data
-}
 
 // Define our log out endpoint/server action.
 export const actions = {
-    follow: async ({ request }) => {
+    follow: async ({ request, locals }) => {
+        if (!locals.user?.$id) {
+            redirect(302, routes?.auth?.signup)
+        }
+
         const formData = await request.formData()
         const followerId = formData.get('followerId') as string
         const profileId = formData.get('profileId') as string
@@ -121,8 +80,10 @@ export const actions = {
         }
     },
     logout: async (event) => {
+        console.log('logout')
         // Create the Appwrite client.
         const { account } = createUserSessionClient(event)
+
         await cleanupUserSession(event.cookies, account)
 
         // Redirect to the sign up page.

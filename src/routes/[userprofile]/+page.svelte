@@ -3,7 +3,6 @@
     import { formOutlineButton } from '$layout/snippets/miniForm.svelte'
 
     const { data } = $props()
-    console.log('data', data)
     const { loggedInUser, profile } = $derived(data)
 
     const canViewProfileDetails = $derived(!profile?.permissions.includes('private'))
@@ -25,11 +24,13 @@
                     <a
                         class="btn btn-outline btn-neutral"
                         href="/{profile?.username}/edit"
-                        data-sveltekit-preload-data>Settings</a
+                        data-sveltekit-preload-data
                     >
-                    {@render formOutlineButton('Log out', 'secondary', '[profile]?/logout')}
+                        Settings
+                    </a>
+                    {@render formOutlineButton('Log out', 'secondary', '[userprofile]?/logout')}
                 {:else}
-                    {@render formOutlineButton('Follow', 'secondary', '[profile]?/follow', {
+                    {@render formOutlineButton('Follow', 'secondary', '[userprofile]?/follow', {
                         profileId: profile?.$id,
                         followerId: loggedInUser?.$id,
                         pending: profile?.isPrivateProfile
