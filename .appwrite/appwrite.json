@@ -166,6 +166,204 @@
                     "orders": ["ASC"]
                 }
             ]
+        },
+        {
+            "$id": "imessageParticipants",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")"
+            ],
+            "databaseId": "main",
+            "name": "imessageParticipants",
+            "enabled": true,
+            "documentSecurity": true,
+            "attributes": [
+                {
+                    "key": "userId",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255
+                },
+                {
+                    "key": "name",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255
+                },
+                {
+                    "key": "avatarFileId",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 255
+                }
+            ],
+            "indexes": [
+                {
+                    "key": "user_index",
+                    "type": "key",
+                    "attributes": ["userId"],
+                    "orders": ["ASC"]
+                }
+            ]
+        },
+        {
+            "$id": "imessageConversations",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")"
+            ],
+            "databaseId": "main",
+            "name": "imessageConversations",
+            "enabled": true,
+            "documentSecurity": true,
+            "attributes": [
+                {
+                    "key": "postId",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255
+                },
+                {
+                    "key": "participantDocRefs",
+                    "type": "string",
+                    "required": true,
+                    "array": true,
+                    "size": 255
+                },
+                {
+                    "key": "rightSideParticipantDocRef",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255
+                },
+                {
+                    "key": "screenshotMessageIds",
+                    "type": "string",
+                    "required": true,
+                    "array": true,
+                    "size": 100000
+                },
+                {
+                    "key": "totalScreenshots",
+                    "type": "integer",
+                    "required": true,
+                    "array": false
+                }
+            ],
+            "indexes": [
+                {
+                    "key": "post_id_unique_index",
+                    "type": "unique",
+                    "attributes": ["postId"],
+                    "orders": ["ASC"]
+                }
+            ]
+        },
+        {
+            "$id": "imessageMessages",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")"
+            ],
+            "databaseId": "main",
+            "name": "imessageMessages",
+            "enabled": true,
+            "documentSecurity": true,
+            "attributes": [
+                {
+                    "key": "conversationId",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255
+                },
+                {
+                    "key": "messageId",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255
+                },
+                {
+                    "key": "participantDocId",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255
+                },
+                {
+                    "key": "content",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 10000
+                },
+                {
+                    "key": "timestamp",
+                    "type": "datetime",
+                    "required": true,
+                    "array": false
+                },
+                {
+                    "key": "timestampDisplay",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 50
+                },
+                {
+                    "key": "isEdited",
+                    "type": "boolean",
+                    "required": true,
+                    "array": false
+                },
+                {
+                    "key": "screenshotIndex",
+                    "type": "integer",
+                    "required": true,
+                    "array": false
+                },
+                {
+                    "key": "deliveryStatus",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 20,
+                    "elements": ["sent", "delivered", "read"],
+                    "format": "enum"
+                }
+            ],
+            "indexes": [
+                {
+                    "key": "conversation_screenshot_index",
+                    "type": "key",
+                    "attributes": ["conversationId", "screenshotIndex"],
+                    "orders": ["ASC", "ASC"]
+                },
+                {
+                    "key": "conversation_timestamp_index",
+                    "type": "key",
+                    "attributes": ["conversationId", "timestamp"],
+                    "orders": ["ASC", "ASC"]
+                },
+                {
+                    "key": "conversation_message_unique_index",
+                    "type": "unique",
+                    "attributes": ["conversationId", "messageId"],
+                    "orders": ["ASC", "ASC"]
+                }
+            ]
         }
     ]
 }

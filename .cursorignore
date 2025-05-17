@@ -1,0 +1,8 @@
+!.appwrite/
+!.cursor/
+
+.svelte-kit/
+build/
+cursor/
+*.log
+*.lock
