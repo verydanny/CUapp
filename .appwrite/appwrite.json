@@ -1,5 +1,5 @@
 {
-    "projectId": "blog",
+    "projectId": "social",
     "databases": [
         {
             "$id": "main",
@@ -454,6 +454,124 @@
                     "orders": ["ASC", "ASC"]
                 }
             ]
+        },
+        {
+            "$id": "richTextPosts",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"any\")",
+                "update(\"users\")",
+                "delete(\"users\")"
+            ],
+            "databaseId": "main",
+            "name": "richTextPosts",
+            "enabled": true,
+            "documentSecurity": true,
+            "attributes": [
+                {
+                    "key": "postId",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "title",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "body",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 10000000,
+                    "default": null
+                },
+                {
+                    "key": "excerpt",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 500,
+                    "default": null
+                },
+                {
+                    "key": "coverImageFileId",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "coverImageUrl",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 2048,
+                    "default": null
+                },
+                {
+                    "key": "coverImageAltText",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 500,
+                    "default": null
+                },
+                {
+                    "key": "version",
+                    "type": "integer",
+                    "required": false,
+                    "array": false,
+                    "min": 0,
+                    "max": 9223372036854775807,
+                    "default": null
+                },
+                {
+                    "key": "estimatedReadTimeMinutes",
+                    "type": "integer",
+                    "required": false,
+                    "array": false,
+                    "min": 0,
+                    "max": 9223372036854775807,
+                    "default": null
+                },
+                {
+                    "key": "contentSchemaVersion",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 50,
+                    "default": null
+                }
+            ],
+            "indexes": [
+                {
+                    "key": "post_id_unique_index",
+                    "type": "unique",
+                    "status": "available",
+                    "attributes": ["postId"],
+                    "orders": ["ASC"]
+                },
+                {
+                    "key": "title_search_index",
+                    "type": "key",
+                    "status": "available",
+                    "attributes": ["title"],
+                    "orders": ["ASC"]
+                }
+            ]
         }
-    ]
+    ],
+    "functions": [],
+    "deployments": [],
+    "buckets": [],
+    "teams": [],
+    "migrations": []
 }

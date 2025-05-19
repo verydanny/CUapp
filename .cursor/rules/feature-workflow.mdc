@@ -75,8 +75,14 @@ alwaysApply: false
         ```
 
     - The AI will generate the full multi-line commit message text.
-    - The AI will use its file editing capabilities to create or overwrite the file `.git/COMMIT_EDITMSG` with the generated message text.
-    - After the AI confirms the file `.git/COMMIT_EDITMSG` has been successfully written, the AI will then create the commit using `git commit -F .git/COMMIT_EDITMSG`.
+    - The AI will then run `git commit` (with no flags).
+    - The AI will clearly state that this command will open `.git/COMMIT_EDITMSG` in the user's configured Git editor.
+    - The AI will provide the generated commit message text to the user.
+    - The AI will instruct the user to:
+        1. Replace the entire content of the editor with the provided commit message text (or paste it in).
+        2. Save the file.
+        3. Close the editor to finalize the commit.
+    - The AI will wait for the user to confirm they have completed these steps and the commit has been successfully made before proceeding.
 
 - **Push:** The AI will push the feature branch to the remote repository.
 - **PR:** Instruct the user to open a pull request. Remind them to:
