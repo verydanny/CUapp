@@ -89,7 +89,7 @@
 <div class="container mx-auto px-4 py-8">
     <div class="mb-6 flex items-center justify-between">
         <h1 class="text-2xl font-bold">iMessage Post Demo</h1>
-        <button class="btn btn-secondary" on:click={loadMockConversation} disabled={isLoading}>
+        <button class="btn btn-secondary" onclick={loadMockConversation} disabled={isLoading}>
             {#if isLoading}
                 <span class="loading loading-spinner loading-xs mr-2"></span>
                 Loading API Mock...{:else}Load Mock Convo via API{/if}

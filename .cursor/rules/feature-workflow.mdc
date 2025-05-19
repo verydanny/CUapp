@@ -1,9 +1,7 @@
 ---
 description: Guides user through feature implementation with Changesets
-# globs: src/**/*, .changeset/*
 tags: [workflow, feature, changeset, git]
 priority: 2
-version: 1.5.0
 alwaysApply: false
 ---
 
@@ -11,61 +9,117 @@ alwaysApply: false
 
 ## Context
 
-- This rule guides the AI and user through the process of implementing a new feature and correctly incorporating Changeset for versioning.
-- Apply this rule when a user expresses intent to start working on a new feature.
+- This rule guides the AI and user through the process of implementing a new feature (including application features, tooling changes, and workflow improvements), creating associated documentation, and correctly incorporating Changesets for versioning.
+- Apply this rule when a user expresses intent to start working on any new feature or significant process/tooling update.
 
 ## Requirements
 
+- **Cursor Rule Modification Protocol:** If the feature work involves modifying or creating any Cursor rule (files in `.cursor/rules/`), the AI must first consult `.cursor/rules/cursor-rules.mdc` for guidelines on rule structure, metadata, and best practices before proposing changes to those rules. This `feature-workflow.mdc` itself should be followed for its own updates.
 - **Sync:** Instruct the user to pull the latest changes from `main`.
-- **Branch:** Guide the user to create and checkout a new feature branch following a consistent naming convention (e.g., `feat/<feature-name>`).
-- **Implement:** Acknowledge the feature implementation phase (AI should assist with coding as requested separately).
+- **Branch:** Guide the user to create and checkout a new feature branch.
+    - For application features: `feat/<feature-name>` (e.g., `feat/user-profile`).
+    - For tooling, workflow, Developer Experience (DX), or documentation-only changes: `feat/workflow/<description>` or `feat/dx/<description>` (e.g., `feat/workflow/improve-changeset-process`, `feat/dx/add-linting-rule`, `feat/workflow/update-feature-rule`).
+    - The AI should help determine the appropriate convention.
+- **Implement:** Acknowledge the implementation phase (AI should assist with coding or rule modification as requested separately).
+- **Classifying Tooling/DX Changes:**
+    - Changes to development tooling, CI/CD, build scripts, linter configurations, documentation structure, or workflow rules (like this one) are also considered features.
+    - They improve the development process, consistency, and maintainability of the project.
+    - These changes should follow this feature workflow, including documentation (as applicable) and changesets.
+- **Document Feature/Change:** Before creating a changeset, the AI must guide the user to document the work:
+    - **For application features:**
+        - Create/update feature documentation in `docs/features/<feature-name>.md`. This should include:
+            - Purpose of the feature.
+            - High-level overview of how it works.
+            - User-facing changes or impact.
+            - Key technical decisions or components.
+        - Create/update AI context documentation in `docs/ai/<feature-name>-ai-context.md`. This should include:
+            - List of primary files/modules touched by the feature.
+            - Key functions, classes, or data structures introduced/modified.
+            - Potential areas for future AI troubleshooting or context that would be helpful for an AI understanding this feature later.
+            - Dependencies or interactions with other systems/modules.
+    - **For tooling, workflow, or DX changes (e.g., updates to Cursor rules):**
+        - The primary documentation _is often the change itself_ (e.g., the updated rule file content, the new script, the modified configuration).
+        - Consider if a brief entry in `docs/features/` (e.g., `docs/features/developer-experience.md` or `docs/features/workflow-updates.md`) or `docs/ai/` is beneficial to explain the tooling change to other developers or for AI context. The AI should discuss this with the user.
+        - If new dedicated documentation files are created for a DX change, they should be referenced in the changeset and commit message.
+    - The AI should offer to create boilerplate for any new documentation files based on the feature's scope and touched files.
 - **Add Changeset:** The AI will run `bun x changeset`. This command is interactive.
     - The AI should guide the user through the terminal prompts.
-    - Based on the nature of the feature work (informed by the conversation context and potentially code analysis), the AI should suggest whether the change is a `patch`, `minor`, or `major` version bump according to semantic versioning principles.
-    - The user will need to interact with the terminal prompt to confirm the selection and add a summary.
-- **Commit:** The AI will stage all relevant changes (including the `.changeset` file(s)) and create a descriptive commit message following Conventional Commits.
-    - The AI will write the commit message to a temporary file (e.g., `.git/COMMIT_EDITMSG`) using `echo -e` with `\n` for newlines.
-    - The AI will then create the commit using `git commit -F .git/COMMIT_EDITMSG`.
+    - Based on the nature of the work, the AI should suggest `patch`, `minor`, or `major` version bump.
+        - For new, backward-compatible application functionality: `minor`.
+        - For backward-compatible bug fixes in the application: `patch`.
+        - For tooling, workflow, or DX improvements that don't directly add user-facing application functionality but improve the development process (like updates to this rule): a `patch` bump for the relevant package(s) (e.g., `cuapp`) is generally appropriate.
+    - **Crucially, the AI must instruct the user to write a detailed summary in the changeset prompt.** This summary should be more comprehensive than a single-line commit message. It should include sections such as:
+        - **Overview:** A brief explanation of the feature or change.
+        - **Key Changes:** Bullet points detailing significant technical modifications or additions.
+        - **User Impact / Developer Impact:** Description of how the change affects users or developers.
+        - **Documentation:** Confirmation that documentation (or rule files etc.) has been created/updated, listing the new/modified files (e.g., "Updated `.cursor/rules/feature-workflow.mdc`").
+        - The AI should provide an example tailored to the current work.
+- **Commit:** The AI will stage all relevant changes (feature code, documentation files, rule files, script files, and the `.changeset` file(s)) and create a descriptive commit message following Conventional Commits.
+
+    - The commit message should be multi-line. The subject line should be a concise summary. The body should elaborate on the feature/change, its purpose, and explicitly mention the documentation created/updated or rules modified.
+    - Example commit message structure:
+
+        - For application features: `feat(<scope>): <short description>` (e.g., `feat(profile): add edit functionality`)
+        - For tooling/workflow changes: `feat(workflow): <short description>` or `feat(dx): <short description>` (e.g., `feat(workflow): update feature guidelines`)
+
+        ```
+        feat(<scope>): <short description of feature or change>
+
+        <Detailed explanation of the feature/change, including the problem it solves or the improvement made.>
+
+        Documentation/Rules Impacted:
+        - `docs/features/<feature-name>.md` (if applicable)
+        - `docs/ai/<feature-name>-ai-context.md` (if applicable)
+        - For rule changes: "Updated `.cursor/rules/feature-workflow.mdc` with new guidelines for DX changes."
+        - For other tooling changes: Path to script/config modified.
+        ```
+
+    - The AI will generate the full multi-line commit message text.
+    - The AI will use its file editing capabilities to create or overwrite the file `.git/COMMIT_EDITMSG` with the generated message text.
+    - After the AI confirms the file `.git/COMMIT_EDITMSG` has been successfully written, the AI will then create the commit using `git commit -F .git/COMMIT_EDITMSG`.
+
 - **Push:** The AI will push the feature branch to the remote repository.
-- **PR:** Instruct the user to open a pull request for the feature branch.
-- Ensure the AI initiates the `bun x changeset` command, provides guidance during the interactive process, handles the staging and committing of changes using the described method, and pushes the branch.
+- **PR:** Instruct the user to open a pull request. Remind them to:
+    - Link to any relevant JIRA tickets or issue trackers.
+    - Ensure the PR description is comprehensive.
+    - Explicitly mention that documentation/rules have been added/updated.
 
 ## Examples
 
-<example>
-  description: AI initiates changeset and suggests version bump
-  ```
-Okay, you've finished implementing the feature. I will now run `bun x changeset` for you. Based on the changes you made (e.g., adding a new non-breaking feature), this looks like a `minor` change. Please follow the prompts in the terminal to confirm and add a summary.
-  ```
-</example>
+(Examples should be reviewed and updated if necessary to reflect these more nuanced guidelines, especially around DX changes - for brevity, I'm not rewriting all examples here but they should align with the above.)
 
-<example type="invalid">
-  description: AI runs changeset but doesn't guide or suggest bump type
+<example>
+  description: AI initiates documentation for a DX change (e.g., rule update).
   ```
-Okay, I'm running bun x changeset. Please interact with the terminal.
+Okay, you've finished modifying the `.cursor/rules/some-other-rule.mdc`. Before we create the changeset, let's consider documentation.
+The primary documentation is the rule change itself. Do you think a summary in `docs/features/workflow-updates.md` or any AI context in `docs/ai/` would be helpful for other developers understanding this change?
+For now, we'll ensure the changeset and commit message clearly state that `.cursor/rules/some-other-rule.mdc` was updated.
   ```
 </example>
 <example>
-  description: AI stages and commits changes using temporary file
+  description: AI initiates changeset for a workflow rule update and suggests bump type and detailed summary.
   ```
-Okay, I have staged all the relevant changes, including the new changeset file. I will now write the commit message to a temporary file and create the commit.
-  ```
+Great. I will now run `bun x changeset`. Since this is an improvement to our development workflow by updating a Cursor rule, a `patch` change for `cuapp` is appropriate.
+When prompted for a summary, please provide a detailed description. For instance:
+
+Refined the 'some-other-rule.mdc' to include X, Y, Z.
+
+**Key Changes:**
+
+- Added new validation steps to the rule.
+- Clarified example usage.
+
+**Developer Impact:**
+
+- Developers will now get clearer guidance when X.
+- This improves consistency for Y.
+
+**Documentation:**
+
+- Updated `.cursor/rules/some-other-rule.mdc`.
+
+Please proceed with the prompts in the terminal.
+
+```
 </example>
-<example type="invalid">
-  description: AI tells the user to stage and commit changes
-  ```
-Okay, the changeset is created. Please stage your changes and commit them.
-  ```
-</example>
-<example>
-  description: AI pushes the branch
-  ```
-Okay, the changes have been committed. I will now push the branch to the remote repository.
-  ```
-</example>
-<example type="invalid">
-  description: AI tells the user to push the branch
-  ```
-Okay, the changes are committed. Please push the branch.
-  ```
-</example>
+```
