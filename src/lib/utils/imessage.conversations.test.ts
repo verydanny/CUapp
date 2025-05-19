@@ -5,7 +5,7 @@ import {
     type iMessageConversation,
     getMessagesForConversation,
     getParticipantsForConversation
-} from './imessage.utils';
+} from './imessage.utils.js';
 import type { Models } from 'appwrite';
 
 const baseMockConversation: iMessageConversation = {

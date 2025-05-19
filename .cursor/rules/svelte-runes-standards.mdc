@@ -1,17 +1,17 @@
 ---
-description: Enforce Svelte 5 runes best practices for clarity, performance, and correctness.
-globs: **/*.svelte, **/+page.svelte, **/+layout.svelte
-tags: [svelte, runes, reactivity, best-practices, linting]
-priority: 1
-version: 1.0.1 
+description: Enforce Svelte 5 runes best practices and SvelteKit environment variable usage for clarity, performance, and correctness.
+globs: **/*.svelte
+tags: [svelte, runes, state-management, best-practices, sveltekit, environment-variables]
+priority: 2
+version: 1.1.0
 alwaysApply: false
 ---
 
-# Svelte 5 Runes Usage Standards
+# Svelte 5 Runes and SvelteKit Environment Variable Standards
 
 ## Context
 
-- This rule defines best practices for using Svelte 5 runes (`$state`, `$props`, `$derived`, `$effect`, etc.) to ensure code clarity, maintainability, performance, and correctness across the project.
+- This rule defines best practices for using Svelte 5 runes (`$state`, `$props`, `$derived`, `$effect`, etc.) and SvelteKit environment variables to ensure code clarity, maintainability, performance, and correctness across the project.
 - Apply this rule when writing or reviewing any Svelte component files (`.svelte`).
 
 ## Requirements
@@ -25,7 +25,7 @@ alwaysApply: false
 
 ### 2. Props Declaration
 
-- Always use `const { /* prop names */ } = $props<PropType>();` for prop declaration.
+- Always use `const { /* prop names */ }: <PropType> = $props();` for prop declaration.
 - Provide clear TypeScript types for props, adhering to `typescript-typing-standards.mdc`. Avoid `any` where possible.
 
 ### 3. Local Reactive State
@@ -38,8 +38,10 @@ alwaysApply: false
     - Example: `let double = $derived(count * 2);`
     - The expression must be free of side-effects. State changes (e.g., `count++`) are disallowed directly within `$derived(expression)`.
 - **Complex Derivations (CRITICAL):** For any derived state that requires multiple statements, conditional logic (`if/else`, `switch`), loops, or calls to helper functions to compute its value, **MUST use `$derived.by(() => { ... });`**.
+
     - This provides a more robust execution context for the Svelte compiler.
     - Example:
+
         ```typescript
         // Assume someState and otherState are $state variables
         // Assume computeA and computeB are well-typed functions
@@ -77,39 +79,45 @@ alwaysApply: false
     - Use HTML-style comments (`<!-- ... -->`).
     - **Disallowed:** Avoid Svelte-specific block comments like `{/* ... */}` as they can be confused with Svelte logic blocks and are not standard HTML comments.
 
-### 8. Dependency Tracking
+### 8. SvelteKit Environment Variables (Client-Side)
+
+- When accessing environment variables in Svelte components (client-side code):
+
+    - **No `process.env`:** Direct usage of `process.env` is **forbidden**.
+    - **Public Environment Variables Only:** Components can only access _public_ environment variables.
+
+        - These variables **must** be prefixed with `PUBLIC_` in your `.env` file (e.g., `PUBLIC_FEATURE_FLAG="true"`).
+        - Import them using SvelteKit's public static environment module:
+
+            ```typescript
+            import { PUBLIC_FEATURE_FLAG, PUBLIC_API_ENDPOINT } from '$env/static/public';
+            ```
+
+    - I will instruct the user to ensure these `PUBLIC_` prefixed variables are correctly defined in their `.env` file.
+    - For _private_ environment variables (secrets, API keys for server use), these **must not** be imported or used in client-side Svelte components. They should be handled by server-side code (e.g., API routes, server hooks) which import from `$env/static/private`.
+
+### 9. Dependency Tracking
 
 - Svelte automatically tracks dependencies read synchronously within `$derived` or `$effect`.
 - Use `$untrack(value)` to read a reactive value without establishing it as a dependency.
 
-### 9. Reactivity with Proxies (Caution)
+### 10. Reactivity with Proxies (Caution)
 
 - When iterating over or performing complex operations on reactive arrays/objects (from `$state` or `$props`) within reactive computations (`$derived`, `$derived.by`, `$effect`):
     - If encountering unexpected behavior or performance issues, consider creating a shallow, non-proxied copy for the operation: `const localArray = [...reactiveArray];`. This is a fallback, as direct use of proxies is generally expected to work.
 
-### 10. Debugging Runes
+### 11. Debugging Runes
 
 - Utilize `$inspect(...).with(label)` for reactive debugging in the console. Prefer this over manual `console.log` in `$effect` for observing state changes during development.
 - Use `$state.snapshot(value)` to get a plain, non-proxied version of reactive state for logging or comparison.
 
-### 11. Troubleshooting Compilation/HMR Issues
-
-- If components render raw JavaScript (uncompiled runes) or fail to update despite seemingly correct code:
-    1. Perform a full restart of the SvelteKit/Vite development server.
-    2. If issues persist, stop the server, delete the `.svelte-kit` directory, and restart.
-    3. As a last resort, delete `node_modules`, the lockfile (`bun.lockb`, `package-lock.json`, etc.), reinstall dependencies (e.g., `bun install`), and restart the server.
-
-### 12. `$host` Rune
-
-- Relevant for Custom Elements; provides a reference to the host element.
-
 ## Examples
 
-<example>
-  description: Correct use of $props, $derived.by(), and onclick event handler
+<example description="Correct use of $props, $derived.by(), onclick event handler, and public env var.">
 
 ```svelte
 <script lang="ts">
+    import { PUBLIC_API_ENDPOINT } from '$env/static/public'; // Correct env var import
     // Assumes User type is defined elsewhere and imported with `import type`
     interface User {
         name: string;
@@ -117,7 +125,7 @@ alwaysApply: false
         isActive: boolean;
     }
 
-    const { user } = $props<{ user: User | null }>();
+    const { user }: { user: User | null } = $props();
 
     /**
      * Generates a greeting message based on the user's status.
@@ -125,7 +133,7 @@ alwaysApply: false
     let greeting = $derived.by(() => {
         if (!user) return 'Hello, guest!';
 
-        let baseGreeting = `Hello, ${user.name}!`;
+        let baseGreeting = `Hello, ${user.name}! You are using endpoint: ${PUBLIC_API_ENDPOINT}`;
         if (user.isActive) {
             return `${baseGreeting} Welcome back.`;
         }
@@ -145,8 +153,7 @@ alwaysApply: false
 
 </example>
 
-<example type="invalid">
-  description: Incorrect use of $derived for multi-statement logic (should use $derived.by()) and legacy event handler
+<example type="invalid" description="Incorrect use of $derived, legacy event handler, and process.env in component.">
 
 ```svelte
 <script lang="ts">
@@ -157,12 +164,15 @@ alwaysApply: false
         if (count > 5) {
             return "Count is large";
         }
+        // BAD: Accessing process.env directly in component
+        // return `Count is small on ${process.env.PUBLIC_ENDPOINT}`;
         return "Count is small";
     });
 
     function handleClick() {
         // ...
     }
+
 </script>
 
 <p>{message}</p>
@@ -172,8 +182,7 @@ alwaysApply: false
 
 </example>
 
-<example>
-  description: Correct use of $effect for logging (use $inspect for debugging state)
+<example description="Correct use of $effect for logging (use $inspect for debugging state)">
 
 ```svelte
 <script lang="ts">

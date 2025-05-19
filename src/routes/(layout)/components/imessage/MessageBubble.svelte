@@ -1,23 +1,21 @@
 <script lang="ts">
-    import type { iMessageMessage, iMessageParticipant } from '$lib/utils/imessage.utils';
+    import type { iMessageMessage } from '$lib/utils/imessage.utils.js';
 
     const {
         message, // The core message object
         isRight = false, // True if the message should appear on the right (current user)
         showTimestamp = false, // True if the timestamp should be displayed for this bubble
-        _userParticipant = undefined, // Prop for potential future use, not currently used for logic
         isFirstInGroup = false, // True if this is the first message in a consecutive group from the same sender
         isLastInGroup = false, // True if this is the last message in a consecutive group
         participantName = '' // Name of the participant (used if !isRight and isFirstInGroup)
-    } = $props<{
+    }: {
         message: iMessageMessage;
         isRight?: boolean;
         showTimestamp?: boolean;
-        _userParticipant?: iMessageParticipant | undefined;
         isFirstInGroup?: boolean;
         isLastInGroup?: boolean;
         participantName?: string;
-    }>();
+    } = $props();
 
     // --- Style Derivations ---
     // These determine the visual appearance of the bubble based on whether it's a right-side message.

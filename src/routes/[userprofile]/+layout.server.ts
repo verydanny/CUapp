@@ -1,5 +1,5 @@
 import { redirect, type LoadEvent } from '@sveltejs/kit';
-import { getProfileByUsername } from '$lib/server/profile';
+import { getProfileByUsername } from '$lib/server/profile.js';
 import { routes } from '$root/lib/const.js';
 
 export async function load({ parent, params }: LoadEvent) {

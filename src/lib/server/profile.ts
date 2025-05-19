@@ -1,6 +1,5 @@
 import { Query } from 'node-appwrite';
 import { createAdminClient } from './appwrite-utils/appwrite.js';
-import { getSingleProfileImageUrl } from './appwrite-utils/imageUtils.js';
 
 import type { BasicProfile, UserWithAdmin } from '$root/app.d.ts'; // Keep this import
 
@@ -12,14 +11,11 @@ export async function getProfileById(id?: string): Promise<BasicProfile> {
     }
 
     const profile = await databases.getDocument('main', 'profiles', id);
-    const profileImage = getSingleProfileImageUrl(
-        profile?.profileImage as (string | { $id: string; mimeType: string })[]
-    );
 
     return {
         $id: profile?.$id,
         username: profile?.username,
-        profileImage,
+        profileImage: undefined,
         permissions: profile?.permissions ?? []
     };
 }
@@ -48,9 +44,7 @@ export async function getProfileByUsername(username?: string): Promise<BasicProf
     return {
         $id: profile.documents[0].$id,
         username: profile.documents[0].username,
-        profileImage: getSingleProfileImageUrl(
-            profile.documents[0].profileImage as (string | { $id: string; mimeType: string })[]
-        ),
+        profileImage: undefined,
         permissions: profile.documents[0].permissions ?? []
     };
 }

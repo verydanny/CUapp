@@ -1,7 +1,7 @@
 ---
-description: Guide Svelte 5 component development with DaisyUI, emphasizing runes best practices and accessibility.
-globs: src/lib/components/**/*.svelte, src/routes/**/*.svelte
-tags: [svelte, daisyui, component, ui, accessibility, runes]
+description: Guide Svelte 5 component development with DaisyUI within src/routes/(layout)/, emphasizing runes, best practices, accessibility, and .js imports.
+globs: **/*.svelte
+tags: [svelte, svelte5, daisyui, tailwind, components, ui, ux, accessibility]
 priority: 2
 version: 1.1.0
 alwaysApply: false
@@ -12,16 +12,25 @@ alwaysApply: false
 ## Context
 
 - This rule provides specific guidelines for developing Svelte 5 components that integrate DaisyUI and Tailwind CSS, building upon general Svelte 5 runes best practices.
-- Apply when creating or modifying Svelte components intended to use DaisyUI's component library and styling conventions.
+- **Component Location:** UI components, their stories, and component-specific tests should primarily be located within appropriate subdirectories of `src/routes/(layout)/` (e.g., `src/routes/(layout)/components/`, `src/routes/(layout)/stories/`, `src/routes/(layout)/components/__tests__/`). Truly global, application-agnostic UI utilities or base components might reside in `$lib`, but the default should be co-location within `src/routes/(layout)/`.
+- **Import Convention**: For internal project imports (e.g., from `$lib/...` or relative paths like `./...`), append `.js` to the import path (e.g., `import { myFunction } from '$lib/utils/myUtils.js';`, `import { GET } from './+server.js';`).
+- Apply when creating or modifying Svelte components intended to use DaisyUI's component library and styling conventions, particularly those within the `src/routes/(layout)/` structure.
 - Focus on maintaining accessibility, performance, modern UI/UX, and consistency with DaisyUI's theming.
 - **Note:** For comprehensive Svelte 5 runes usage, TypeScript standards, event handlers, and commenting, refer to `svelte-runes-standards.mdc` and `typescript-typing-standards.mdc`.
 
 ## Requirements
 
+### Component File Structure
+
+- **Source Files:** Place Svelte component files (e.g., `MyButton.svelte`) in a dedicated subdirectory like `src/routes/(layout)/components/your-feature/`.
+- **Stories:** Storybook files (e.g., `MyButton.story.svelte` or `MyButton.stories.ts`) should be co-located, perhaps in `src/routes/(layout)/stories/your-feature/` or alongside components if preferred.
+- **Unit Tests:** Vitest unit tests (e.g., `MyButton.test.ts`) should also be co-located, for example, in `src/routes/(layout)/components/your-feature/__tests__/MyButton.test.ts` or directly alongside the component.
+
 ### Svelte 5 Runes & General Practices
 
 - Adhere to all guidelines in `svelte-runes-standards.mdc`. This includes:
     - Props declaration with `$props()` and strong typing (see `typescript-typing-standards.mdc`).
+    - Props are declared like `let { name, user, ...etc }: <PropTypes> = $props()`
     - State management with `$state()`.
     - Derived state with `$derived()` for simple expressions and `$derived.by()` for complex logic.
     - Side effects with `$effect()`.
@@ -58,45 +67,38 @@ alwaysApply: false
 
 ### Testing
 
-- **Unit Tests (Vitest):** Write unit tests for component logic, especially for Svelte runes interactions and any complex utility functions within components.
-- **E2E Tests (Playwright):** Create end-to-end tests for critical user flows involving new UI components or features.
-- **Storybook Stories:** Develop Storybook stories for UI components to allow for isolated development, visual testing, and documentation.
+- **Unit Tests (Vitest):** Write unit tests for component logic, ideally co-located with the component (e.g., in a `__tests__` subdirectory or alongside it in `src/routes/(layout)/components/your-feature/`).
+- **E2E Tests (Playwright):** Create end-to-end tests for critical user flows involving new UI components or features. These tests will typically reside in the project\'s main `e2e` directory.
+- **Storybook Stories:** Develop Storybook stories for UI components. Store these alongside the components or in a parallel structure (e.g., `src/routes/(layout)/stories/your-feature/YourComponent.story.svelte`). This allows for isolated development, visual testing, and documentation.
 
 ## Examples
 
-<example>
-  description: Proper use of Svelte 5 runes with DaisyUI, including $derived.by() and onclick event handler
+<example description="Proper use of Svelte 5 runes with DaisyUI, assuming component is in src/routes/(layout)/components/">
 
 ```svelte
 <script lang="ts">
-    // Assumes SomeItemType is defined, e.g., in $lib/types
-    import type { SomeItemType } from '$lib/types';
+    // Assumes SomeItemType is defined, e.g., in a shared types file like $lib/types/index.ts
+    // or co-located with route-specific types.
+    import type { SomeItemType } from '$lib/types.js'; // Note .js, or a more specific path if type is route-specific
 
     const {
-        items = [] as SomeItemType[], // Default to typed empty array
+        items = [] as SomeItemType[],
         title,
         initialCount = 0
-    } = $props<{
-        items?: SomeItemType[]; // Assuming SomeItemType has id and name
+    }: {
+        items?: SomeItemType[];
         title: string;
         initialCount?: number;
-    }>();
+    } = $props();
 
     let count = $state(initialCount);
 
-    /**
-     * Filters items based on their name length relative to the current count.
-     */
     let filteredItems = $derived.by(() => {
-        // Ensure items is not undefined before filtering
         if (!items) return [];
         return items.filter((item) => item.name.length > count);
     });
 
-    // Example of an effect (use $inspect for state debugging)
     $effect(() => {
-        // This is a side effect, e.g., logging to an external service or imperative DOM manipulation
-        // For simply inspecting state changes during dev, $inspect(count) is better.
         // console.log(`Effect: Filtered items count changed to ${filteredItems.length} based on count ${count}`);
     });
 
@@ -106,14 +108,12 @@ alwaysApply: false
 </script>
 
 <div class="card bg-base-100 w-full max-w-md shadow-xl">
-    <!-- This is an HTML-style comment -->
     <div class="card-body">
         <h2 class="card-title text-accent">{title}</h2>
         <p>Current count: {count}</p>
         {#if items && items.length > 0}
             <ul class="mt-2 mb-4 list-disc pl-5">
                 {#each filteredItems as item (item.id)}
-                    <!-- Assuming item has an id for keying -->
                     <li class="py-1">{item.name}</li>
                 {/each}
             </ul>
@@ -121,8 +121,8 @@ alwaysApply: false
             <p class="text-base-content/70 italic">No items to display.</p>
         {/if}
         <div class="card-actions justify-end">
-            <button class="btn btn-primary" onclick={increment} <!-- Correct event handler -->
-                aria-label="Increment filter count" > Increment Count ({count})
+            <button class="btn btn-primary" onclick={increment} aria-label="Increment filter count">
+                Increment Count ({count})
             </button>
         </div>
     </div>
@@ -131,18 +131,15 @@ alwaysApply: false
 
 </example>
 
-<example type="invalid">
-  description: Incorrect use of $derived for potentially complex filter (should use $derived.by()) and legacy event handler
+<example type="invalid" description="Incorrect use of $derived for potentially complex filter (should use $derived.by()) and legacy event handler">
 
 ```svelte
 <script lang="ts">
   interface Item { id: string; name: string; }
-  // ... props ...
   let items = $state<Item[]>([{name: 'short', id: '1'}, {name: 'loooong', id: '2'}]);
   let threshold = $state(5);
 
   // BAD: Potentially problematic if filter logic becomes complex.
-  // Should use $derived.by() for clarity and robustness here.
   let longItems = $derived(items.filter(item => item.name.length > threshold));
 
   function doSomething() { /* ... */ }
@@ -155,8 +152,7 @@ alwaysApply: false
 
 </example>
 
-<example>
-  description: Using DaisyUI theme variables for a button
+<example description="Using DaisyUI theme variables for a button">
 
 ```svelte
 <button class="btn btn-secondary hover:btn-accent focus:ring-secondary-focus focus:ring-2">
@@ -166,8 +162,7 @@ alwaysApply: false
 
 </example>
 
-<example type="invalid">
-  description: Hard-coding styles instead of using DaisyUI classes or theme variables
+<example type="invalid" description="Hard-coding styles instead of using DaisyUI classes or theme variables">
 
 ```svelte
 <!-- Manually styled button, less maintainable and inconsistent with DaisyUI -->

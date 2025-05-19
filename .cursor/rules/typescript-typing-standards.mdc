@@ -28,66 +28,66 @@ version: 1.0.0
 
 ## Examples
 
-<example>
-  description: Preferring 'unknown' over 'any'
-  ```typescript
+<example description="Preferring unknown over any">
+
+```typescript
 // Good: Using unknown for a truly variable input
 function processData(input: unknown) {
-  if (typeof input === 'string') {
-    console.log(input.toUpperCase());
-  } else if (typeof input === 'number') {
-    console.log(input.toFixed(2));
-  }
-  // ... other checks
+    if (typeof input === 'string') {
+        console.log(input.toUpperCase());
+    } else if (typeof input === 'number') {
+        console.log(input.toFixed(2));
+    }
+    // ... other checks
 }
 
 // Bad: Using any, losing type safety
 // function processData(input: any) {
 // console.log(input.toUpperCase()); // Potential runtime error if input is not a string
 // }
+```
 
-````
 </example>
 
-<example>
-description: Specific function return types
+<example description=" Specific function return types">
+
 ```typescript
 interface UserProfile {
-id: string;
-name: string;
-email?: string;
+    id: string;
+    name: string;
+    email?: string;
 }
 
 // Good: Specific return type
 function getUserProfile(userId: string): UserProfile | null {
-// ... logic to fetch user
-if (userId === '1') return { id: '1', name: 'Alice' };
-return null;
+    // ... logic to fetch user
+    if (userId === '1') return { id: '1', name: 'Alice' };
+    return null;
 }
 
 // Bad: Vague return type
-// function getUserProfile(userId: string): object | null { /* ... */ }
+// function getUserProfile(userId: string): object | null { /_ ... _/ }
 // Bad: Implicit any return type
-// function getUserProfile(userId: string) { /* ... */ }
-````
+// function getUserProfile(userId: string) { /_ ... _/ }
+```
 
 </example>
 
-<example>
-  description: Type-only imports
-  ```typescript
+<example description="Type-only imports">
+
+```typescript
 // Good: Using type-only import for an interface
 import type { User } from './user-model';
 
 function displayUser(user: User) {
-console.log(user.name);
+    console.log(user.name);
 }
+```
 
-````
 </example>
 
-<example type="invalid">
-description: Unnecessary use of 'any'
+<example type="invalid" description="Unnecessary use of any">
+
 ```typescript
 // Bad: Defaulting to 'any'
 // let myVariable: any;
@@ -96,7 +96,7 @@ description: Unnecessary use of 'any'
 // Better alternatives:
 let myVariable: unknown;
 let specificVariable: string | number;
-const inferredVariable = "hello"; // Type string is inferred
-````
+const inferredVariable = 'hello'; // Type string is inferred
+```
 
 </example>

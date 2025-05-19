@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
-import { createAdminClient } from '$lib/server/appwrite-utils/appwrite';
+import type { RequestHandler } from './$types.d.ts';
+import { createAdminClient } from '$lib/server/appwrite-utils/appwrite.js';
 import { APPWRITE_BUCKET_IMAGES } from '$env/static/private'; // Assuming you have a bucket ID in env
 
 export const GET: RequestHandler = async ({ url }) => {
