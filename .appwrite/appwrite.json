@@ -10,7 +10,11 @@
     "collections": [
         {
             "$id": "profiles",
-            "$permissions": ["create(\"users\")", "read(\"users\")", "update(\"users\")"],
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")"
+            ],
             "databaseId": "main",
             "name": "profiles",
             "enabled": true,
@@ -45,7 +49,9 @@
                     "type": "string",
                     "required": false,
                     "array": true,
-                    "elements": ["private"],
+                    "elements": [
+                        "private"
+                    ],
                     "format": "enum",
                     "default": null
                 }
@@ -55,8 +61,12 @@
                     "key": "username_index",
                     "type": "unique",
                     "status": "available",
-                    "attributes": ["username"],
-                    "orders": ["ASC"]
+                    "attributes": [
+                        "username"
+                    ],
+                    "orders": [
+                        "ASC"
+                    ]
                 }
             ]
         },
@@ -64,7 +74,7 @@
             "$id": "posts",
             "$permissions": [
                 "create(\"users\")",
-                "read(\"any\")",
+                "read(\"users\")",
                 "update(\"users\")",
                 "delete(\"users\")"
             ],
@@ -102,7 +112,13 @@
                     "type": "string",
                     "required": true,
                     "array": false,
-                    "elements": ["image", "text", "blog", "video", "imessage"],
+                    "elements": [
+                        "image",
+                        "text",
+                        "blog",
+                        "video",
+                        "imessage"
+                    ],
                     "format": "enum",
                     "default": null
                 },
@@ -137,7 +153,11 @@
                     "type": "string",
                     "required": true,
                     "array": false,
-                    "elements": ["published", "draft", "archived"],
+                    "elements": [
+                        "published",
+                        "draft",
+                        "archived"
+                    ],
                     "format": "enum",
                     "default": null
                 },
@@ -146,7 +166,14 @@
                     "type": "string",
                     "required": true,
                     "array": false,
-                    "elements": ["public", "private", "followers", "mutuals", "unlisted", "team"],
+                    "elements": [
+                        "public",
+                        "private",
+                        "followers",
+                        "mutuals",
+                        "unlisted",
+                        "team"
+                    ],
                     "format": "enum",
                     "default": null
                 },
@@ -164,22 +191,36 @@
                     "key": "user_created_index",
                     "type": "key",
                     "status": "available",
-                    "attributes": ["userId", "createdAt"],
-                    "orders": ["DESC", "DESC"]
+                    "attributes": [
+                        "userId",
+                        "createdAt"
+                    ],
+                    "orders": [
+                        "DESC",
+                        "DESC"
+                    ]
                 },
                 {
                     "key": "type_index",
                     "type": "key",
                     "status": "available",
-                    "attributes": ["type"],
-                    "orders": ["ASC"]
+                    "attributes": [
+                        "type"
+                    ],
+                    "orders": [
+                        "ASC"
+                    ]
                 },
                 {
                     "key": "access_level_index",
                     "type": "key",
                     "status": "available",
-                    "attributes": ["accessLevel"],
-                    "orders": ["ASC"]
+                    "attributes": [
+                        "accessLevel"
+                    ],
+                    "orders": [
+                        "ASC"
+                    ]
                 }
             ]
         },
@@ -226,15 +267,25 @@
                     "key": "user_index",
                     "type": "key",
                     "status": "available",
-                    "attributes": ["userId"],
-                    "orders": ["ASC"]
+                    "attributes": [
+                        "userId"
+                    ],
+                    "orders": [
+                        "ASC"
+                    ]
                 },
                 {
                     "key": "user_name_unique_index",
                     "type": "unique",
                     "status": "available",
-                    "attributes": ["userId", "name"],
-                    "orders": ["ASC", "ASC"]
+                    "attributes": [
+                        "userId",
+                        "name"
+                    ],
+                    "orders": [
+                        "ASC",
+                        "ASC"
+                    ]
                 }
             ]
         },
@@ -306,8 +357,12 @@
                     "key": "post_id_unique_index",
                     "type": "unique",
                     "status": "available",
-                    "attributes": ["postId"],
-                    "orders": ["ASC"]
+                    "attributes": [
+                        "postId"
+                    ],
+                    "orders": [
+                        "ASC"
+                    ]
                 }
             ]
         },
@@ -393,7 +448,11 @@
                     "type": "string",
                     "required": false,
                     "array": false,
-                    "elements": ["sent", "delivered", "read"],
+                    "elements": [
+                        "sent",
+                        "delivered",
+                        "read"
+                    ],
                     "format": "enum",
                     "default": null
                 },
@@ -402,7 +461,10 @@
                     "type": "string",
                     "required": false,
                     "array": false,
-                    "elements": ["text", "image"],
+                    "elements": [
+                        "text",
+                        "image"
+                    ],
                     "format": "enum",
                     "default": "text"
                 },
@@ -436,22 +498,40 @@
                     "key": "conversation_screenshot_index",
                     "type": "key",
                     "status": "available",
-                    "attributes": ["conversationId", "screenshotIndex"],
-                    "orders": ["ASC", "ASC"]
+                    "attributes": [
+                        "conversationId",
+                        "screenshotIndex"
+                    ],
+                    "orders": [
+                        "ASC",
+                        "ASC"
+                    ]
                 },
                 {
                     "key": "conversation_timestamp_index",
                     "type": "key",
                     "status": "available",
-                    "attributes": ["conversationId", "timestamp"],
-                    "orders": ["ASC", "ASC"]
+                    "attributes": [
+                        "conversationId",
+                        "timestamp"
+                    ],
+                    "orders": [
+                        "ASC",
+                        "ASC"
+                    ]
                 },
                 {
                     "key": "conversation_message_unique_index",
                     "type": "unique",
                     "status": "available",
-                    "attributes": ["conversationId", "messageId"],
-                    "orders": ["ASC", "ASC"]
+                    "attributes": [
+                        "conversationId",
+                        "messageId"
+                    ],
+                    "orders": [
+                        "ASC",
+                        "ASC"
+                    ]
                 }
             ]
         },
@@ -459,7 +539,7 @@
             "$id": "richTextPosts",
             "$permissions": [
                 "create(\"users\")",
-                "read(\"any\")",
+                "read(\"users\")",
                 "update(\"users\")",
                 "delete(\"users\")"
             ],
@@ -556,15 +636,23 @@
                     "key": "post_id_unique_index",
                     "type": "unique",
                     "status": "available",
-                    "attributes": ["postId"],
-                    "orders": ["ASC"]
+                    "attributes": [
+                        "postId"
+                    ],
+                    "orders": [
+                        "ASC"
+                    ]
                 },
                 {
                     "key": "title_search_index",
                     "type": "key",
                     "status": "available",
-                    "attributes": ["title"],
-                    "orders": ["ASC"]
+                    "attributes": [
+                        "title"
+                    ],
+                    "orders": [
+                        "ASC"
+                    ]
                 }
             ]
         }
