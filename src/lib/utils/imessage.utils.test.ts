@@ -3,7 +3,7 @@ import {
     filterMessagesByParticipant,
     filterMessagesByContent,
     type iMessageMessage
-} from './imessage.utils';
+} from './imessage.utils.js';
 import type { Models } from 'appwrite';
 
 // Define reusable mock objects (fixtures)

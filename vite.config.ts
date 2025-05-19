@@ -1,4 +1,7 @@
-import { defineConfig } from 'vite';
+/// <reference types="@vitest/browser/matchers" />
+/// <reference types="@vitest/browser/providers/playwright" />
+
+import { defineConfig } from 'vitest/config';
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
 
@@ -46,7 +49,13 @@ export default defineConfig(({ mode }) => {
         },
 
         test: {
-            include: ['src/**/*.{test,spec}.{js,ts}']
+            include: ['src/**/*.{test,spec}.{js,ts}'],
+            browser: {
+                provider: 'playwright',
+                enabled: true,
+                headless: true,
+                instances: [{ browser: 'chromium' }]
+            }
         }
 
         // server: {

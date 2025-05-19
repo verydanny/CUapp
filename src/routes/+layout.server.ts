@@ -1,6 +1,6 @@
-import { getProfileById } from '$lib/server/profile'; // Adjust path if necessary
-import type { LayoutServerLoad } from './$types';
-import type { BasicProfile } from '$root/app';
+import { getProfileById } from '$lib/server/profile.js'; // Adjust path if necessary
+import type { LayoutServerLoad } from './$types.d.ts';
+import type { BasicProfile } from '$root/app.d.ts';
 
 export const load: LayoutServerLoad = async ({ locals, depends }) => {
     depends('app:user-profile');

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { iMessageParticipant } from '$lib/utils/imessage.utils';
+    import type { iMessageParticipant } from '$lib/utils/imessage.utils.js';
 
     const { participants, rightSideParticipant } = $props<{
         participants: iMessageParticipant[] | undefined | null;

@@ -1,5 +1,11 @@
 import { ID, Query } from 'appwrite';
 import type { Models } from 'appwrite';
+import {
+    APPWRITE_DATABASE_ID,
+    IMESSAGE_CONVERSATIONS_COLLECTION_ID,
+    IMESSAGE_MESSAGES_COLLECTION_ID,
+    IMESSAGE_PARTICIPANTS_COLLECTION_ID
+} from '$env/static/private';
 
 // --- Data Transfer Object (DTO) Interfaces for Appwrite Operations ---
 
@@ -91,16 +97,6 @@ export interface AppwriteDatabasesClient {
         documentId: string
     ) => Promise<unknown>; // Appwrite delete typically returns an empty response or throws
 }
-
-// --- Appwrite Configuration Constants ---
-// These should be sourced from environment variables for security and flexibility.
-const APPWRITE_DATABASE_ID = process.env.APPWRITE_DATABASE_ID || 'main';
-const IMESSAGE_CONVERSATIONS_COLLECTION_ID =
-    process.env.IMESSAGE_CONVERSATIONS_COLLECTION_ID || 'imessageConversations';
-const IMESSAGE_MESSAGES_COLLECTION_ID =
-    process.env.IMESSAGE_MESSAGES_COLLECTION_ID || 'imessageMessages';
-const IMESSAGE_PARTICIPANTS_COLLECTION_ID =
-    process.env.IMESSAGE_PARTICIPANTS_COLLECTION_ID || 'imessageParticipants';
 
 // --- CRUD Functions for iMessage Entities ---
 

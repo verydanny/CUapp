@@ -1,8 +1,8 @@
 // src/hooks.server.js
 import { sequence } from '@sveltejs/kit/hooks';
 import type { Handle } from '@sveltejs/kit';
-import { ADMIN_LABEL } from '$lib/const';
-import { createUserSessionClient } from '$lib/server/appwrite-utils/appwrite';
+import { ADMIN_LABEL } from '$lib/const.js';
+import { createUserSessionClient } from '$lib/server/appwrite-utils/appwrite.js';
 
 /**
  * This hook is used to create the Appwrite client and store the current logged in user in locals,

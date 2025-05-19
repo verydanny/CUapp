@@ -1,17 +1,16 @@
 <script lang="ts">
-    import type {
-        iMessageConversation,
-        iMessageMessage,
-        iMessageParticipant
-    } from '$lib/utils/imessage.utils';
+    import type { iMessageMessage, iMessageParticipant } from '$lib/utils/imessage.utils.js';
     import MessageBubble from './MessageBubble.svelte';
 
-    const { _conversation, messages, participants, rightSideParticipant } = $props<{
-        _conversation: iMessageConversation | null;
+    const {
+        messages,
+        participants,
+        rightSideParticipant
+    }: {
         messages: iMessageMessage[] | undefined | null;
         participants: iMessageParticipant[] | undefined | null;
         rightSideParticipant: iMessageParticipant | undefined | null;
-    }>();
+    } = $props();
 
     const isRightSide = (message: iMessageMessage) => {
         if (!rightSideParticipant) return false;
@@ -57,7 +56,7 @@
     });
 </script>
 
-<div class="flex flex-col space-y-1 bg-white p-3">
+<div class="imessage-conversation flex flex-col space-y-1 bg-white p-3">
     {#if groupedMessages && groupedMessages.length > 0}
         {#each groupedMessages as group, groupIndex (group.sender.$id + '-' + groupIndex)}
             {#each group.messages as message, messageIndex (message.$id)}

@@ -1,3 +1,7 @@
+---
+'cuapp': minor
+---
+
 feat: Add rich text post model and documentation
 
 **Overview:**

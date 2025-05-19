@@ -20,7 +20,9 @@ export interface Profile extends BasicProfile {
 }
 
 export interface UserWithAdmin
-    extends Pick<Models.User<Models.Preferences>, '$id' | 'email' | 'name' | 'phone' | 'labels'> {
+    extends Partial<
+        Pick<Models.User<Models.Preferences>, '$id' | 'email' | 'name' | 'phone' | 'labels'>
+    > {
     userIsAdmin: boolean;
     userWasLoggedIn: boolean;
 }

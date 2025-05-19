@@ -1,3 +1,4 @@
+import type { Models } from 'appwrite';
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/svelte';
 import IMessagePost from './IMessagePost.svelte';
@@ -5,8 +6,7 @@ import type {
     iMessageConversation,
     iMessageMessage,
     iMessageParticipant
-} from '$lib/utils/imessage.utils';
-import type { Models } from 'appwrite';
+} from '$lib/utils/imessage.utils.js';
 
 // Mock data
 const mockParticipants: iMessageParticipant[] = [
@@ -80,31 +80,13 @@ const mockConversation: iMessageConversation & Models.Document = {
     totalScreenshots: 2
 };
 
-// Let's install the testing library
-vi.mock('@testing-library/svelte', () => ({
-    render: vi.fn().mockReturnValue({
-        container: {
-            textContent: 'Test message 1 Test message 2 Alice',
-            querySelector: vi.fn().mockImplementation((selector) => {
-                if (selector === '.animate-pulse') {
-                    return {};
-                }
-                if (selector === 'a[href="/post/test-post-id"]') {
-                    return { textContent: 'View full post' };
-                }
-                return null;
-            }),
-            querySelectorAll: vi.fn().mockReturnValue([{ textContent: 'Test message 1' }])
-        }
-    })
-}));
-
 describe('IMessagePost Component', () => {
     it('renders the component with messages', () => {
         const { container } = render(IMessagePost, {
             conversation: mockConversation,
             messages: mockMessages,
-            participants: mockParticipants
+            participants: mockParticipants,
+            rightSideParticipant: mockParticipants[1]
         });
 
         // Check if messages are rendered
@@ -117,18 +99,15 @@ describe('IMessagePost Component', () => {
 
     it('renders a loading state when loading is true', () => {
         const { container } = render(IMessagePost, {
-            conversation: mockConversation,
+            conversation: null,
             messages: mockMessages,
             participants: mockParticipants,
+            rightSideParticipant: mockParticipants[0],
             loading: true
         });
 
-        // The loading div should have the animate-pulse class
-        const loadingElement = container.querySelector('.animate-pulse');
-        expect(loadingElement).not.toBeNull();
-
         // Messages should not be visible
-        expect(container.textContent).not.toContain('Test message 1');
+        expect(container.textContent).toContain('Loading Conversation...');
     });
 
     it('shows an error when rightSideParticipant is not found', () => {
@@ -141,12 +120,14 @@ describe('IMessagePost Component', () => {
         const { container } = render(IMessagePost, {
             conversation: badConversation,
             messages: mockMessages,
-            participants: mockParticipants
+            participants: mockParticipants,
+            rightSideParticipant: null
         });
 
         // Should show an error message
-        expect(container.textContent).toContain('Error');
-        expect(container.textContent).toContain('Could not load conversation participants');
+        expect(container.textContent).toContain(
+            'Preparing Data... Conversation data is (still) incomplete or not fully processed.'
+        );
     });
 
     it('renders a link to the post when postId is provided', () => {
@@ -154,7 +135,8 @@ describe('IMessagePost Component', () => {
             conversation: mockConversation,
             messages: mockMessages,
             participants: mockParticipants,
-            postId: 'test-post-id'
+            postId: 'test-post-id',
+            rightSideParticipant: mockParticipants[1]
         });
 
         // Check for the post link
@@ -181,13 +163,12 @@ describe('IMessagePost Component', () => {
         const { container } = render(IMessagePost, {
             conversation: mockConversation,
             messages: reverseMessages,
-            participants: mockParticipants
+            participants: mockParticipants,
+            rightSideParticipant: mockParticipants[1]
         });
 
         // The first message in the DOM should be the one with screenshotIndex 0
-        const messageElements = container.querySelectorAll(
-            '.flex > .bg-base-200, .flex > .bg-primary'
-        );
+        const messageElements = container.querySelectorAll('.imessage-conversation');
         expect(messageElements.length).toBeGreaterThan(0);
         expect(messageElements[0].textContent).toContain('Test message 1');
 

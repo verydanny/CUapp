@@ -1,7 +1,7 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { routes } from '$lib/const';
-    import type { PageProps } from './$types';
+    import { routes } from '$lib/const.js';
+    import type { PageProps } from './$types.d.ts';
 
     let { form }: PageProps = $props();
 </script>

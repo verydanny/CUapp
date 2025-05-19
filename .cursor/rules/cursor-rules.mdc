@@ -17,9 +17,9 @@ This rule defines the required format, location, naming, content standards, and 
 
 - All rule files **must** be located in the `.cursor/rules/` directory.
 - File names **must** follow the `name.mdc` kebab-case convention (without prefixes).
-- Each rule file **must** start with the specified frontmatter. The required fields are:
+- Each rule file **must** start with the specified frontmatter. Do not add comments in the frontmatter. The required fields are:
     - `description` (String): Concise (under ~150 characters), ideally following the `ACTION when TRIGGER to OUTCOME` format.
-    - `globs` (String): Comma-separated string of glob patterns. Use an empty string `""` if the rule is not glob-dependent (e.g., if primarily triggered by `tags` or `alwaysApply`). For single patterns, do not enclose the pattern in quotes.
+    - `globs` (String): `globs` **must** be a comma-separated string of patterns. Do not use YAML/JSON array format with quotes for each individual pattern (e.g., `['**/*.svelte', ... ]`). For example, use `globs: **/*.svelte, **/+page.svelte`. For single patterns, ensure the pattern itself is not enclosed in quotes (e.g., `globs: my/path/*.js` not `globs: "my/path/*.js"`). Do not add quotes around the globs either. The globs are like so: `globs: **/*.svelte, **/*.ts` **NOT** `globs: '**/*.svelte', '**/*.ts'` or `globs: '**/*.svelte, **/*.ts'`, etc. NO QUOTES IN GLOBS.
     - `tags` (Array of Strings): List of relevant keywords.
     - `priority` (Integer): A number indicating precedence (e.g., 1-5, lower might mean more general or overridden).
     - `version` (String): Semantic version (e.g., `1.0.0`).
@@ -29,14 +29,16 @@ This rule defines the required format, location, naming, content standards, and 
 - Include both valid and invalid examples using `<example>` tags with the appropriate `type` attribute (if `type="invalid"`), indented by 2 spaces.
 - Use concise Markdown.
 - Keep rules and examples as short as possible while maintaining clarity and usefulness for the AI.
-- **Glob formatting:** `globs` **must** be a comma-separated string of patterns. Do not use YAML/JSON array format with quotes for each individual pattern (e.g., `['**/*.svelte', ... ]`). For example, use `globs: **/*.svelte, **/+page.svelte`. For single patterns, ensure the pattern itself is not enclosed in quotes (e.g., `globs: my/path/*.js` not `globs: "my/path/*.js"`). Do not add quotes around the globs either. The globs are like so: `globs: **/*.svelte, **/*.ts` **NOT** `globs: '**/*.svelte', '**/*.ts'` or `globs: '**/*.svelte, **/*.ts'`, etc. NO QUOTES IN GLOBS.
+- **Glob formatting:**
 - Update the `version` in the frontmatter following semantic versioning whenever the rule is modified (PATCH for fixes/clarifications, MINOR for new non-breaking requirements, MAJOR for breaking changes).
 - **AI Interaction Requirement for Rule Modification:** When working with `.cursor/rules/*.mdc` files (i.e., modifying existing rules or creating new ones), I (the AI) **must not** use the `edit_file` tool. Instead, I **must** generate the full, complete content of the desired rule file (including all frontmatter and the entire markdown body) and present it to the user. The user will then be responsible for manually creating/updating the file with the content I provide.
+- MDC files must have a blank link (new line) before and after adding code blocks or code in examples (when using triple backticks).
 
 ## Examples
 
 <example description="Correctly formatted rule frontmatter with alwaysApply">
-  ```mdc
+
+```mdc
 ---
 description: Enforce consistent JavaScript semicolon usage and best practices.
 globs: src/**/*.js, **/*.mjs
@@ -47,26 +49,30 @@ alwaysApply: false # Specific to JS files, not a universal AI rule
 ---
 # JavaScript Semicolon and Best Practices Rule
 ...
-  ```
+```
+
 </example>
 
 <example description="Correctly formatted rule frontmatter for a foundational AI rule">
-  ```mdc
+
+```mdc
 ---
 description: Guide AI to always respond politely and ask clarifying questions when unsure.
-globs: "" # Not file-specific
+globs: ""
 tags: [ai, communication, best-practice]
 priority: 1
 version: 1.0.0
-alwaysApply: true # This is a core AI behavior guideline
+alwaysApply: true
 ---
 # AI Politeness and Clarification Protocol
 ...
-  ```
+```
+
 </example>
 
 <example type="invalid" description="Incorrect glob formatting (using array of strings)">
-  ```mdc
+
+```mdc
 ---
 description: Svelte file standards
 globs: ['**/*.svelte', '**/+page.svelte', '**/+layout.svelte'] # Incorrect: looks like a YAML/JSON array
@@ -77,11 +83,13 @@ alwaysApply: false
 ---
 # Svelte File Rule
 ...
-  ```
+```
+
 </example>
 
 <example type="invalid" description="Incorrect glob formatting (quotes around a single pattern)">
-  ```mdc
+
+```mdc
 ---
 description: Rule for specific config file.
 globs: "src/configs/special.config.json" # Incorrect: quotes around the single pattern
@@ -92,11 +100,13 @@ alwaysApply: false
 ---
 # Special Config Rule
 ...
-  ```
+```
+
 </example>
 
 <example description="Correct glob formatting (single pattern, no quotes)">
-  ```mdc
+
+```mdc
 ---
 description: Rule for specific config file.
 globs: src/configs/special.config.json # Correct: no quotes around the single pattern
@@ -107,11 +117,13 @@ alwaysApply: false
 ---
 # Special Config Rule
 ...
-  ```
+```
+
 </example>
 
 <example description="Correct glob formatting (multiple patterns, comma-separated string)">
-  ```mdc
+
+```mdc
 ---
 description: Svelte file standards
 globs: **/*.svelte, **/+page.svelte, **/+layout.svelte
@@ -122,11 +134,13 @@ alwaysApply: false
 ---
 # Svelte File Rule
 ...
-  ```
+```
+
 </example>
 
 <example type="invalid" description="Missing required frontmatter field (e.g., version or alwaysApply if we decide it's mandatory to list)">
-  ```mdc
+
+```mdc
 ---
 description: Enforce semicolon usage in JavaScript files
 globs: src/**/*.js
@@ -137,7 +151,8 @@ priority: 3
 ---
 # JavaScript Semicolon Rule
 ...
-  ```
+```
+
 </example>
 
 ## File Organization

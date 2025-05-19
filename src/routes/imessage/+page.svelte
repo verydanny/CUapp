@@ -1,10 +1,10 @@
 <script lang="ts">
-    import IMessagePost from '$lib/components/imessage/IMessagePost.svelte';
+    import IMessagePost from '$layout/components/imessage/IMessagePost.svelte';
     import type {
         iMessageConversation,
         iMessageMessage,
         iMessageParticipant
-    } from '$lib/utils/imessage.utils';
+    } from '$lib/utils/imessage.utils.js';
 
     // Component State
     let loadedConversation = $state<iMessageConversation | null>(null); // Holds the fetched conversation metadata

@@ -3,7 +3,7 @@
         iMessageConversation,
         iMessageMessage,
         iMessageParticipant
-    } from '$lib/utils/imessage.utils';
+    } from '$lib/utils/imessage.utils.js';
     import ConversationHeader from './ConversationHeader.svelte';
     import Conversation from './Conversation.svelte';
 
@@ -14,27 +14,25 @@
         rightSideParticipant, // This prop is directly passed from the parent page
         loading = false,
         postId = undefined
-    } = $props<{
+    }: {
         conversation: iMessageConversation | null; // Allow null from parent
         messages: iMessageMessage[];
         participants: iMessageParticipant[];
         rightSideParticipant: iMessageParticipant | undefined | null; // Allow undefined or null
         loading?: boolean;
         postId?: string;
-    }>();
+    } = $props();
 
     // effectiveRightSideParticipant will just be the prop passed in, or null if that prop is null/undefined.
     // The parent (+page.svelte) is now responsible for correctly deriving it.
-    let effectiveRightSideParticipant = $derived(rightSideParticipant);
+    let effectiveRightSideParticipant = $state(rightSideParticipant);
 
     let headerDataReady = $derived(
         !!(conversation && effectiveRightSideParticipant && participants && participants.length > 0)
     );
-
     let sortedMessages = $derived.by(() => {
         return messages ? [...messages].sort((a, b) => a.screenshotIndex - b.screenshotIndex) : [];
     });
-
     // Placeholder function for icon clicks - can be implemented later if needed
     function onIconClick(iconName: string) {
         console.log(`${iconName} icon clicked`);
@@ -54,11 +52,6 @@
             <p class="text-gray-600">
                 Conversation data is (still) incomplete or not fully processed.
             </p>
-            <!-- Debug info -->
-            <pre class="mt-2 overflow-auto bg-gray-100 p-2 text-left text-xs">Debug:
-Conversation loaded: {JSON.stringify(!!conversation)}
-Effective RSP valid: {JSON.stringify(!!effectiveRightSideParticipant)}
-Participants loaded: {participants?.length || 0}</pre>
         </div>
     </div>
 {:else}
@@ -66,7 +59,7 @@ Participants loaded: {participants?.length || 0}</pre>
         <ConversationHeader {participants} rightSideParticipant={effectiveRightSideParticipant} />
         <div class="p-0">
             <Conversation
-                _conversation={conversation}
+                {conversation}
                 messages={sortedMessages}
                 {participants}
                 rightSideParticipant={effectiveRightSideParticipant}

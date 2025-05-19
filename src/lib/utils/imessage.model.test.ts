@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { sortMessagesByScreenshotIndex, type iMessageMessage } from './imessage.utils';
+import { sortMessagesByScreenshotIndex, type iMessageMessage } from './imessage.utils.js';
 import type { Models } from 'appwrite'; // Import Models
 
 const baseMockMessage: iMessageMessage & Models.Document = {

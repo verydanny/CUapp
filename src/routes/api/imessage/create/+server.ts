@@ -1,12 +1,12 @@
+import { ID } from 'appwrite';
+import type { Models } from 'appwrite';
 import { json, error } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
+import type { RequestHandler } from './$types.d.ts';
 import type {
     iMessageConversation,
     iMessageMessage,
     iMessageParticipant
-} from '$lib/utils/imessage.utils';
-import { ID } from 'appwrite';
-import type { Models } from 'appwrite';
+} from '$lib/utils/imessage.utils.js';
 import {
     createIMessageConversation,
     createIMessageMessage,
@@ -14,8 +14,8 @@ import {
     type CreateIMessageMessageData,
     type CreateIMessageParticipantData,
     type AppwriteDatabasesClient // Assuming this type defines your db client structure
-} from '$lib/server/appwrite-utils/imessage.appwrite';
-import { createAdminClient } from '$lib/server/appwrite-utils/appwrite';
+} from '$lib/server/appwrite-utils/imessage.appwrite.js';
+import { createAdminClient } from '$lib/server/appwrite-utils/appwrite.js';
 
 // This endpoint simulates creating and returning a mock iMessage conversation.
 // In a real scenario, this would interact with a database.
@@ -37,14 +37,14 @@ export const POST: RequestHandler = async ({ request: _request, locals }) => {
 
         // 1. Create Participants
         const participantData1: CreateIMessageParticipantData = {
-            userId: locals.user.$id,
+            userId: locals.user.$id as string,
             name: mockUserAlias1
             // avatarFileId: '...' // Optional
         };
         const participant1 = await createIMessageParticipant(databases, participantData1);
 
         const participantData2: CreateIMessageParticipantData = {
-            userId: locals.user.$id,
+            userId: locals.user.$id as string,
             name: mockUserAlias2
             // avatarFileId: '...'
         };

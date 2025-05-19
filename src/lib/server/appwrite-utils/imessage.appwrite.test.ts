@@ -1,5 +1,6 @@
+// @vitest-environment node
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-// import { ID } from 'appwrite' // No longer needed here
+
 import {
     createIMessageConversation,
     createIMessageMessage,
@@ -20,7 +21,7 @@ import {
     type UpdateIMessageMessageData,
     type AppwriteDatabasesClient,
     type UpdateIMessageParticipantData
-} from './imessage.appwrite'; // Import the actual function and type
+} from './imessage.appwrite.js'; // Import the actual function and type
 import type { Models } from 'appwrite'; // For Models.Document type hint
 import { Query } from 'appwrite'; // Import Query for test assertions
 

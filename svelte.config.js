@@ -17,7 +17,6 @@ const config = {
     },
 
     kit: {
-        env: { dir: '.' },
         alias: {
             $root: 'src',
             $layout: 'src/routes/(layout)',

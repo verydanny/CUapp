@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { sortParticipantsByName, type iMessageParticipant } from './imessage.utils';
+import { sortParticipantsByName, type iMessageParticipant } from './imessage.utils.js';
 import type { Models } from 'appwrite';
 
 const baseMockParticipant: iMessageParticipant & Models.Document = {

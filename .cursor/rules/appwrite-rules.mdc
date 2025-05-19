@@ -1,91 +1,133 @@
 ---
-description: Guide AI interaction with Appwrite check version, learn latest docs/changelog, and generate version-specific rule.
-globs: **/*appwrite*, **/*Appwrite*
-tags: [appwrite, workflow, learning, bootstrap]
-priority: 1
-version: 1.0.0
+description: Guide testing Appwrite utility functions in SvelteKit with Vitest, emphasizing mocking Appwrite client methods and SvelteKit environment variables.
+globs: src/lib/server/appwrite-utils/*.appwrite.ts, src/lib/server/appwrite-utils/*.appwrite.test.ts
+tags: [svelte, sveltekit, appwrite, testing, vitest, mock, env]
+priority: 3
+version: 1.2.0 # Updated version
 alwaysApply: false
 ---
 
-# Appwrite Interaction Protocol
+# Appwrite SvelteKit Utility Function Testing Workflow
 
 ## Context
 
-This rule is designed to ensure that the AI (I) always uses the most up-to-date information and best practices when assisting with Appwrite-related tasks. It will be triggered when "Appwrite" is mentioned in a query, or when files or directories containing "appwrite" in their name are created or modified. The goal is to maintain accuracy and relevance in Appwrite guidance by dynamically updating my knowledge and creating version-specific reference rules.
+- This rule guides the process of writing unit tests for Appwrite utility functions (e.g., those in `src/lib/server/appwrite-utils/*.appwrite.ts`) within a SvelteKit project.
+- It emphasizes using Vitest and `vi.fn()` for mocking the Appwrite client methods that these utilities call, and `vi.mock()` for mocking `$env/static/private` if the utilities use environment variables directly (e.g., for Database or Collection IDs).
+- **Import Convention**: For internal project imports (e.g., from `$lib/...` or relative paths like `./...`), append `.js` to the import path (e.g., `import { myFunction } from '$lib/utils/myUtils.js';`, `import { GET } from './+server.js';`).
+- Apply this rule when creating or modifying unit tests for these Appwrite utility functions.
 
 ## Requirements
 
-1.  **Ascertain Appwrite Version:**
-
-    - If the user's current Appwrite version is not already known from the conversation context, I **must** ask the user: "What version of Appwrite are you currently using?"
-    - I will wait for the user's response before proceeding.
-
-2.  **Learn Latest Appwrite Information:**
-
-    - Once the Appwrite version is known, I **must** perform web searches to fetch the latest official Appwrite documentation and changelog:
-        - Main Documentation: `https://appwrite.io/docs`
-        - Changelog: `https://appwrite.io/changelog`
-    - I will then conduct a deep and thorough review of the fetched content. This review should focus on:
-        - Information pertinent to the user's specified Appwrite version.
-        - Changes, new features, and deprecated functionalities mentioned in versions up to and including the user's version, as well as any subsequent versions if available (to understand the evolution and current best practices).
-        - Key API endpoints, CLI command syntax, common workflows, and potential breaking changes.
-
-3.  **Update Internal Knowledge:**
-
-    - I **must** update my internal knowledge of Appwrite based on the information gathered in the previous step.
-    - I will actively prioritize this new information, and it should supersede any prior, potentially outdated knowledge I might have regarding Appwrite. Obsolete CLI commands or features should be flagged in my internal understanding.
-
-4.  **Generate Version-Specific Rule:**
-
-    - After learning, I **must** create the content for a _new_ Cursor rule file.
-    - This new rule file will be named according to the user's Appwrite version, e.g., `appwrite-1.6.2.mdc` if the user is on version 1.6.2.
-    - The content of this new version-specific rule **must** summarize:
-        - Key architectural concepts for that version.
-        - Commonly used CLI commands with correct syntax for that version.
-        - Links to specific important pages within `https://appwrite.io/docs` relevant to that version (if identifiable).
-        - Notable features or limitations of that version.
-        - Any critical migration notes if upgrading from a common prior version.
-    - This version-specific rule should also follow the formatting guidelines from `@cursor-rules.mdc` (including frontmatter like description, version 1.0.0 for the new rule, etc.).
-    - I will then present the _full content_ of this new version-specific rule to the user and instruct them to save it in the `.cursor/rules/` directory with the appropriate filename.
-
-5.  **Proceed with User's Request:**
-    - Only after completing the steps above (version check, learning, internal knowledge update, and generation of the new version-specific rule content), will I address the user's original Appwrite-related query.
-    - When addressing the query, I will use my newly updated knowledge and may refer to the version-specific rule if it aids in providing a concise answer or pointing to further details.
+- Appwrite utility functions (e.g., `createRichTextPost`) are located in `src/lib/server/appwrite-utils/`. They accept an Appwrite service client (like `Databases`) as an argument.
+- Test files reside in the same directory as the utility functions they test, with a `.test.ts` extension.
+- **Mocking Appwrite Client Methods:**
+    - The Appwrite service client instance (e.g., `Databases`) passed to utility functions should have its methods (e.g., `createDocument`, `getDocument`) mocked using `vi.fn()`. This allows asserting how the utility function interacts with the Appwrite SDK.
+    - Clear all mocks before each test using `beforeEach(() => { vi.clearAllMocks(); });` for test isolation.
+- **Mocking SvelteKit Environment Variables (`$env/static/private`) for Utilities:**
+    - If your Appwrite utility functions _directly import_ configuration constants (like specific Database IDs or Collection IDs) from `$env/static/private`, these imports **must** be mocked in the test files for those utilities.
+    - Use `vi.mock('$env/static/private', ...)` to provide mock values for these imported constants. This mock should be at the top level of your test file.
+    - Test files should define their own constants for these IDs, and the mock ensures the utility implementation uses these test-defined constants.
+- **Assertions:**
+    - Verify that the mocked Appwrite SDK methods (e.g., `mockDatabases.createDocument`) are called by the utility function with the correct parameters. These parameters will often include Database/Collection IDs which, if imported by the utility from `$env/static/private`, will correspond to the values supplied in the `vi.mock('$env/static/private', ...)` setup.
+    - When asserting document IDs generated by Appwrite's `ID.unique()`, use `expect.any(String)`.
+- **Constants in Tests:**
+    - Define constants for Appwrite database IDs and collection IDs directly within test files. These are used for assertions and to supply values for the `$env/static/private` mock.
+- **Implementation Files (`*.appwrite.ts` Utilities):**
+    - These utility files **must** source their Appwrite configuration constants (Database ID, Collection IDs) from `$env/static/private` as per `appwrite-rules.mdc` if they need to reference them directly.
+- **Shared Types:**
+    - Define interfaces for data payloads and Appwrite client stubs. Export these from the utility file and import into tests using the `.js` extension (e.g., `from './example.appwrite.js'`).
+- Ensure all linting and typing errors are resolved before running tests.
 
 ## Examples
 
-<example description="User asks an Appwrite question for the first time">
-  ```
-  User: How do I add attributes to an Appwrite collection?
-  AI: Okay, I can help with that! What version of Appwrite are you currently using?
-  User: I'm on Appwrite 1.6.2.
-  AI: Thanks! One moment while I refresh my knowledge on Appwrite 1.6.2 and prepare some version-specific notes for us...
-  (AI performs web search, learns, then generates content for .cursor/rules/appwrite-1.6.2.mdc)
-  AI: I've prepared a summary for Appwrite 1.6.2. Please save the following content as `.cursor/rules/appwrite-1.6.2.mdc`:
-  ---
-  description: Quick reference for Appwrite 1.6.2 features and CLI commands.
-  globs: ""
-  tags: [appwrite, appwrite-1.6.2, reference]
-  priority: 2
-  version: 1.0.0
-  ---
-  # Appwrite 1.6.2 Reference
-  ## Context
-  This rule contains a quick summary of Appwrite 1.6.2 specific information.
-  ## Key Features & CLI (example content)
-  - Collections are managed via `appwrite deploy collection`.
-  - ...
-  ## Important Links
-  - Docs: https://appwrite.io/docs/version/1.6.2/collections
-  ...
-  (AI provides the full rule content)
-  AI: Once you've saved that, regarding your question: to add attributes to a collection in Appwrite 1.6.2, you'll define them in your `appwrite.json` file within the collection's definition under the `attributes` array, and then deploy the collection. For example...
-  ```
+<example description="Mocking Appwrite client methods and `$env/static/private` in a utility function's test.">
+
+```typescript
+// In src/lib/server/appwrite-utils/example.appwrite.test.ts
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import {
+    createExampleDocument,
+    type CreateExampleData,
+    type AppwriteDatabasesClient
+} from './example.appwrite.js'; // Note .js for internal import
+
+// ---- Critical: Mock $env/static/private if example.appwrite.ts uses it ----
+const MOCK_ENV_APPWRITE_DB_ID = 'test_db_id_from_env_mock';
+const MOCK_ENV_EXAMPLE_COLLECTION_ID = 'test_coll_id_from_env_mock';
+
+vi.mock('$env/static/private', () => ({
+    // $env/static/private does not take .js
+    APPWRITE_DATABASE_ID: MOCK_ENV_APPWRITE_DB_ID,
+    EXAMPLE_COLLECTION_ID: MOCK_ENV_EXAMPLE_COLLECTION_ID
+}));
+// ---- End Mock ----
+
+const mockCreateDocumentMethod = vi.fn();
+const mockDatabasesService = {
+    createDocument: mockCreateDocumentMethod
+} as unknown as AppwriteDatabasesClient;
+
+describe('Appwrite Utility: createExampleDocument', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        mockCreateDocumentMethod.mockResolvedValue({ $id: 'newDocId' });
+    });
+
+    it('should call databases.createDocument with correct env-sourced IDs and data', async () => {
+        const exampleData: CreateExampleData = { name: 'Test Item', value: 100 };
+        await createExampleDocument(mockDatabasesService, exampleData);
+
+        expect(mockCreateDocumentMethod).toHaveBeenCalledOnce();
+        expect(mockCreateDocumentMethod).toHaveBeenCalledWith(
+            MOCK_ENV_APPWRITE_DB_ID,
+            MOCK_ENV_EXAMPLE_COLLECTION_ID,
+            expect.any(String),
+            exampleData
+        );
+    });
+});
+```
+
 </example>
 
-<example type="invalid" description="AI answers an Appwrite question without checking version or updating knowledge">
-  ```
-  User: How do I create a new Appwrite function?
-  AI: You just run `appwrite functions create --name "My Func"` (This is invalid because the AI did not follow the protocol to check version, learn, and create the version-specific rule first, and the command might be outdated).
-  ```
+<example description="Corresponding utility implementation in `example.appwrite.ts` using `$env/static/private` (no changes needed here for `.js` on $env imports).">
+
+```typescript
+// In src/lib/server/appwrite-utils/example.appwrite.ts
+import { ID } from 'appwrite';
+import type { Models } from 'appwrite';
+import { APPWRITE_DATABASE_ID, EXAMPLE_COLLECTION_ID } from '$env/static/private'; // $env imports are special
+
+export interface CreateExampleData {
+    name: string;
+    value: number;
+}
+export interface AppwriteDatabasesClient {
+    createDocument: (
+        databaseId: string,
+        collectionId: string,
+        documentId: string,
+        data: object
+    ) => Promise<Models.Document>;
+}
+
+export async function createExampleDocument(
+    databases: AppwriteDatabasesClient,
+    data: CreateExampleData
+): Promise<Models.Document> {
+    try {
+        const document = await databases.createDocument(
+            APPWRITE_DATABASE_ID,
+            EXAMPLE_COLLECTION_ID,
+            ID.unique(),
+            data
+        );
+        return document;
+    } catch (error) {
+        console.error('Error creating example document:', error);
+        throw error;
+    }
+}
+```
+
 </example>
