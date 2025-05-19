@@ -1,0 +1,91 @@
+---
+description: Guide AI interaction with Appwrite check version, learn latest docs/changelog, and generate version-specific rule.
+globs: **/*appwrite*, **/*Appwrite*
+tags: [appwrite, workflow, learning, bootstrap]
+priority: 1
+version: 1.0.0
+alwaysApply: false
+---
+
+# Appwrite Interaction Protocol
+
+## Context
+
+This rule is designed to ensure that the AI (I) always uses the most up-to-date information and best practices when assisting with Appwrite-related tasks. It will be triggered when "Appwrite" is mentioned in a query, or when files or directories containing "appwrite" in their name are created or modified. The goal is to maintain accuracy and relevance in Appwrite guidance by dynamically updating my knowledge and creating version-specific reference rules.
+
+## Requirements
+
+1.  **Ascertain Appwrite Version:**
+
+    - If the user's current Appwrite version is not already known from the conversation context, I **must** ask the user: "What version of Appwrite are you currently using?"
+    - I will wait for the user's response before proceeding.
+
+2.  **Learn Latest Appwrite Information:**
+
+    - Once the Appwrite version is known, I **must** perform web searches to fetch the latest official Appwrite documentation and changelog:
+        - Main Documentation: `https://appwrite.io/docs`
+        - Changelog: `https://appwrite.io/changelog`
+    - I will then conduct a deep and thorough review of the fetched content. This review should focus on:
+        - Information pertinent to the user's specified Appwrite version.
+        - Changes, new features, and deprecated functionalities mentioned in versions up to and including the user's version, as well as any subsequent versions if available (to understand the evolution and current best practices).
+        - Key API endpoints, CLI command syntax, common workflows, and potential breaking changes.
+
+3.  **Update Internal Knowledge:**
+
+    - I **must** update my internal knowledge of Appwrite based on the information gathered in the previous step.
+    - I will actively prioritize this new information, and it should supersede any prior, potentially outdated knowledge I might have regarding Appwrite. Obsolete CLI commands or features should be flagged in my internal understanding.
+
+4.  **Generate Version-Specific Rule:**
+
+    - After learning, I **must** create the content for a _new_ Cursor rule file.
+    - This new rule file will be named according to the user's Appwrite version, e.g., `appwrite-1.6.2.mdc` if the user is on version 1.6.2.
+    - The content of this new version-specific rule **must** summarize:
+        - Key architectural concepts for that version.
+        - Commonly used CLI commands with correct syntax for that version.
+        - Links to specific important pages within `https://appwrite.io/docs` relevant to that version (if identifiable).
+        - Notable features or limitations of that version.
+        - Any critical migration notes if upgrading from a common prior version.
+    - This version-specific rule should also follow the formatting guidelines from `@cursor-rules.mdc` (including frontmatter like description, version 1.0.0 for the new rule, etc.).
+    - I will then present the _full content_ of this new version-specific rule to the user and instruct them to save it in the `.cursor/rules/` directory with the appropriate filename.
+
+5.  **Proceed with User's Request:**
+    - Only after completing the steps above (version check, learning, internal knowledge update, and generation of the new version-specific rule content), will I address the user's original Appwrite-related query.
+    - When addressing the query, I will use my newly updated knowledge and may refer to the version-specific rule if it aids in providing a concise answer or pointing to further details.
+
+## Examples
+
+<example description="User asks an Appwrite question for the first time">
+  ```
+  User: How do I add attributes to an Appwrite collection?
+  AI: Okay, I can help with that! What version of Appwrite are you currently using?
+  User: I'm on Appwrite 1.6.2.
+  AI: Thanks! One moment while I refresh my knowledge on Appwrite 1.6.2 and prepare some version-specific notes for us...
+  (AI performs web search, learns, then generates content for .cursor/rules/appwrite-1.6.2.mdc)
+  AI: I've prepared a summary for Appwrite 1.6.2. Please save the following content as `.cursor/rules/appwrite-1.6.2.mdc`:
+  ---
+  description: Quick reference for Appwrite 1.6.2 features and CLI commands.
+  globs: ""
+  tags: [appwrite, appwrite-1.6.2, reference]
+  priority: 2
+  version: 1.0.0
+  ---
+  # Appwrite 1.6.2 Reference
+  ## Context
+  This rule contains a quick summary of Appwrite 1.6.2 specific information.
+  ## Key Features & CLI (example content)
+  - Collections are managed via `appwrite deploy collection`.
+  - ...
+  ## Important Links
+  - Docs: https://appwrite.io/docs/version/1.6.2/collections
+  ...
+  (AI provides the full rule content)
+  AI: Once you've saved that, regarding your question: to add attributes to a collection in Appwrite 1.6.2, you'll define them in your `appwrite.json` file within the collection's definition under the `attributes` array, and then deploy the collection. For example...
+  ```
+</example>
+
+<example type="invalid" description="AI answers an Appwrite question without checking version or updating knowledge">
+  ```
+  User: How do I create a new Appwrite function?
+  AI: You just run `appwrite functions create --name "My Func"` (This is invalid because the AI did not follow the protocol to check version, learn, and create the version-specific rule first, and the command might be outdated).
+  ```
+</example>

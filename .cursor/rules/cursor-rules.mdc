@@ -1,67 +1,116 @@
 ---
-description: Guides correct format and usage of Cursor rules
-globs: .cursor/rules/*.mdc
-tags: [cursor, rules, standards, meta]
+description: Define format, location, naming, content standards, and AI interaction for Cursor rules.
+globs: .cursor/**/*.mdc
+tags: [cursor, rules, meta, standards]
 priority: 1
-version: 1.3.0
+version: 1.4.0
+alwaysApply: true
 ---
 
 # Cursor Rules Standards
 
 ## Context
 
-- This rule defines the required format, location, naming, and content standards for all Cursor rule files (`.mdc`) within this project.
-- Apply this rule whenever creating, modifying, or reviewing a Cursor rule file.
+This rule defines the required format, location, naming, content standards, and AI interaction protocols for all Cursor rule files (`.mdc`) within this project. It ensures consistency and proper behavior of the AI when working with rules. Apply this rule whenever creating, modifying, or reviewing any Cursor rule file.
 
 ## Requirements
 
-- All rule files must be located in the `.cursor/rules/` directory.
-- File names must follow the `name.mdc` kebab-case convention (without prefixes).
-- Each rule file must start with the specified frontmatter (description, globs, tags, priority, version).
-- The frontmatter description must be concise (under ~120 characters) and follow the `ACTION when TRIGGER to OUTCOME` format.
-- The file body must include sections for `# Rule Title`, `## Context`, `## Requirements`, and `## Examples` (as outlined in the Formatting Guidelines).
-- Requirements must be concise, actionable, and testable.
-- Include both valid and invalid examples using `<example>` tags with the appropriate `type` attribute, indented by 2 spaces.
+- All rule files **must** be located in the `.cursor/rules/` directory.
+- File names **must** follow the `name.mdc` kebab-case convention (without prefixes).
+- Each rule file **must** start with the specified frontmatter. The required fields are:
+    - `description` (String): Concise (under ~150 characters), ideally following the `ACTION when TRIGGER to OUTCOME` format.
+    - `globs` (String): Comma-separated string of glob patterns. Use an empty string `""` if the rule is not glob-dependent (e.g., if primarily triggered by `tags` or `alwaysApply`). For single patterns, do not enclose the pattern in quotes.
+    - `tags` (Array of Strings): List of relevant keywords.
+    - `priority` (Integer): A number indicating precedence (e.g., 1-5, lower might mean more general or overridden).
+    - `version` (String): Semantic version (e.g., `1.0.0`).
+    - `alwaysApply` (Boolean): Set to `true` if the rule represents fundamental guidelines the AI should always consider active (e.g., general coding standards, core AI behavior). Defaults to `false` if not specified for most rules.
+- The file body **must** include sections for `# Rule Title`, `## Context`, `## Requirements`, and `## Examples`.
+- Requirements **must** be concise, actionable, and testable.
+- Include both valid and invalid examples using `<example>` tags with the appropriate `type` attribute (if `type="invalid"`), indented by 2 spaces.
 - Use concise Markdown.
 - Keep rules and examples as short as possible while maintaining clarity and usefulness for the AI.
-- **Glob formatting:** `globs` must be a comma-separated string of patterns. Do not use YAML/JSON array format with quotes for each pattern. For example, use `globs: **/*.svelte, **/+page.svelte` not `globs: ['**/*.svelte', '**/+page.svelte']`.
-- Update the `version` in the frontmatter following semantic versioning whenever the rule is modified.
-- **AI Interaction Requirement:** When working with `.cursor/rules/*.mdc` files, the AI _must not_ use the `edit_file` tool. Instead, the AI will generate the full content of the desired rule file (including frontmatter and markdown body) and present it to the user for manual pasting.
+- **Glob formatting:** `globs` **must** be a comma-separated string of patterns. Do not use YAML/JSON array format with quotes for each individual pattern (e.g., `['**/*.svelte', ... ]`). For example, use `globs: **/*.svelte, **/+page.svelte`. For single patterns, ensure the pattern itself is not enclosed in quotes (e.g., `globs: my/path/*.js` not `globs: "my/path/*.js"`). Do not add quotes around the globs either. The globs are like so: `globs: **/*.svelte, **/*.ts` **NOT** `globs: '**/*.svelte', '**/*.ts'` or `globs: '**/*.svelte, **/*.ts'`, etc. NO QUOTES IN GLOBS.
+- Update the `version` in the frontmatter following semantic versioning whenever the rule is modified (PATCH for fixes/clarifications, MINOR for new non-breaking requirements, MAJOR for breaking changes).
+- **AI Interaction Requirement for Rule Modification:** When working with `.cursor/rules/*.mdc` files (i.e., modifying existing rules or creating new ones), I (the AI) **must not** use the `edit_file` tool. Instead, I **must** generate the full, complete content of the desired rule file (including all frontmatter and the entire markdown body) and present it to the user. The user will then be responsible for manually creating/updating the file with the content I provide.
 
 ## Examples
 
-<example>
-  description: Correctly formatted rule frontmatter
+<example description="Correctly formatted rule frontmatter with alwaysApply">
   ```mdc
 ---
-description: Enforce semicolon usage in JavaScript files
+description: Enforce consistent JavaScript semicolon usage and best practices.
 globs: src/**/*.js, **/*.mjs
-tags: [javascript, formatting]
+tags: [javascript, formatting, styleguide]
 priority: 3
-version: 1.0.0
+version: 1.2.0
+alwaysApply: false # Specific to JS files, not a universal AI rule
 ---
-# JavaScript Semicolon Rule
+# JavaScript Semicolon and Best Practices Rule
 ...
   ```
 </example>
 
-<example type="invalid">
-  description: Incorrect glob formatting (using array of strings)
+<example description="Correctly formatted rule frontmatter for a foundational AI rule">
+  ```mdc
+---
+description: Guide AI to always respond politely and ask clarifying questions when unsure.
+globs: "" # Not file-specific
+tags: [ai, communication, best-practice]
+priority: 1
+version: 1.0.0
+alwaysApply: true # This is a core AI behavior guideline
+---
+# AI Politeness and Clarification Protocol
+...
+  ```
+</example>
+
+<example type="invalid" description="Incorrect glob formatting (using array of strings)">
   ```mdc
 ---
 description: Svelte file standards
-globs: ['**/*.svelte', '**/+page.svelte', '**/+layout.svelte']
+globs: ['**/*.svelte', '**/+page.svelte', '**/+layout.svelte'] # Incorrect: looks like a YAML/JSON array
 tags: [svelte, formatting]
 priority: 2
 version: 1.0.0
+alwaysApply: false
 ---
 # Svelte File Rule
 ...
   ```
 </example>
 
-<example>
-  description: Correct glob formatting (using comma-separated string)
+<example type="invalid" description="Incorrect glob formatting (quotes around a single pattern)">
+  ```mdc
+---
+description: Rule for specific config file.
+globs: "src/configs/special.config.json" # Incorrect: quotes around the single pattern
+tags: [config, special]
+priority: 2
+version: 1.0.0
+alwaysApply: false
+---
+# Special Config Rule
+...
+  ```
+</example>
+
+<example description="Correct glob formatting (single pattern, no quotes)">
+  ```mdc
+---
+description: Rule for specific config file.
+globs: src/configs/special.config.json # Correct: no quotes around the single pattern
+tags: [config, special]
+priority: 2
+version: 1.0.0
+alwaysApply: false
+---
+# Special Config Rule
+...
+  ```
+</example>
+
+<example description="Correct glob formatting (multiple patterns, comma-separated string)">
   ```mdc
 ---
 description: Svelte file standards
@@ -69,27 +118,22 @@ globs: **/*.svelte, **/+page.svelte, **/+layout.svelte
 tags: [svelte, formatting]
 priority: 2
 version: 1.0.0
+alwaysApply: false
 ---
 # Svelte File Rule
 ...
   ```
 </example>
 
-<example type="invalid">
-  description: Incorrect rule location
-  ```
-rules/my-rule.mdc
-  ```
-</example>
-
-<example type="invalid">
-  description: Missing required frontmatter field (version)
+<example type="invalid" description="Missing required frontmatter field (e.g., version or alwaysApply if we decide it's mandatory to list)">
   ```mdc
 ---
 description: Enforce semicolon usage in JavaScript files
 globs: src/**/*.js
 tags: [javascript, formatting]
 priority: 3
+# version: 1.0.0 (missing)
+# alwaysApply: false (missing)
 ---
 # JavaScript Semicolon Rule
 ...
@@ -102,23 +146,14 @@ priority: 3
 - **Extension:** `.mdc`
 - **Naming Convention:** `name.mdc` (kebab-case)
 
-## Glob Pattern Examples
+## Required Frontmatter Fields
 
-- Core standards: `.cursor/rules/*.mdc`
-- Language rules: `src/**/*.{js,ts}`
-- Testing standards: `**/*.test.{js,ts}`
-- React components: `src/components/**/*.tsx`
-- Documentation: `docs/**/*.md`
-- Configuration files: `*.config.{js,json}`
-- Build artifacts: `dist/**/*`
-- Multiple extensions: `src/**/*.{js,jsx,ts,tsx}` (comma-separated)
-- Multiple files: `dist/*, docs/*.md` (comma-separated)
-- Svelte files: `**/*.svelte, **/+page.svelte, **/+layout.svelte` (comma-separated)
-
-## Required Fields
-
-- **Frontmatter:** `description`, `globs`, `tags`, `priority`, `version`
-- **Body:** `# Rule Title`, `## Context`, `## Requirements`, `## Examples`
+- `description`
+- `globs`
+- `tags`
+- `priority`
+- `version`
+- `alwaysApply`
 
 ## Formatting Guidelines
 
@@ -134,7 +169,7 @@ priority: 3
 - Document changes in commit messages.
 - Always update the version when modifying a rule based on the change impact.
 
-## AI Optimization Tips
+## AI Optimization Tips - SUPER IMPORTANT
 
 - Use precise `ACTION when TRIGGER to OUTCOME` format in `description`.
 - Include only essential `tags`.
@@ -142,4 +177,4 @@ priority: 3
 - Provide concise positive and negative `examples`.
 - Optimize for AI context window by removing non-essential information.
 - Focus on machine-actionable instructions.
-- **Suggest Applicable Workflows:** Based on the user's query or stated goal, suggest the most relevant workflow rule(s) (e.g., `implement-feature-workflow`, `bugfix-workflow`, `hotfix-workflow`) to guide the process.
+- **Suggest Applicable Workflows:** Based on the user's query or stated goal, suggest the most relevant workflow rule(s) (e.g., `feature-workflow`, `bugfix-workflow`, `hotfix-workflow`) to guide the process.
