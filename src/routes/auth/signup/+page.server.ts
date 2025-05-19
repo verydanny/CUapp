@@ -1,9 +1,5 @@
 import { type ActionResult, type RequestEvent } from '@sveltejs/kit';
-import {
-    cleanupUserSession,
-    createAdminClient,
-    setSessionCookies
-} from '$lib/server/appwrite-utils/appwrite.js';
+import { cleanupUserSession, createAdminClient } from '$lib/server/appwrite-utils/appwrite.js';
 import { redirect, type LoadEvent } from '@sveltejs/kit';
 import { AppwriteException, ID } from 'node-appwrite';
 
@@ -65,16 +61,14 @@ export const actions: ActionsExport = {
 
                 // Parallelize account creation and profile creation
                 // When user first signs up, we create a profile for them. The username is the same as the userId initially.
-                const [, getSession] = await Promise.all([
+                await Promise.all([
                     adminCreateDocumentWithUserPermissions('main', 'profiles', userId, {
                         username: userId,
                         bio: null,
                         profileImage: []
                     }),
-                    adminCreateEmailPasswordSession(email, password)
+                    adminCreateEmailPasswordSession(email, password, cookies)
                 ]);
-
-                setSessionCookies(cookies, getSession);
 
                 return {
                     type: 'redirect',

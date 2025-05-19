@@ -1,13 +1,17 @@
 import { json } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
+import { Permission, Role } from 'node-appwrite';
 import { createRichTextPost } from '$lib/server/appwrite-utils/richtext.appwrite.js';
 import type { CreateRichTextPostData } from '$lib/server/appwrite-utils/richtext.appwrite.js';
-import { createAdminClient } from '$lib/server/appwrite-utils/appwrite.js';
+import { createUserSessionClient } from '$lib/server/appwrite-utils/appwrite.js';
 
 // Placeholder POST function
 export async function POST(event: RequestEvent) {
-    const adminClient = createAdminClient();
-    const databases = adminClient.databases;
+    if (!event.locals.user.$id) {
+        return json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { databases } = createUserSessionClient({ cookies: event.cookies });
 
     try {
         const data = (await event.request.json()) as CreateRichTextPostData;
@@ -24,8 +28,10 @@ export async function POST(event: RequestEvent) {
         }
 
         // Add other optional field validations if necessary, or use a schema validation library like Zod
-
-        const newRichTextPostDocument = await createRichTextPost(databases, data);
+        const newRichTextPostDocument = await createRichTextPost(databases, data, [
+            Permission.read(Role.user(event.locals.user.$id)),
+            Permission.write(Role.user(event.locals.user.$id))
+        ]);
         return json(newRichTextPostDocument, { status: 201 });
     } catch (error: unknown) {
         if (error instanceof SyntaxError) {

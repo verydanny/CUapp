@@ -80,7 +80,6 @@ export const actions = {
         };
     },
     logout: async (event: RequestEvent) => {
-        console.log('logout');
         // Create the Appwrite client.
         const { account } = createUserSessionClient(event);
 

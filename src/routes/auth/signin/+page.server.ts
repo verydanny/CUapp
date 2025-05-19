@@ -1,4 +1,5 @@
 import { redirect } from '@sveltejs/kit';
+import type { LoadEvent, RequestEvent } from '@sveltejs/kit';
 import { AppwriteException } from 'node-appwrite';
 
 // Define the messages constant if it's not exported from const.js
@@ -8,8 +9,7 @@ const messages = {
 };
 
 import { routes } from '$lib/const.js';
-import { createUserSessionClient } from '$lib/server/appwrite-utils/appwrite.js';
-import type { LoadEvent, RequestEvent } from '@sveltejs/kit';
+import { adminCreateEmailPasswordSession } from '$root/lib/server/appwrite-utils/accountHelpers.js';
 
 export const load = async ({ parent }: LoadEvent) => {
     const data = await parent();
@@ -36,11 +36,9 @@ export const actions = {
         }
 
         try {
-            const { account } = createUserSessionClient({
-                cookies
-            });
-            await account.createEmailPasswordSession(email, password);
+            await adminCreateEmailPasswordSession(email, password, cookies);
         } catch (error) {
+            console.log('Error creating email password session:', error);
             if (error instanceof AppwriteException) {
                 return {
                     type: 'failure',
@@ -60,6 +58,6 @@ export const actions = {
             };
         }
 
-        redirect(302, routes?.feed);
+        redirect(302, routes.feed);
     }
 };

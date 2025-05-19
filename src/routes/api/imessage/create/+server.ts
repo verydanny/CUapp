@@ -1,7 +1,7 @@
 import { ID } from 'appwrite';
 import type { Models } from 'appwrite';
 import { json, error } from '@sveltejs/kit';
-import type { RequestHandler } from './$types.d.ts';
+import type { RequestHandler } from './$types.js';
 import type {
     iMessageConversation,
     iMessageMessage,
@@ -12,22 +12,19 @@ import {
     createIMessageMessage,
     createIMessageParticipant,
     type CreateIMessageMessageData,
-    type CreateIMessageParticipantData,
-    type AppwriteDatabasesClient // Assuming this type defines your db client structure
+    type CreateIMessageParticipantData
 } from '$lib/server/appwrite-utils/imessage.appwrite.js';
-import { createAdminClient } from '$lib/server/appwrite-utils/appwrite.js';
+import { createUserSessionClient } from '$lib/server/appwrite-utils/appwrite.js';
 
 // This endpoint simulates creating and returning a mock iMessage conversation.
 // In a real scenario, this would interact with a database.
-export const POST: RequestHandler = async ({ request: _request, locals }) => {
+export const POST: RequestHandler = async ({ request: _request, locals, cookies }) => {
     if (!locals.user) {
         return json({ success: false, message: 'User not authenticated' }, { status: 401 });
     }
 
     try {
-        const adminClient = createAdminClient();
-        // Ensure the 'databases' client part matches your AppwriteDatabasesClient type
-        const databases = adminClient.databases as AppwriteDatabasesClient;
+        const { databases } = createUserSessionClient({ cookies });
 
         // For now, we generate a fixed mock conversation set to save
         // Later, this data could come from the request body

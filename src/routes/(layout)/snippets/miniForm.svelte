@@ -35,15 +35,15 @@
 </script>
 
 {#snippet formOutlineButton(
-    text: string,
-    btnClass: 'secondary' | 'neutral' | 'primary' | 'accent' | 'ghost',
     action: string,
+    text: string,
+    btnClasses: string | null = null,
+    formClasses: string | null = null,
     data?: Record<string, string | boolean | undefined>
 )}
     {@const onsubmit = data ? handleSubmitData(data) : undefined}
-    {@const buttonClass = `btn btn-outline btn-${btnClass}`}
 
-    <form method="post" {action} {onsubmit}>
-        <button type="submit" class={buttonClass}>{text}</button>
+    <form method="post" {action} {onsubmit} class={formClasses ? `form ${formClasses}` : 'form'}>
+        <button type="submit" class={btnClasses ? `btn ${btnClasses}` : 'btn'}>{text}</button>
     </form>
 {/snippet}

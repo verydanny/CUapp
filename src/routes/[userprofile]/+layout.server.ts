@@ -1,8 +1,9 @@
-import { redirect, type LoadEvent } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import { getProfileByUsername } from '$lib/server/profile.js';
 import { routes } from '$root/lib/const.js';
+import { createUserSessionClient } from '$root/lib/server/appwrite-utils/appwrite.js';
 
-export async function load({ parent, params }: LoadEvent) {
+export async function load({ parent, params, cookies }) {
     const data = await parent();
     /**
      * Here we should establish permissions about viewing "this" current profile
@@ -32,7 +33,8 @@ export async function load({ parent, params }: LoadEvent) {
     }
 
     try {
-        const profile = await getProfileByUsername(params?.userprofile);
+        const { databases } = createUserSessionClient({ cookies });
+        const profile = await getProfileByUsername(params?.userprofile, databases);
 
         return {
             ...data,
@@ -44,6 +46,6 @@ export async function load({ parent, params }: LoadEvent) {
     } catch {
         // There is no profile with this username
 
-        redirect(302, routes?.feed);
+        redirect(302, routes.feed);
     }
 }

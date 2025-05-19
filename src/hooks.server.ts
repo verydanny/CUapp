@@ -2,7 +2,10 @@
 import { sequence } from '@sveltejs/kit/hooks';
 import type { Handle } from '@sveltejs/kit';
 import { ADMIN_LABEL } from '$lib/const.js';
-import { createUserSessionClient } from '$lib/server/appwrite-utils/appwrite.js';
+import {
+    createUserSessionClient,
+    COOKIE_NAME_WAS_LOGGED_IN
+} from '$lib/server/appwrite-utils/appwrite.js';
 
 /**
  * This hook is used to create the Appwrite client and store the current logged in user in locals,
@@ -16,7 +19,7 @@ import { createUserSessionClient } from '$lib/server/appwrite-utils/appwrite.js'
  * @returns The event object.
  */
 export const userSessionHandler: Handle = async ({ event, resolve }) => {
-    const userWasLoggedIn = event.cookies.get('was_logged_in') === 'true';
+    const userWasLoggedIn = event.cookies.get(COOKIE_NAME_WAS_LOGGED_IN) === 'true';
 
     event.locals.user = {
         $id: undefined,
@@ -33,7 +36,6 @@ export const userSessionHandler: Handle = async ({ event, resolve }) => {
         const { account } = createUserSessionClient(event);
 
         const user = await account.get();
-
         event.locals.user = {
             ...event.locals.user,
             $id: user.$id,

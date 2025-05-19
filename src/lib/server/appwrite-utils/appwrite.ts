@@ -10,8 +10,9 @@ import {
 
 export const COOKIE_NAME = PUBLIC_SESSION_COOKIE_PREFIX + PUBLIC_APPWRITE_PROJECT;
 export const COOKIE_NAME_LEGACY = COOKIE_NAME + '_legacy';
+export const COOKIE_NAME_WAS_LOGGED_IN = 'was_logged_in';
 
-export const setSessionCookies = (cookies: Cookies, session: Models.Session) =>
+export const setSessionCookies = (cookies: Cookies, session: Models.Session) => {
     [COOKIE_NAME, COOKIE_NAME_LEGACY].forEach((cookieName) =>
         cookies.set(cookieName, session.secret, {
             httpOnly: true,
@@ -22,6 +23,15 @@ export const setSessionCookies = (cookies: Cookies, session: Models.Session) =>
             domain: PUBLIC_ORIGIN
         })
     );
+
+    cookies.set(COOKIE_NAME_WAS_LOGGED_IN, 'true', {
+        httpOnly: false,
+        sameSite: 'strict',
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 10), // 10 days
+        secure: true,
+        path: '/'
+    });
+};
 
 export const deleteSessionCookies = (cookies: Cookies) => {
     cookies.delete(COOKIE_NAME, { path: '/' });
@@ -35,18 +45,6 @@ export const cleanupUserSession = async (cookies: Cookies, account: Account) => 
     await account.deleteSession('current');
     deleteSessionCookies(cookies);
 };
-
-export function createPublicAccountClient() {
-    const client = new Client()
-        .setEndpoint(PUBLIC_APPWRITE_ENDPOINT)
-        .setProject(PUBLIC_APPWRITE_PROJECT);
-
-    return {
-        get account() {
-            return new Account(client);
-        }
-    };
-}
 
 export function createAdminClient() {
     const client = new Client()
@@ -71,31 +69,14 @@ export function createAdminClient() {
     };
 }
 
-export function accountClient() {
-    const client = new Client()
-        .setEndpoint(PUBLIC_APPWRITE_ENDPOINT)
-        .setProject(PUBLIC_APPWRITE_PROJECT);
-
-    return {
-        get account() {
-            return new Account(client);
-        },
-        get storage() {
-            return new Storage(client);
-        },
-        get users() {
-            return new Users(client);
-        }
-    };
-}
-
 export function createUserSessionClient({ cookies }: { cookies: Cookies }) {
     const client = new Client()
         .setEndpoint(PUBLIC_APPWRITE_ENDPOINT)
         .setProject(PUBLIC_APPWRITE_PROJECT);
 
     // Extract our custom domain's session cookie from the request
-    const session = cookies.get(COOKIE_NAME);
+    const session = getSessionCookie(cookies);
+
     if (!session) {
         throw new Error('No user session');
     }
@@ -109,6 +90,9 @@ export function createUserSessionClient({ cookies }: { cookies: Cookies }) {
         },
         get storage() {
             return new Storage(client);
+        },
+        get databases() {
+            return new Databases(client);
         }
     };
 }

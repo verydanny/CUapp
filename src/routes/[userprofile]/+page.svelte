@@ -28,13 +28,23 @@
                     >
                         Settings
                     </a>
-                    {@render formOutlineButton('Log out', 'secondary', '[userprofile]?/logout')}
+                    {@render formOutlineButton(
+                        '[userprofile]?/logout',
+                        'Log out',
+                        'btn-outline btn-secondary'
+                    )}
                 {:else}
-                    {@render formOutlineButton('Follow', 'secondary', '[userprofile]?/follow', {
-                        profileId: profile?.$id,
-                        followerId: loggedInUser?.$id,
-                        pending: profile?.isPrivateProfile
-                    })}
+                    {@render formOutlineButton(
+                        '[userprofile]?/follow',
+                        'Follow',
+                        'btn-outline btn-secondary',
+                        null,
+                        {
+                            profileId: profile?.$id,
+                            followerId: loggedInUser?.$id,
+                            pending: profile?.isPrivateProfile
+                        }
+                    )}
                 {/if}
             </div>
         {:else}

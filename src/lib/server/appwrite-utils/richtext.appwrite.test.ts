@@ -7,10 +7,9 @@ import {
     updateRichTextPost,
     deleteRichTextPost,
     type CreateRichTextPostData,
-    type UpdateRichTextPostData,
-    type AppwriteDatabasesClient
+    type UpdateRichTextPostData
 } from './richtext.appwrite.js';
-import type { Models } from 'appwrite';
+import type { Databases, Models } from 'node-appwrite';
 
 const mockCreateDocument = vi.fn();
 const mockGetDocument = vi.fn();
@@ -24,7 +23,7 @@ const mockDatabases = {
     listDocuments: mockListDocuments,
     updateDocument: mockUpdateDocument,
     deleteDocument: mockDeleteDocument
-} as unknown as AppwriteDatabasesClient;
+} as unknown as Databases;
 
 const APPWRITE_DATABASE_ID = 'main';
 const RICH_TEXT_POSTS_COLLECTION_ID = 'richTextPosts';

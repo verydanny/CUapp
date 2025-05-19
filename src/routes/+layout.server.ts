@@ -1,8 +1,9 @@
 import { getProfileById } from '$lib/server/profile.js'; // Adjust path if necessary
 import type { LayoutServerLoad } from './$types.d.ts';
 import type { BasicProfile } from '$root/app.d.ts';
+import { createUserSessionClient } from '$root/lib/server/appwrite-utils/appwrite.js';
 
-export const load: LayoutServerLoad = async ({ locals, depends }) => {
+export const load: LayoutServerLoad = async ({ locals, depends, cookies }) => {
     depends('app:user-profile');
 
     const loggedInProfile: BasicProfile = {
@@ -14,7 +15,8 @@ export const load: LayoutServerLoad = async ({ locals, depends }) => {
 
     if (locals?.user?.$id) {
         try {
-            const profile = await getProfileById(locals.user.$id);
+            const { databases } = createUserSessionClient({ cookies });
+            const profile = await getProfileById(locals.user.$id, databases);
 
             if (profile) {
                 return {

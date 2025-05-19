@@ -19,11 +19,10 @@ import {
     type CreateIMessageParticipantData,
     type UpdateIMessageConversationData,
     type UpdateIMessageMessageData,
-    type AppwriteDatabasesClient,
     type UpdateIMessageParticipantData
 } from './imessage.appwrite.js'; // Import the actual function and type
-import type { Models } from 'appwrite'; // For Models.Document type hint
-import { Query } from 'appwrite'; // Import Query for test assertions
+import type { Models, Databases } from 'node-appwrite'; // For Models.Document type hint
+import { Query } from 'node-appwrite'; // Import Query for test assertions
 
 // Mock Appwrite Databases client and createDocument method
 const mockCreateDocument = vi.fn();
@@ -38,7 +37,7 @@ const mockDatabases = {
     listDocuments: mockListDocuments, // Add to mock client
     updateDocument: mockUpdateDocument, // Add to mock client
     deleteDocument: mockDeleteDocument // Add to mock client
-} as unknown as AppwriteDatabasesClient;
+} as unknown as Databases;
 
 // Configuration for Appwrite (replace with actual values or env variables)
 const APPWRITE_DATABASE_ID = 'main'; // As per posts-model-ai-context.md

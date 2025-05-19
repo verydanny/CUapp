@@ -56,6 +56,10 @@ export default defineConfig(({ mode }) => {
                 headless: true,
                 instances: [{ browser: 'chromium' }]
             }
+        },
+
+        optimizeDeps: {
+            exclude: ['clsx']
         }
 
         // server: {

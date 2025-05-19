@@ -37,9 +37,15 @@
                             Settings
                         </a>
                     </li>
-                    <li>
-                        <form method="POST" action={`/${loggedInProfile?.username}?/logout`}>
-                            <button type="submit" class="w-full text-left">Logout</button>
+                    <li class="mt-1 flex">
+                        <form
+                            method="POST"
+                            action={`/${loggedInProfile?.username}?/logout`}
+                            class="flex"
+                        >
+                            <button type="submit" class="btn btn-sm btn-primary btn-wide">
+                                Logout
+                            </button>
                         </form>
                     </li>
                 {/if}

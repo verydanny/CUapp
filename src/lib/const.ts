@@ -5,7 +5,7 @@ export const routes = {
         signin: '/auth/signin',
         signup: '/auth/signup'
     },
-    feed: '/feed'
+    feed: '/'
 } as const;
 
 export const ADMIN_LABEL = 'admin';

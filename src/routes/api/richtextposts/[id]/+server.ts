@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
-import { AppwriteException } from 'appwrite';
+import { AppwriteException } from 'node-appwrite';
 import type { RequestEvent } from '@sveltejs/kit';
-import { createAdminClient } from '$lib/server/appwrite-utils/appwrite.js';
+import { createUserSessionClient } from '$lib/server/appwrite-utils/appwrite.js';
 import {
     getRichTextPostById,
     updateRichTextPost,
@@ -17,8 +17,7 @@ export async function GET(event: RequestEvent) {
         return json({ error: 'Post ID is required' }, { status: 400 });
     }
 
-    const adminClient = createAdminClient();
-    const databases = adminClient.databases;
+    const { databases } = createUserSessionClient({ cookies: event.cookies });
 
     try {
         const document = await getRichTextPostById(databases, id);
@@ -73,8 +72,7 @@ export async function PATCH(event: RequestEvent) {
         );
     }
 
-    const adminClient = createAdminClient();
-    const databases = adminClient.databases;
+    const { databases } = createUserSessionClient({ cookies: event.cookies });
 
     try {
         const updatedDocument = await updateRichTextPost(databases, id, data);
@@ -102,8 +100,7 @@ export async function DELETE(event: RequestEvent) {
         return json({ error: 'Post ID is required for deletion' }, { status: 400 });
     }
 
-    const adminClient = createAdminClient();
-    const databases = adminClient.databases;
+    const { databases } = createUserSessionClient({ cookies: event.cookies });
 
     try {
         await deleteRichTextPost(databases, id);

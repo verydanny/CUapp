@@ -1,11 +1,12 @@
-import { ID, Query } from 'appwrite';
-import type { Models } from 'appwrite';
+import { ID, Query } from 'node-appwrite';
+import type { Models } from 'node-appwrite';
 import {
     APPWRITE_DATABASE_ID,
     IMESSAGE_CONVERSATIONS_COLLECTION_ID,
     IMESSAGE_MESSAGES_COLLECTION_ID,
     IMESSAGE_PARTICIPANTS_COLLECTION_ID
 } from '$env/static/private';
+import type { Databases } from 'node-appwrite';
 
 // --- Data Transfer Object (DTO) Interfaces for Appwrite Operations ---
 
@@ -52,52 +53,6 @@ export interface CreateIMessageParticipantData {
 // For updates, all fields are optional.
 export type UpdateIMessageParticipantData = Partial<CreateIMessageParticipantData>;
 
-// Generic type for Appwrite document data, accommodating all iMessage entity types and updates.
-// Using Record<string, unknown> for broader compatibility than `any`.
-type AppwriteDocumentData =
-    | CreateIMessageConversationData
-    | CreateIMessageMessageData
-    | CreateIMessageParticipantData
-    | UpdateIMessageConversationData
-    | UpdateIMessageMessageData
-    | UpdateIMessageParticipantData
-    | Record<string, unknown>;
-
-/**
- * Interface defining the expected structure of an Appwrite Databases client.
- * This allows for type-safe interaction with the Appwrite SDK's database methods.
- * Only includes methods currently used by this utility module.
- */
-export interface AppwriteDatabasesClient {
-    createDocument: (
-        databaseId: string,
-        collectionId: string,
-        documentId: string, // Use ID.unique() for auto-generation by Appwrite
-        data: AppwriteDocumentData
-    ) => Promise<Models.Document>;
-    getDocument: (
-        databaseId: string,
-        collectionId: string,
-        documentId: string
-    ) => Promise<Models.Document>;
-    listDocuments: (
-        databaseId: string,
-        collectionId: string,
-        queries?: string[] // Optional array of Appwrite query strings
-    ) => Promise<Models.DocumentList<Models.Document>>;
-    updateDocument: (
-        databaseId: string,
-        collectionId: string,
-        documentId: string,
-        data: AppwriteDocumentData // Can be partial data for updates
-    ) => Promise<Models.Document>;
-    deleteDocument: (
-        databaseId: string,
-        collectionId: string,
-        documentId: string
-    ) => Promise<unknown>; // Appwrite delete typically returns an empty response or throws
-}
-
 // --- CRUD Functions for iMessage Entities ---
 
 /**
@@ -107,15 +62,17 @@ export interface AppwriteDatabasesClient {
  * @returns The created Appwrite document.
  */
 export async function createIMessageConversation(
-    appwriteDatabases: AppwriteDatabasesClient,
-    data: CreateIMessageConversationData
+    appwriteDatabases: Databases,
+    data: CreateIMessageConversationData,
+    permissions?: string[]
 ): Promise<Models.Document> {
     try {
         const document = await appwriteDatabases.createDocument(
             APPWRITE_DATABASE_ID,
             IMESSAGE_CONVERSATIONS_COLLECTION_ID,
             ID.unique(), // Appwrite generates the document ID
-            data
+            data,
+            permissions
         );
         return document;
     } catch (error) {
@@ -132,15 +89,17 @@ export async function createIMessageConversation(
  * @returns The created Appwrite document.
  */
 export async function createIMessageMessage(
-    appwriteDatabases: AppwriteDatabasesClient,
-    data: CreateIMessageMessageData
+    appwriteDatabases: Databases,
+    data: CreateIMessageMessageData,
+    permissions?: string[]
 ): Promise<Models.Document> {
     try {
         const document = await appwriteDatabases.createDocument(
             APPWRITE_DATABASE_ID,
             IMESSAGE_MESSAGES_COLLECTION_ID,
             ID.unique(),
-            data
+            data,
+            permissions
         );
         return document;
     } catch (error) {
@@ -156,15 +115,17 @@ export async function createIMessageMessage(
  * @returns The created Appwrite document.
  */
 export async function createIMessageParticipant(
-    appwriteDatabases: AppwriteDatabasesClient,
-    data: CreateIMessageParticipantData
+    appwriteDatabases: Databases,
+    data: CreateIMessageParticipantData,
+    permissions?: string[]
 ): Promise<Models.Document> {
     try {
         const document = await appwriteDatabases.createDocument(
             APPWRITE_DATABASE_ID,
             IMESSAGE_PARTICIPANTS_COLLECTION_ID,
             ID.unique(),
-            data
+            data,
+            permissions
         );
         return document;
     } catch (error) {
@@ -180,14 +141,16 @@ export async function createIMessageParticipant(
  * @returns The fetched Appwrite document.
  */
 export async function getIMessageConversationById(
-    appwriteDatabases: AppwriteDatabasesClient,
-    conversationDocumentId: string
+    appwriteDatabases: Databases,
+    conversationDocumentId: string,
+    permissions?: string[]
 ): Promise<Models.Document> {
     try {
         const document = await appwriteDatabases.getDocument(
             APPWRITE_DATABASE_ID,
             IMESSAGE_CONVERSATIONS_COLLECTION_ID,
-            conversationDocumentId
+            conversationDocumentId,
+            permissions
         );
         return document;
     } catch (error) {
@@ -209,7 +172,7 @@ export async function getIMessageConversationById(
  * @returns A list of Appwrite documents representing the messages.
  */
 export async function getIMessageMessagesByConversationId(
-    appwriteDatabases: AppwriteDatabasesClient,
+    appwriteDatabases: Databases,
     conversationId: string,
     queries: string[] = [],
     limit?: number,
@@ -252,8 +215,9 @@ export async function getIMessageMessagesByConversationId(
  * @returns An array of fetched Appwrite documents.
  */
 export async function getIMessageParticipantsByIds(
-    appwriteDatabases: AppwriteDatabasesClient,
-    participantDocumentIds: string[]
+    appwriteDatabases: Databases,
+    participantDocumentIds: string[],
+    permissions?: string[]
 ): Promise<Models.Document[]> {
     try {
         // Fetch each participant document individually and await all promises
@@ -261,7 +225,8 @@ export async function getIMessageParticipantsByIds(
             appwriteDatabases.getDocument(
                 APPWRITE_DATABASE_ID,
                 IMESSAGE_PARTICIPANTS_COLLECTION_ID,
-                id
+                id,
+                permissions
             )
         );
         const participants = await Promise.all(participantPromises);
@@ -280,7 +245,7 @@ export async function getIMessageParticipantsByIds(
  * @returns The updated Appwrite document.
  */
 export async function updateIMessageConversation(
-    appwriteDatabases: AppwriteDatabasesClient,
+    appwriteDatabases: Databases,
     documentId: string,
     data: UpdateIMessageConversationData
 ): Promise<Models.Document> {
@@ -304,7 +269,7 @@ export async function updateIMessageConversation(
  * @param documentId The Appwrite document ID of the conversation to delete.
  */
 export async function deleteIMessageConversation(
-    appwriteDatabases: AppwriteDatabasesClient,
+    appwriteDatabases: Databases,
     documentId: string
 ): Promise<void> {
     try {
@@ -327,7 +292,7 @@ export async function deleteIMessageConversation(
  * @returns The updated Appwrite document.
  */
 export async function updateIMessageMessage(
-    appwriteDatabases: AppwriteDatabasesClient,
+    appwriteDatabases: Databases,
     documentId: string,
     data: UpdateIMessageMessageData
 ): Promise<Models.Document> {
@@ -351,7 +316,7 @@ export async function updateIMessageMessage(
  * @param documentId The Appwrite document ID of the message to delete.
  */
 export async function deleteIMessageMessage(
-    appwriteDatabases: AppwriteDatabasesClient,
+    appwriteDatabases: Databases,
     documentId: string
 ): Promise<void> {
     try {
@@ -374,7 +339,7 @@ export async function deleteIMessageMessage(
  * @returns The updated Appwrite document.
  */
 export async function updateIMessageParticipant(
-    appwriteDatabases: AppwriteDatabasesClient,
+    appwriteDatabases: Databases,
     documentId: string,
     data: UpdateIMessageParticipantData
 ): Promise<Models.Document> {
@@ -398,7 +363,7 @@ export async function updateIMessageParticipant(
  * @param documentId The Appwrite document ID of the participant to delete.
  */
 export async function deleteIMessageParticipant(
-    appwriteDatabases: AppwriteDatabasesClient,
+    appwriteDatabases: Databases,
     documentId: string
 ): Promise<void> {
     try {

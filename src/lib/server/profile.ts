@@ -1,11 +1,8 @@
-import { Query } from 'node-appwrite';
-import { createAdminClient } from './appwrite-utils/appwrite.js';
+import { Databases, Query } from 'node-appwrite';
 
 import type { BasicProfile, UserWithAdmin } from '$root/app.d.ts'; // Keep this import
 
-const { databases } = createAdminClient();
-
-export async function getProfileById(id?: string): Promise<BasicProfile> {
+export async function getProfileById(id: string, databases: Databases): Promise<BasicProfile> {
     if (!id) {
         throw new Error('ID is required');
     }
@@ -20,7 +17,10 @@ export async function getProfileById(id?: string): Promise<BasicProfile> {
     };
 }
 
-export async function getProfileByUsername(username?: string): Promise<BasicProfile> {
+export async function getProfileByUsername(
+    username: string,
+    databases: Databases
+): Promise<BasicProfile> {
     if (!username) {
         throw new Error('Username is required');
     }

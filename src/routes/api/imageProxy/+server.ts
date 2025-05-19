@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import type { RequestHandler } from './$types.d.ts';
+import type { RequestHandler } from './$types.js';
 import { createAdminClient } from '$lib/server/appwrite-utils/appwrite.js';
 import { APPWRITE_BUCKET_IMAGES } from '$env/static/private'; // Assuming you have a bucket ID in env
 
