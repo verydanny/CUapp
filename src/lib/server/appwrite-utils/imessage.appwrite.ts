@@ -2,7 +2,7 @@ import { ID, Query } from 'node-appwrite';
 import type { Models } from 'node-appwrite';
 import {
     DATABASE_ID,
-    IMESSAGE_CONVERSATIONS_COLLECTION_ID,
+    IMESSAGE_CONVERSATION_COLLECTION_ID,
     IMESSAGE_MESSAGES_COLLECTION_ID,
     IMESSAGE_PARTICIPANTS_COLLECTION_ID
 } from '$lib/server/model.const.js';
@@ -69,7 +69,7 @@ export async function createIMessageConversation(
     try {
         const document = await appwriteDatabases.createDocument(
             DATABASE_ID,
-            IMESSAGE_CONVERSATIONS_COLLECTION_ID,
+            IMESSAGE_CONVERSATION_COLLECTION_ID,
             ID.unique(), // Appwrite generates the document ID
             data,
             permissions
@@ -148,7 +148,7 @@ export async function getIMessageConversationById(
     try {
         const document = await appwriteDatabases.getDocument(
             DATABASE_ID,
-            IMESSAGE_CONVERSATIONS_COLLECTION_ID,
+            IMESSAGE_CONVERSATION_COLLECTION_ID,
             conversationDocumentId,
             permissions
         );
@@ -252,7 +252,7 @@ export async function updateIMessageConversation(
     try {
         const document = await appwriteDatabases.updateDocument(
             DATABASE_ID,
-            IMESSAGE_CONVERSATIONS_COLLECTION_ID,
+            IMESSAGE_CONVERSATION_COLLECTION_ID,
             documentId,
             data
         );
@@ -275,7 +275,7 @@ export async function deleteIMessageConversation(
     try {
         await appwriteDatabases.deleteDocument(
             DATABASE_ID,
-            IMESSAGE_CONVERSATIONS_COLLECTION_ID,
+            IMESSAGE_CONVERSATION_COLLECTION_ID,
             documentId
         );
     } catch (error) {

@@ -50,7 +50,7 @@ export function createAdminClient() {
     const client = new Client()
         .setEndpoint(PUBLIC_APPWRITE_ENDPOINT)
         .setProject(PUBLIC_APPWRITE_PROJECT)
-        .setKey(APPWRITE_KEY); // Set the Appwrite API key!
+        .setKey(APPWRITE_KEY); // Set the Appwrite API key
 
     // Return the services we want to use.
     return {

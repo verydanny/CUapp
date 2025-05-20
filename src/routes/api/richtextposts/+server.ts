@@ -29,7 +29,7 @@ export async function POST(event: RequestEvent) {
 
         // Add other optional field validations if necessary, or use a schema validation library like Zod
         const newRichTextPostDocument = await createRichTextPost(databases, data, [
-            Permission.read(Role.user(event.locals.user.$id)),
+            Permission.read(Role.any()),
             Permission.write(Role.user(event.locals.user.$id))
         ]);
         return json(newRichTextPostDocument, { status: 201 });

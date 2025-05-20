@@ -15,7 +15,7 @@
 
     /**
      * Fetches a mock iMessage conversation from the API endpoint
-     * and updates the component's state.
+     * and updates the component\'s state.
      */
     async function loadMockConversation() {
         isLoading = true;

@@ -15,7 +15,7 @@ This document provides context for AI assistants working with the Rich Text Post
 - **Appwrite Client Initialization:**
     - `src/lib/server/appwrite-utils/appwrite.ts` (Provides `createAdminClient()`)
 - **Environment Variables (Accessed via `appwrite.ts` indirectly):**
-    - `$env/static/private`: `DATABASE_ID`, `RICH_TEXT_POSTS_COLLECTION_ID` (though these are directly imported in `richtext.appwrite.ts`)
+    - `$env/static/private`: `DATABASE_ID`, `RICH_TEXT_POST_COLLECTION_ID` (though these are directly imported in `richtext.appwrite.ts`)
 
 ## Key Functions & Data Structures
 

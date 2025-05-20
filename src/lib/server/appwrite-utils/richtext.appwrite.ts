@@ -1,11 +1,12 @@
 import { ID } from 'node-appwrite';
 import type { Models, Databases } from 'node-appwrite';
-import { DATABASE_ID, RICH_TEXT_POSTS_COLLECTION_ID } from '$lib/server/model.const.js';
+import { DATABASE_ID, RICH_TEXT_POST_COLLECTION_ID } from '$lib/server/model.const.js';
 
 // --- Data Transfer Object (DTO) Interfaces for RichTextPost Operations ---
 
 // Describes the data structure required when creating a new RichTextPost document.
 export interface CreateRichTextPostData {
+    $id: string;
     postId: string;
     title: string;
     body: string;
@@ -39,11 +40,13 @@ export async function createRichTextPost(
     data: CreateRichTextPostData,
     permissions?: string[]
 ): Promise<Models.Document> {
+    const id = data?.$id ?? ID.unique();
+
     try {
         const document = await appwriteDatabases.createDocument(
             DATABASE_ID,
-            RICH_TEXT_POSTS_COLLECTION_ID,
-            ID.unique(), // Appwrite generates the document ID
+            RICH_TEXT_POST_COLLECTION_ID,
+            id,
             data,
             permissions ?? []
         );
@@ -67,7 +70,7 @@ export async function getRichTextPostById(
     try {
         const document = await appwriteDatabases.getDocument(
             DATABASE_ID,
-            RICH_TEXT_POSTS_COLLECTION_ID,
+            RICH_TEXT_POST_COLLECTION_ID,
             documentId
         );
         return document;
@@ -93,7 +96,7 @@ export async function updateRichTextPost(
     try {
         const document = await appwriteDatabases.updateDocument(
             DATABASE_ID,
-            RICH_TEXT_POSTS_COLLECTION_ID,
+            RICH_TEXT_POST_COLLECTION_ID,
             documentId,
             data,
             permissions ?? []
@@ -117,7 +120,7 @@ export async function deleteRichTextPost(
     try {
         await appwriteDatabases.deleteDocument(
             DATABASE_ID,
-            RICH_TEXT_POSTS_COLLECTION_ID,
+            RICH_TEXT_POST_COLLECTION_ID,
             documentId
         );
     } catch (error) {
