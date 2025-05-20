@@ -26,14 +26,14 @@ const mockDatabases = {
 } as unknown as Databases;
 
 const DATABASE_ID = 'main';
-const RICH_TEXT_POSTS_COLLECTION_ID = 'richTextPosts';
+const RICH_TEXT_POST_COLLECTION_ID = 'richTextPosts';
 
 describe('Appwrite: RichTextPost Interactions', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockCreateDocument.mockResolvedValue({
             $id: 'mock-rtp-id',
-            $collectionId: RICH_TEXT_POSTS_COLLECTION_ID,
+            $collectionId: RICH_TEXT_POST_COLLECTION_ID,
             $databaseId: DATABASE_ID,
             $createdAt: new Date().toISOString(),
             $updatedAt: new Date().toISOString(),
@@ -58,7 +58,7 @@ describe('Appwrite: RichTextPost Interactions', () => {
                 expect(mockDatabases.createDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.createDocument).toHaveBeenCalledWith(
                     DATABASE_ID,
-                    RICH_TEXT_POSTS_COLLECTION_ID,
+                    RICH_TEXT_POST_COLLECTION_ID,
                     expect.any(String),
                     postData
                 );
@@ -81,7 +81,7 @@ describe('Appwrite: RichTextPost Interactions', () => {
                 expect(mockDatabases.createDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.createDocument).toHaveBeenCalledWith(
                     DATABASE_ID,
-                    RICH_TEXT_POSTS_COLLECTION_ID,
+                    RICH_TEXT_POST_COLLECTION_ID,
                     expect.any(String),
                     postData
                 );
@@ -100,7 +100,7 @@ describe('Appwrite: RichTextPost Interactions', () => {
                 };
                 const mockReturnedDoc: Models.Document = {
                     $id: mockDocumentId,
-                    $collectionId: RICH_TEXT_POSTS_COLLECTION_ID,
+                    $collectionId: RICH_TEXT_POST_COLLECTION_ID,
                     $databaseId: DATABASE_ID,
                     $createdAt: new Date().toISOString(),
                     $updatedAt: new Date().toISOString(),
@@ -114,7 +114,7 @@ describe('Appwrite: RichTextPost Interactions', () => {
                 expect(mockDatabases.getDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.getDocument).toHaveBeenCalledWith(
                     DATABASE_ID,
-                    RICH_TEXT_POSTS_COLLECTION_ID,
+                    RICH_TEXT_POST_COLLECTION_ID,
                     mockDocumentId
                 );
                 expect(fetchedDoc).toEqual(mockReturnedDoc);
@@ -133,7 +133,7 @@ describe('Appwrite: RichTextPost Interactions', () => {
                 expect(mockDatabases.getDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.getDocument).toHaveBeenCalledWith(
                     DATABASE_ID,
-                    RICH_TEXT_POSTS_COLLECTION_ID,
+                    RICH_TEXT_POST_COLLECTION_ID,
                     mockDocumentId
                 );
             });
@@ -150,7 +150,7 @@ describe('Appwrite: RichTextPost Interactions', () => {
                 };
                 const mockReturnedUpdatedDoc: Models.Document = {
                     $id: mockDocumentId,
-                    $collectionId: RICH_TEXT_POSTS_COLLECTION_ID,
+                    $collectionId: RICH_TEXT_POST_COLLECTION_ID,
                     $databaseId: DATABASE_ID,
                     $createdAt: new Date().toISOString(), // Original creation time
                     $updatedAt: new Date().toISOString(), // New update time
@@ -172,7 +172,7 @@ describe('Appwrite: RichTextPost Interactions', () => {
                 expect(mockDatabases.updateDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.updateDocument).toHaveBeenCalledWith(
                     DATABASE_ID,
-                    RICH_TEXT_POSTS_COLLECTION_ID,
+                    RICH_TEXT_POST_COLLECTION_ID,
                     mockDocumentId,
                     updateData
                 );
@@ -193,7 +193,7 @@ describe('Appwrite: RichTextPost Interactions', () => {
                 expect(mockDatabases.updateDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.updateDocument).toHaveBeenCalledWith(
                     DATABASE_ID,
-                    RICH_TEXT_POSTS_COLLECTION_ID,
+                    RICH_TEXT_POST_COLLECTION_ID,
                     mockDocumentId,
                     updateData
                 );
@@ -213,7 +213,7 @@ describe('Appwrite: RichTextPost Interactions', () => {
                 expect(mockDatabases.deleteDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.deleteDocument).toHaveBeenCalledWith(
                     DATABASE_ID,
-                    RICH_TEXT_POSTS_COLLECTION_ID,
+                    RICH_TEXT_POST_COLLECTION_ID,
                     mockDocumentId
                 );
             });
@@ -231,7 +231,7 @@ describe('Appwrite: RichTextPost Interactions', () => {
                 expect(mockDatabases.deleteDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.deleteDocument).toHaveBeenCalledWith(
                     DATABASE_ID,
-                    RICH_TEXT_POSTS_COLLECTION_ID,
+                    RICH_TEXT_POST_COLLECTION_ID,
                     mockDocumentId
                 );
             });

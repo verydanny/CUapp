@@ -10,10 +10,7 @@
     "collections": [
         {
             "$id": "profiles",
-            "$permissions": [
-                "read(\"users\")",
-                "update(\"users\")"
-            ],
+            "$permissions": ["read(\"users\")", "update(\"users\")"],
             "databaseId": "main",
             "name": "profiles",
             "enabled": true,
@@ -48,9 +45,7 @@
                     "type": "string",
                     "required": false,
                     "array": true,
-                    "elements": [
-                        "private"
-                    ],
+                    "elements": ["private"],
                     "format": "enum",
                     "default": null
                 }
@@ -60,12 +55,8 @@
                     "key": "username_index",
                     "type": "unique",
                     "status": "available",
-                    "attributes": [
-                        "username"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
+                    "attributes": ["username"],
+                    "orders": ["ASC"]
                 }
             ]
         },
@@ -111,13 +102,7 @@
                     "type": "string",
                     "required": true,
                     "array": false,
-                    "elements": [
-                        "image",
-                        "text",
-                        "blog",
-                        "video",
-                        "imessage"
-                    ],
+                    "elements": ["richTextPost", "imessageConversation", "imagePost"],
                     "format": "enum",
                     "default": null
                 },
@@ -152,11 +137,7 @@
                     "type": "string",
                     "required": true,
                     "array": false,
-                    "elements": [
-                        "published",
-                        "draft",
-                        "archived"
-                    ],
+                    "elements": ["published", "draft", "archived"],
                     "format": "enum",
                     "default": null
                 },
@@ -165,14 +146,7 @@
                     "type": "string",
                     "required": true,
                     "array": false,
-                    "elements": [
-                        "public",
-                        "private",
-                        "followers",
-                        "mutuals",
-                        "unlisted",
-                        "team"
-                    ],
+                    "elements": ["public", "private", "followers", "mutuals", "unlisted", "team"],
                     "format": "enum",
                     "default": null
                 },
@@ -190,36 +164,22 @@
                     "key": "user_created_index",
                     "type": "key",
                     "status": "available",
-                    "attributes": [
-                        "userId",
-                        "createdAt"
-                    ],
-                    "orders": [
-                        "DESC",
-                        "DESC"
-                    ]
+                    "attributes": ["userId", "createdAt"],
+                    "orders": ["DESC", "DESC"]
                 },
                 {
                     "key": "type_index",
                     "type": "key",
                     "status": "available",
-                    "attributes": [
-                        "type"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
+                    "attributes": ["type"],
+                    "orders": ["ASC"]
                 },
                 {
                     "key": "access_level_index",
                     "type": "key",
                     "status": "available",
-                    "attributes": [
-                        "accessLevel"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
+                    "attributes": ["accessLevel"],
+                    "orders": ["ASC"]
                 }
             ]
         },
@@ -266,30 +226,20 @@
                     "key": "user_index",
                     "type": "key",
                     "status": "available",
-                    "attributes": [
-                        "userId"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
+                    "attributes": ["userId"],
+                    "orders": ["ASC"]
                 },
                 {
                     "key": "user_name_unique_index",
                     "type": "unique",
                     "status": "available",
-                    "attributes": [
-                        "userId",
-                        "name"
-                    ],
-                    "orders": [
-                        "ASC",
-                        "ASC"
-                    ]
+                    "attributes": ["userId", "name"],
+                    "orders": ["ASC", "ASC"]
                 }
             ]
         },
         {
-            "$id": "imessageConversations",
+            "$id": "imessageConversation",
             "$permissions": [
                 "create(\"users\")",
                 "read(\"users\")",
@@ -297,7 +247,7 @@
                 "delete(\"users\")"
             ],
             "databaseId": "main",
-            "name": "imessageConversations",
+            "name": "imessageConversation",
             "enabled": true,
             "documentSecurity": true,
             "attributes": [
@@ -356,12 +306,8 @@
                     "key": "post_id_unique_index",
                     "type": "unique",
                     "status": "available",
-                    "attributes": [
-                        "postId"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
+                    "attributes": ["postId"],
+                    "orders": ["ASC"]
                 }
             ]
         },
@@ -447,11 +393,7 @@
                     "type": "string",
                     "required": false,
                     "array": false,
-                    "elements": [
-                        "sent",
-                        "delivered",
-                        "read"
-                    ],
+                    "elements": ["sent", "delivered", "read"],
                     "format": "enum",
                     "default": null
                 },
@@ -460,10 +402,7 @@
                     "type": "string",
                     "required": false,
                     "array": false,
-                    "elements": [
-                        "text",
-                        "image"
-                    ],
+                    "elements": ["text", "image"],
                     "format": "enum",
                     "default": "text"
                 },
@@ -497,45 +436,27 @@
                     "key": "conversation_screenshot_index",
                     "type": "key",
                     "status": "available",
-                    "attributes": [
-                        "conversationId",
-                        "screenshotIndex"
-                    ],
-                    "orders": [
-                        "ASC",
-                        "ASC"
-                    ]
+                    "attributes": ["conversationId", "screenshotIndex"],
+                    "orders": ["ASC", "ASC"]
                 },
                 {
                     "key": "conversation_timestamp_index",
                     "type": "key",
                     "status": "available",
-                    "attributes": [
-                        "conversationId",
-                        "timestamp"
-                    ],
-                    "orders": [
-                        "ASC",
-                        "ASC"
-                    ]
+                    "attributes": ["conversationId", "timestamp"],
+                    "orders": ["ASC", "ASC"]
                 },
                 {
                     "key": "conversation_message_unique_index",
                     "type": "unique",
                     "status": "available",
-                    "attributes": [
-                        "conversationId",
-                        "messageId"
-                    ],
-                    "orders": [
-                        "ASC",
-                        "ASC"
-                    ]
+                    "attributes": ["conversationId", "messageId"],
+                    "orders": ["ASC", "ASC"]
                 }
             ]
         },
         {
-            "$id": "richTextPosts",
+            "$id": "richTextPost",
             "$permissions": [
                 "create(\"users\")",
                 "read(\"users\")",
@@ -543,7 +464,7 @@
                 "delete(\"users\")"
             ],
             "databaseId": "main",
-            "name": "richTextPosts",
+            "name": "richTextPost",
             "enabled": true,
             "documentSecurity": true,
             "attributes": [
@@ -635,23 +556,88 @@
                     "key": "post_id_unique_index",
                     "type": "unique",
                     "status": "available",
-                    "attributes": [
-                        "postId"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
+                    "attributes": ["postId"],
+                    "orders": ["ASC"]
                 },
                 {
                     "key": "title_search_index",
                     "type": "key",
                     "status": "available",
-                    "attributes": [
-                        "title"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
+                    "attributes": ["title"],
+                    "orders": ["ASC"]
+                }
+            ]
+        },
+        {
+            "$id": "imessageConversation",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")"
+            ],
+            "databaseId": "main",
+            "name": "imessageConversation",
+            "enabled": true,
+            "documentSecurity": true,
+            "attributes": [
+                {
+                    "key": "postId",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "participantDocRefs",
+                    "type": "string",
+                    "required": true,
+                    "array": true,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "rightSideParticipantDocRef",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "screenshotMessageIds",
+                    "type": "string",
+                    "required": true,
+                    "array": true,
+                    "size": 100000,
+                    "default": null
+                },
+                {
+                    "key": "totalScreenshots",
+                    "type": "integer",
+                    "required": true,
+                    "array": false,
+                    "min": -9223372036854775808,
+                    "max": 9223372036854775807,
+                    "default": null
+                },
+                {
+                    "key": "conversationId",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                }
+            ],
+            "indexes": [
+                {
+                    "key": "post_id_unique_index",
+                    "type": "unique",
+                    "status": "available",
+                    "attributes": ["postId"],
+                    "orders": ["ASC"]
                 }
             ]
         }
