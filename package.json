@@ -62,11 +62,11 @@
         "vitest": "^3.1.4"
     },
     "dependencies": {
-        "appwrite": "^17.0.0",
+        "appwrite": "^18.0.0",
         "daisyui": "^5.0.35",
         "mime2ext": "^2.0.1",
         "svelte": "^5.31.1",
-        "node-appwrite": "^16.0.0"
+        "node-appwrite": "^17.0.0"
     },
     "packageManager": "bun@1.2.13",
     "engines": {

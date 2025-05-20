@@ -57,7 +57,7 @@ const MOCK_EXAMPLE_COLLECTION_ID = 'test_collection_id_from_mock';
 vi.mock('$env/static/private', () => {
     // $env/static/private does not take .js
     return {
-        APPWRITE_DATABASE_ID: MOCK_APPWRITE_DB_ID,
+        DATABASE_ID: MOCK_APPWRITE_DB_ID,
         EXAMPLE_COLLECTION_ID: MOCK_EXAMPLE_COLLECTION_ID
     };
 });
@@ -97,7 +97,7 @@ describe('Appwrite: Example Document Creation with Env Mocking', () => {
 // In src/lib/server/appwrite-utils/example.appwrite.ts
 import { ID } from 'appwrite';
 import type { Models } from 'appwrite';
-import { APPWRITE_DATABASE_ID, EXAMPLE_COLLECTION_ID } from '$env/static/private'; // $env imports are special
+import { DATABASE_ID, EXAMPLE_COLLECTION_ID } from '$env/static/private'; // $env imports are special
 
 export interface CreateExampleData {
     /* ... */
@@ -117,7 +117,7 @@ export async function createExampleDocument(
 ): Promise<Models.Document> {
     try {
         const document = await databases.createDocument(
-            APPWRITE_DATABASE_ID,
+            DATABASE_ID,
             EXAMPLE_COLLECTION_ID,
             ID.unique(),
             data
@@ -139,9 +139,9 @@ export async function createExampleDocument(
 // Missing: vi.mock('$env/static/private', ...);
 
 // Implementation file (example.appwrite.ts) uses:
-// import { APPWRITE_DATABASE_ID } from '$env/static/private';
+// import { DATABASE_ID } from '$env/static/private';
 
-// This test would likely fail or behave unpredictably because APPWRITE_DATABASE_ID
+// This test would likely fail or behave unpredictably because DATABASE_ID
 // in example.appwrite.ts would be undefined or its actual value from .env,
 // not a controlled test value.
 ```

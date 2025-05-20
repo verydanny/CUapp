@@ -1,6 +1,6 @@
 import { ID } from 'node-appwrite';
 import type { Models, Databases } from 'node-appwrite';
-import { APPWRITE_DATABASE_ID, RICH_TEXT_POSTS_COLLECTION_ID } from '$env/static/private';
+import { DATABASE_ID, RICH_TEXT_POSTS_COLLECTION_ID } from '$env/static/private';
 
 // --- Data Transfer Object (DTO) Interfaces for RichTextPost Operations ---
 
@@ -41,7 +41,7 @@ export async function createRichTextPost(
 ): Promise<Models.Document> {
     try {
         const document = await appwriteDatabases.createDocument(
-            APPWRITE_DATABASE_ID,
+            DATABASE_ID,
             RICH_TEXT_POSTS_COLLECTION_ID,
             ID.unique(), // Appwrite generates the document ID
             data,
@@ -66,7 +66,7 @@ export async function getRichTextPostById(
 ): Promise<Models.Document> {
     try {
         const document = await appwriteDatabases.getDocument(
-            APPWRITE_DATABASE_ID,
+            DATABASE_ID,
             RICH_TEXT_POSTS_COLLECTION_ID,
             documentId
         );
@@ -92,7 +92,7 @@ export async function updateRichTextPost(
 ): Promise<Models.Document> {
     try {
         const document = await appwriteDatabases.updateDocument(
-            APPWRITE_DATABASE_ID,
+            DATABASE_ID,
             RICH_TEXT_POSTS_COLLECTION_ID,
             documentId,
             data,
@@ -116,7 +116,7 @@ export async function deleteRichTextPost(
 ): Promise<void> {
     try {
         await appwriteDatabases.deleteDocument(
-            APPWRITE_DATABASE_ID,
+            DATABASE_ID,
             RICH_TEXT_POSTS_COLLECTION_ID,
             documentId
         );

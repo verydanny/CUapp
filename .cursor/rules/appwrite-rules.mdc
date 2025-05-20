@@ -23,6 +23,8 @@ alwaysApply: false
 - **Mocking Appwrite Client Methods:**
     - The Appwrite service client instance (e.g., `Databases`) passed to utility functions should have its methods (e.g., `createDocument`, `getDocument`) mocked using `vi.fn()`. This allows asserting how the utility function interacts with the Appwrite SDK.
     - Clear all mocks before each test using `beforeEach(() => { vi.clearAllMocks(); });` for test isolation.
+- **Database models and table constants:**
+    - Appwrite constants should be saved into `src/lib/const.ts`, not any .env file. For example, `export const RICH_TEXT_POSTS_COLLECTION_ID = 'richTextPosts';`
 - **Mocking SvelteKit Environment Variables (`$env/static/private`) for Utilities:**
     - If your Appwrite utility functions _directly import_ configuration constants (like specific Database IDs or Collection IDs) from `$env/static/private`, these imports **must** be mocked in the test files for those utilities.
     - Use `vi.mock('$env/static/private', ...)` to provide mock values for these imported constants. This mock should be at the top level of your test file.
@@ -57,7 +59,7 @@ const MOCK_ENV_EXAMPLE_COLLECTION_ID = 'test_coll_id_from_env_mock';
 
 vi.mock('$env/static/private', () => ({
     // $env/static/private does not take .js
-    APPWRITE_DATABASE_ID: MOCK_ENV_APPWRITE_DB_ID,
+    DATABASE_ID: MOCK_ENV_APPWRITE_DB_ID,
     EXAMPLE_COLLECTION_ID: MOCK_ENV_EXAMPLE_COLLECTION_ID
 }));
 // ---- End Mock ----
@@ -96,7 +98,7 @@ describe('Appwrite Utility: createExampleDocument', () => {
 // In src/lib/server/appwrite-utils/example.appwrite.ts
 import { ID } from 'appwrite';
 import type { Models } from 'appwrite';
-import { APPWRITE_DATABASE_ID, EXAMPLE_COLLECTION_ID } from '$env/static/private'; // $env imports are special
+import { DATABASE_ID, EXAMPLE_COLLECTION_ID } from '$env/static/private'; // $env imports are special
 
 export interface CreateExampleData {
     name: string;
@@ -117,7 +119,7 @@ export async function createExampleDocument(
 ): Promise<Models.Document> {
     try {
         const document = await databases.createDocument(
-            APPWRITE_DATABASE_ID,
+            DATABASE_ID,
             EXAMPLE_COLLECTION_ID,
             ID.unique(),
             data

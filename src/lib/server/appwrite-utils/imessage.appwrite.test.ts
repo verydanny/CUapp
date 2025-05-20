@@ -40,7 +40,7 @@ const mockDatabases = {
 } as unknown as Databases;
 
 // Configuration for Appwrite (replace with actual values or env variables)
-const APPWRITE_DATABASE_ID = 'main'; // As per posts-model-ai-context.md
+const DATABASE_ID = 'main'; // As per posts-model-ai-context.md
 const IMESSAGE_CONVERSATIONS_COLLECTION_ID = 'imessageConversations'; // As per imessage-models-ai-context.md
 const IMESSAGE_MESSAGES_COLLECTION_ID = 'imessageMessages'; // New constant for tests
 const IMESSAGE_PARTICIPANTS_COLLECTION_ID = 'imessageParticipants'; // New constant for tests
@@ -90,7 +90,7 @@ describe('Appwrite: iMessage Interactions', () => {
                 // Because the placeholder doesn't call mockDatabases.createDocument, this will fail.
                 expect(mockDatabases.createDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.createDocument).toHaveBeenCalledWith(
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_CONVERSATIONS_COLLECTION_ID,
                     expect.any(String), // Use expect.any(String) for the document ID
                     conversationData
@@ -120,7 +120,7 @@ describe('Appwrite: iMessage Interactions', () => {
                 // Optionally, verify that createDocument was still called
                 expect(mockDatabases.createDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.createDocument).toHaveBeenCalledWith(
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_CONVERSATIONS_COLLECTION_ID,
                     expect.any(String),
                     conversationData
@@ -145,7 +145,7 @@ describe('Appwrite: iMessage Interactions', () => {
 
                 expect(mockDatabases.createDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.createDocument).toHaveBeenCalledWith(
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_MESSAGES_COLLECTION_ID, // Use the correct collection ID
                     expect.any(String), // For ID.unique() or similar in implementation
                     messageData
@@ -177,7 +177,7 @@ describe('Appwrite: iMessage Interactions', () => {
                 // Optionally, verify that createDocument was still called
                 expect(mockDatabases.createDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.createDocument).toHaveBeenCalledWith(
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_MESSAGES_COLLECTION_ID,
                     expect.any(String),
                     messageData
@@ -197,7 +197,7 @@ describe('Appwrite: iMessage Interactions', () => {
 
                 expect(mockDatabases.createDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.createDocument).toHaveBeenCalledWith(
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_PARTICIPANTS_COLLECTION_ID, // Use the correct collection ID
                     expect.any(String), // For ID.unique() or similar in implementation
                     participantData
@@ -224,7 +224,7 @@ describe('Appwrite: iMessage Interactions', () => {
                 // Optionally, verify that createDocument was still called
                 expect(mockDatabases.createDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.createDocument).toHaveBeenCalledWith(
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_PARTICIPANTS_COLLECTION_ID,
                     expect.any(String),
                     participantData
@@ -248,7 +248,7 @@ describe('Appwrite: iMessage Interactions', () => {
                 const mockReturnedDoc: Models.Document = {
                     $id: mockConversationDocId,
                     $collectionId: IMESSAGE_CONVERSATIONS_COLLECTION_ID,
-                    $databaseId: APPWRITE_DATABASE_ID,
+                    $databaseId: DATABASE_ID,
                     $createdAt: new Date().toISOString(),
                     $updatedAt: new Date().toISOString(),
                     $permissions: [],
@@ -263,7 +263,7 @@ describe('Appwrite: iMessage Interactions', () => {
 
                 expect(mockDatabases.getDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.getDocument).toHaveBeenCalledWith(
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_CONVERSATIONS_COLLECTION_ID,
                     mockConversationDocId
                 );
@@ -286,7 +286,7 @@ describe('Appwrite: iMessage Interactions', () => {
                 const mockMessageDoc: Models.Document = {
                     $id: 'msgDocFetched1',
                     $collectionId: IMESSAGE_MESSAGES_COLLECTION_ID,
-                    $databaseId: APPWRITE_DATABASE_ID,
+                    $databaseId: DATABASE_ID,
                     $createdAt: new Date().toISOString(),
                     $updatedAt: new Date().toISOString(),
                     $permissions: [],
@@ -305,7 +305,7 @@ describe('Appwrite: iMessage Interactions', () => {
 
                 expect(mockDatabases.listDocuments).toHaveBeenCalledOnce();
                 expect(mockDatabases.listDocuments).toHaveBeenCalledWith(
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_MESSAGES_COLLECTION_ID,
                     [Query.equal('conversationId', targetConversationId)]
                 );
@@ -327,7 +327,7 @@ describe('Appwrite: iMessage Interactions', () => {
                 // Optionally, verify that listDocuments was still called
                 expect(mockDatabases.listDocuments).toHaveBeenCalledOnce();
                 expect(mockDatabases.listDocuments).toHaveBeenCalledWith(
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_MESSAGES_COLLECTION_ID,
                     [Query.equal('conversationId', targetConversationId)]
                 );
@@ -359,7 +359,7 @@ describe('Appwrite: iMessage Interactions', () => {
 
                 expect(mockDatabases.listDocuments).toHaveBeenCalledOnce();
                 expect(mockDatabases.listDocuments).toHaveBeenCalledWith(
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_MESSAGES_COLLECTION_ID,
                     [
                         Query.equal('conversationId', targetConversationId),
@@ -380,7 +380,7 @@ describe('Appwrite: iMessage Interactions', () => {
                 const mockParticipantDoc1: Models.Document = {
                     $id: participantIds[0],
                     $collectionId: IMESSAGE_PARTICIPANTS_COLLECTION_ID,
-                    $databaseId: APPWRITE_DATABASE_ID,
+                    $databaseId: DATABASE_ID,
                     $createdAt: new Date().toISOString(),
                     $updatedAt: new Date().toISOString(),
                     $permissions: [],
@@ -393,7 +393,7 @@ describe('Appwrite: iMessage Interactions', () => {
                 const mockParticipantDoc2: Models.Document = {
                     $id: participantIds[1],
                     $collectionId: IMESSAGE_PARTICIPANTS_COLLECTION_ID,
-                    $databaseId: APPWRITE_DATABASE_ID,
+                    $databaseId: DATABASE_ID,
                     $createdAt: new Date().toISOString(),
                     $updatedAt: new Date().toISOString(),
                     $permissions: [],
@@ -413,13 +413,13 @@ describe('Appwrite: iMessage Interactions', () => {
                 expect(mockDatabases.getDocument).toHaveBeenCalledTimes(participantIds.length);
                 expect(mockDatabases.getDocument).toHaveBeenNthCalledWith(
                     1,
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_PARTICIPANTS_COLLECTION_ID,
                     participantIds[0]
                 );
                 expect(mockDatabases.getDocument).toHaveBeenNthCalledWith(
                     2,
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_PARTICIPANTS_COLLECTION_ID,
                     participantIds[1]
                 );
@@ -444,7 +444,7 @@ describe('Appwrite: iMessage Interactions', () => {
             // Optionally, verify that getDocument was still called
             expect(mockDatabases.getDocument).toHaveBeenCalledOnce();
             expect(mockDatabases.getDocument).toHaveBeenCalledWith(
-                APPWRITE_DATABASE_ID,
+                DATABASE_ID,
                 IMESSAGE_CONVERSATIONS_COLLECTION_ID,
                 mockConversationDocId
             );
@@ -466,7 +466,7 @@ describe('Appwrite: iMessage Interactions', () => {
             // Optionally, verify that updateDocument was still called
             expect(mockDatabases.updateDocument).toHaveBeenCalledOnce();
             expect(mockDatabases.updateDocument).toHaveBeenCalledWith(
-                APPWRITE_DATABASE_ID,
+                DATABASE_ID,
                 IMESSAGE_CONVERSATIONS_COLLECTION_ID,
                 documentIdToUpdate,
                 updateData
@@ -486,7 +486,7 @@ describe('Appwrite: iMessage Interactions', () => {
 
                 expect(mockDatabases.updateDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.updateDocument).toHaveBeenCalledWith(
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_CONVERSATIONS_COLLECTION_ID,
                     mockConversationDocId,
                     updateData
@@ -514,7 +514,7 @@ describe('Appwrite: iMessage Interactions', () => {
                 const mockReturnedUpdatedDoc: Models.Document = {
                     $id: documentIdToUpdate,
                     $collectionId: IMESSAGE_MESSAGES_COLLECTION_ID,
-                    $databaseId: APPWRITE_DATABASE_ID,
+                    $databaseId: DATABASE_ID,
                     $createdAt: new Date().toISOString(),
                     $updatedAt: new Date().toISOString(),
                     $permissions: [],
@@ -531,7 +531,7 @@ describe('Appwrite: iMessage Interactions', () => {
 
                 expect(mockDatabases.updateDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.updateDocument).toHaveBeenCalledWith(
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_MESSAGES_COLLECTION_ID,
                     documentIdToUpdate,
                     updateData
@@ -557,7 +557,7 @@ describe('Appwrite: iMessage Interactions', () => {
                 // Optionally, verify that updateDocument was still called
                 expect(mockDatabases.updateDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.updateDocument).toHaveBeenCalledWith(
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_MESSAGES_COLLECTION_ID,
                     documentIdToUpdate,
                     updateData
@@ -581,7 +581,7 @@ describe('Appwrite: iMessage Interactions', () => {
                 const mockReturnedUpdatedDoc: Models.Document = {
                     $id: documentIdToUpdate,
                     $collectionId: IMESSAGE_PARTICIPANTS_COLLECTION_ID,
-                    $databaseId: APPWRITE_DATABASE_ID,
+                    $databaseId: DATABASE_ID,
                     $createdAt: new Date().toISOString(), // Assume original creation time
                     $updatedAt: new Date().toISOString(), // New update time
                     $permissions: [],
@@ -598,7 +598,7 @@ describe('Appwrite: iMessage Interactions', () => {
 
                 expect(mockDatabases.updateDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.updateDocument).toHaveBeenCalledWith(
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_PARTICIPANTS_COLLECTION_ID,
                     documentIdToUpdate,
                     updateData
@@ -624,7 +624,7 @@ describe('Appwrite: iMessage Interactions', () => {
                 // Optionally, verify that updateDocument was still called
                 expect(mockDatabases.updateDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.updateDocument).toHaveBeenCalledWith(
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_PARTICIPANTS_COLLECTION_ID,
                     documentIdToUpdate,
                     updateData
@@ -642,7 +642,7 @@ describe('Appwrite: iMessage Interactions', () => {
 
                 expect(mockDatabases.deleteDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.deleteDocument).toHaveBeenCalledWith(
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_CONVERSATIONS_COLLECTION_ID,
                     conversationDocIdToDelete
                 );
@@ -663,7 +663,7 @@ describe('Appwrite: iMessage Interactions', () => {
                 // Optionally, verify that deleteDocument was still called
                 expect(mockDatabases.deleteDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.deleteDocument).toHaveBeenCalledWith(
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_CONVERSATIONS_COLLECTION_ID,
                     documentIdToDelete
                 );
@@ -678,7 +678,7 @@ describe('Appwrite: iMessage Interactions', () => {
 
                 expect(mockDatabases.deleteDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.deleteDocument).toHaveBeenCalledWith(
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_MESSAGES_COLLECTION_ID,
                     messageDocIdToDelete
                 );
@@ -699,7 +699,7 @@ describe('Appwrite: iMessage Interactions', () => {
                 // Optionally, verify that deleteDocument was still called
                 expect(mockDatabases.deleteDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.deleteDocument).toHaveBeenCalledWith(
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_MESSAGES_COLLECTION_ID,
                     documentIdToDelete
                 );
@@ -714,7 +714,7 @@ describe('Appwrite: iMessage Interactions', () => {
 
                 expect(mockDatabases.deleteDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.deleteDocument).toHaveBeenCalledWith(
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_PARTICIPANTS_COLLECTION_ID,
                     participantDocIdToDelete
                 );
@@ -735,7 +735,7 @@ describe('Appwrite: iMessage Interactions', () => {
                 // Optionally, verify that deleteDocument was still called
                 expect(mockDatabases.deleteDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.deleteDocument).toHaveBeenCalledWith(
-                    APPWRITE_DATABASE_ID,
+                    DATABASE_ID,
                     IMESSAGE_PARTICIPANTS_COLLECTION_ID,
                     documentIdToDelete
                 );
