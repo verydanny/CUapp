@@ -45,8 +45,7 @@ export const adminCreateDocumentWithUserPermissions = async (
     if (userId) {
         return databases.createDocument(databaseId, collectionId, documentId, document, [
             Permission.read(Role.user(userId)),
-            Permission.update(Role.user(userId)),
-            Permission.delete(Role.user(userId))
+            Permission.write(Role.user(userId))
         ]);
     }
 
