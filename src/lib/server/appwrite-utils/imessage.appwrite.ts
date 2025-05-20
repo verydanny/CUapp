@@ -5,7 +5,7 @@ import {
     IMESSAGE_CONVERSATIONS_COLLECTION_ID,
     IMESSAGE_MESSAGES_COLLECTION_ID,
     IMESSAGE_PARTICIPANTS_COLLECTION_ID
-} from '$lib/const';
+} from '$lib/server/model.const.js';
 import type { Databases } from 'node-appwrite';
 
 // --- Data Transfer Object (DTO) Interfaces for Appwrite Operations ---

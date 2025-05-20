@@ -1,9 +1,9 @@
 ---
-description: Guide TDD of SvelteKit API endpoints using Appwrite utility functions to ensure robust and well-tested API layers.
-globs: src/routes/api/**/+server.ts, src/routes/api/**/server.test.ts
-tags: [svelte, sveltekit, appwrite, tdd, api, testing, vitest]
+description: Guide TDD of SvelteKit API endpoints using Appwrite utility functions, ensuring robust API layers and correct constant usage.
+globs: src/routes/api/**/+server.ts, src/routes/api/**/+*.test.ts
+tags: [appwrite, svelte, tdd, api, testing, constants]
 priority: 2
-version: 1.3.0 # Updated version
+version: 1.0.1
 alwaysApply: false
 ---
 
@@ -16,9 +16,9 @@ This rule guides the AI and user through creating SvelteKit API endpoints that l
 This workflow assumes:
 
 - An Appwrite data model is already defined in `.appwrite/appwrite.json` and documented.
-- Corresponding Appwrite utility functions (CRUD operations) for that model exist in `src/lib/server/appwrite-utils/<model>.appwrite.ts`. These functions accept an initialized Appwrite service client (e.g., `Databases`) as an argument.
+- Corresponding Appwrite utility functions (CRUD operations) for that model exist in `src/lib/server/appwrite-utils/<model>.appwrite.ts`. These functions accept an initialized Appwrite service client (e.g., `Databases`) as an argument and source their Database/Collection IDs from `$lib/server/model.const.js`.
 - Unit tests for these utility functions are present and pass, as per `appwrite-testing-workflow.mdc`.
-- A centralized Appwrite client setup exists in `src/lib/server/appwrite-utils/appwrite.ts`, exporting factory functions like `createAdminClient()`.
+- A centralized Appwrite client setup exists in `src/lib/server/appwrite-utils/appwrite.ts`, exporting factory functions like `createAdminClient()`. This setup uses `$env/static/private` for API keys and endpoint configuration.
 
 This rule should be applied when creating or modifying SvelteKit API endpoints (`+server.ts` files) that interact with an Appwrite backend.
 
@@ -29,7 +29,7 @@ The development process follows the Red-Green-Refactor cycle of TDD:
 ### 1. Setup & Pre-requisites
 
 - Ensure `feature-workflow.mdc` is active for branch creation, changesets, etc.
-- Confirm model, utility functions, and their tests are in place.
+- Confirm model, utility functions (using `$lib/server/model.const.js` for IDs), and their tests are in place.
 - API endpoints are in `src/routes/api/your-feature/.../+server.ts`.
 - Tests for these endpoints are co-located, e.g., `src/routes/api/your-feature/.../server.test.ts` (or `<feature_name>.test.ts` if preferred, but directly alongside `+server.ts`).
 - **Import Convention**: For internal project imports (e.g., from `$lib/...` or relative paths like `./...`), append `.js` to the import path (e.g., `import { myFunction } from '$lib/utils/myUtils.js';`, `import { GET } from './+server.js';`).
@@ -60,7 +60,7 @@ The development process follows the Red-Green-Refactor cycle of TDD:
     - **Initialize Appwrite Service:** Import `createAdminClient` (or other relevant client factory) from `src/lib/server/appwrite-utils/appwrite.js`. Call it to get an Appwrite client instance, then get the required service (e.g., `const adminClient = createAdminClient(); const databases = adminClient.databases;`).
     - Parse and validate the request body.
     - Extract path parameters.
-    - Call the (real) Appwrite utility function, passing the obtained Appwrite service (e.g., `databases`) and the data: `await createYourModelItem(databases, data);`.
+    - Call the (real) Appwrite utility function, passing the obtained Appwrite service (e.g., `databases`) and the data: `await createYourModelItem(databases, data);`. (This utility function will use constants from `$lib/server/model.const.js` internally for DB/Collection IDs).
     - Handle errors and return appropriate HTTP responses using `json()` from `@sveltejs/kit`.
 - Write code until tests pass.
 
@@ -69,10 +69,11 @@ The development process follows the Red-Green-Refactor cycle of TDD:
 - Refactor endpoint and test code for clarity and efficiency.
 - Adhere to `typescript-typing-standards.mdc`.
 
-### 5. Environment Variables
+### 5. Constants and Environment Variables
 
-- API endpoint handlers obtain Appwrite services via `createAdminClient()` from `src/lib/server/appwrite-utils/appwrite.js`. This central utility is responsible for using environment variables from `$env/static/private` and `$env/static/public` correctly, as per `appwrite-rules.mdc`.
-- API endpoint tests mock the higher-level Appwrite utility functions (e.g., `createYourModelItem`), so they don't need to mock `createAdminClient` or `$env/static/private` directly.
+- API endpoint handlers obtain Appwrite services via `createAdminClient()` (or similar) from `src/lib/server/appwrite-utils/appwrite.js`. This central utility is responsible for using environment variables from `$env/static/private` (e.g., for API keys, Appwrite Project ID, endpoint) and `$env/static/public` correctly.
+- The Appwrite utility functions (e.g., `createYourModelItem`) called by the endpoint handlers are responsible for sourcing their specific Database IDs and Collection IDs from `src/lib/server/model.const.ts` (imported as `$lib/server/model.const.js`).
+- API endpoint tests mock the higher-level Appwrite utility functions. Therefore, these tests do not need to mock `createAdminClient` or `$env/static/private` for Database/Collection IDs, as these are encapsulated within the (actual) utility functions.
 
 ## Examples
 
@@ -83,6 +84,7 @@ The development process follows the Red-Green-Refactor cycle of TDD:
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { POST } from './+server.js'; // Note .js
 import type { RequestEvent } from '@sveltejs/kit';
+// Assuming CreateWidgetData is defined in the utility module
 import type { CreateWidgetData } from '$lib/server/appwrite-utils/widgets.appwrite.js'; // Note .js
 
 // Mock the specific Appwrite utility function that the POST handler will call
@@ -122,6 +124,7 @@ describe('POST /api/widgets', () => {
 
         expect(response.status).toBe(201);
         expect(body).toEqual(mockAppwriteDocument);
+        // The actual createWidgetInAppwrite utility will use constants from model.const.js
         expect(mockCreateWidgetInAppwrite).toHaveBeenCalledWith(expect.anything(), widgetData);
     });
 
@@ -138,11 +141,13 @@ describe('POST /api/widgets', () => {
 import { json } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
 import { createAdminClient } from '$lib/server/appwrite-utils/appwrite.js'; // Note .js
+// The actual createWidgetInAppwrite utility function will import its DB/Collection IDs
+// from $lib/server/model.const.js
 import { createWidgetInAppwrite } from '$lib/server/appwrite-utils/widgets.appwrite.js'; // Note .js
 import type { CreateWidgetData } from '$lib/server/appwrite-utils/widgets.appwrite.js'; // Note .js
 
 export async function POST(event: RequestEvent) {
-    const adminClient = createAdminClient();
+    const adminClient = createAdminClient(); // Uses $env/static/private for API key etc.
     const databases = adminClient.databases;
 
     try {
@@ -152,6 +157,7 @@ export async function POST(event: RequestEvent) {
             return json({ error: 'Name is required' }, { status: 400 });
         }
 
+        // createWidgetInAppwrite uses constants from $lib/server/model.const.js for its collection IDs
         const newWidgetDocument = await createWidgetInAppwrite(databases, data);
         return json(newWidgetDocument, { status: 201 });
     } catch (error: any) {

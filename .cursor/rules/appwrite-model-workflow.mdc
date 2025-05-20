@@ -1,9 +1,10 @@
 ---
-description: Guides user when adding Appwrite database models
-globs: .appwrite/appwrite.json, features/\*-model-ai-context.md
-tags: [appwrite, database, workflow, model]
+description: Guides user when adding Appwrite database models, including updating a central constants file.
+globs: .appwrite/appwrite.json, docs/database/*.md, features/*.md, src/lib/server/model.const.ts
+tags: [appwrite, database, model, workflow, constants]
 priority: 2
-version: 1.1.0
+version: 1.0.1
+alwaysApply: false
 ---
 
 # Add Appwrite Database Model Workflow
@@ -11,7 +12,7 @@ version: 1.1.0
 ## Context
 
 - This rule guides the AI and user through the process of adding a new collection or set of related collections to the Appwrite database.
-- It focuses on deliberation, implementation in `appwrite.json`, deployment via CLI, and comprehensive documentation.
+- It focuses on deliberation, implementation in `appwrite.json`, deployment via CLI, updating a central constants file (`src/lib/server/model.const.ts`), and comprehensive documentation.
 - Apply this rule when the user indicates they are adding or modifying Appwrite database models.
 
 ## Requirements
@@ -24,31 +25,31 @@ version: 1.1.0
     - Require required fields to have no default values.
 - **Push to Appwrite:** Instruct the user to use the Appwrite CLI (`cd .appwrite && appwrite deploy collection` or `appwrite push collections`).
     - Require ensuring only new/modified collections are selected during the push.
+- **Update Constants File:** Guide the user to add the new Collection ID(s) (and Database ID if relevant and not already present) as exported constants to `src/lib/server/model.const.ts`. These constants will be imported (using `.js` extension) by Appwrite utility functions for runtime use. Example: `export const NEW_MODEL_COLLECTION_ID = 'yourNewCollectionId';`
 - **Create AI Context:** Guide the user to create a markdown file in `features/` for AI reference, detailing design decisions and relationships.
 - **Create Human Documentation:** Guide the user to create a markdown file in `docs/database/` for human-readable documentation.
-- **Commit:** Instruct the user to stage _all_ relevant changes and commit using Conventional Commits (e.g., `feat(<model_name>-model): add <model_name> data model and documentation`) with a detailed body.
+- **Commit:** Instruct the user to stage _all_ relevant changes (including `appwrite.json`, `model.const.ts`, and documentation) and commit using Conventional Commits (e.g., `feat(<model_name>-model): add <model_name> data model, constants, and documentation`) with a detailed body.
 - **Push:** Guide the user to push the feature branch.
 - The AI should follow these steps sequentially, confirming completion of major steps.
 - The AI should act as a data modeling and database performance professional during deliberation.
 - The AI should pay close attention to user access requirements when designing the structure.
 - The AI should double-check `appwrite.json` for correct JSON and absence of comments.
+- The AI should ensure the `src/lib/server/model.const.ts` file is updated with the new model's constants.
 - The AI should ensure comprehensive documentation is created in both specified locations.
 - The AI must use Conventional Commits rigorously.
 
 ## Examples
 
-<example>
-  description: AI reminds user to check appwrite.json for comments
-  ```
+<example description="AI reminds user to check appwrite.json for comments">
 Okay, you've added the model to appwrite.json. Make sure there are no comments in the file, as Appwrite requires strict JSON.
-  ```
 </example>
 
-<example type="invalid">
-  description: AI doesn't remind user about appwrite.json constraints
-  ```
+<example description="AI guides user to update the constants file">
+Great, the new collection has been pushed to Appwrite. Now, let's add its Collection ID to our constants file at src/lib/server/model.const.ts. For example:
+export const NEW_MODEL_COLLECTION_ID = 'theActualIdFromAppwrite';
+This constant will then be used in your Appwrite utility functions.
+</example>
+
+<example type="invalid" description="AI doesn't remind user about appwrite.json constraints">
 Looks good. What's next?
-  ```
-</example>
-
 </example>

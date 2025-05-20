@@ -1,6 +1,6 @@
 import { ID } from 'node-appwrite';
 import type { Models, Databases } from 'node-appwrite';
-import { DATABASE_ID, RICH_TEXT_POSTS_COLLECTION_ID } from '$env/static/private';
+import { DATABASE_ID, RICH_TEXT_POSTS_COLLECTION_ID } from '$lib/server/model.const.js';
 
 // --- Data Transfer Object (DTO) Interfaces for RichTextPost Operations ---
 
