@@ -74,7 +74,6 @@
     "trustedDependencies": [
         "@sveltejs/kit",
         "@tailwindcss/oxide",
-        "argon2",
         "esbuild",
         "svelte-preprocess"
     ],
