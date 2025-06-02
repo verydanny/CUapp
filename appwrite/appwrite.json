@@ -37,38 +37,7 @@
             }
         }
     },
-    "functions": [
-        {
-            "$id": "starter",
-            "execute": [
-                "users"
-            ],
-            "name": "starter",
-            "enabled": true,
-            "logging": true,
-            "runtime": "bun-1.1",
-            "scopes": [
-                "users.read",
-                "databases.read",
-                "databases.write",
-                "collections.read",
-                "collections.write",
-                "attributes.read",
-                "attributes.write",
-                "indexes.read",
-                "indexes.write",
-                "documents.read",
-                "documents.write"
-            ],
-            "events": [],
-            "schedule": "",
-            "timeout": 15,
-            "entrypoint": "src/main.ts",
-            "commands": "bun install",
-            "specification": "s-0.5vcpu-512mb",
-            "path": "functions/starter"
-        }
-    ],
+    "functions": [],
     "databases": [
         {
             "$id": "main",
