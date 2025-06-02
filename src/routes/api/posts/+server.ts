@@ -1,11 +1,12 @@
-import { text, json } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
-import { ExecutionMethod, Permission, Role } from 'node-appwrite';
+import { ExecutionMethod, Permission, Query, Role, type Models } from 'node-appwrite';
 import { createUserSessionClient } from '$lib/server/appwrite-utils/appwrite.js';
 import {
     createPost,
     type RequiredPostDocument
 } from '$lib/server/appwrite-utils/posts.appwrite.js';
+import { type PostsDocument, type RichTextPostDocument, PostsTypeType } from '$root/lib/types/appwrite';
 
 export async function GET(event: RequestEvent): Promise<Response> {
     const { locals, cookies } = event;
@@ -14,19 +15,55 @@ export async function GET(event: RequestEvent): Promise<Response> {
         return json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { functions } = createUserSessionClient({ cookies });
+    const { functions, databases } = createUserSessionClient({ cookies });
 
     try {
-        const posts = await functions.createExecution(
-            'starter',
+        const allPosts = await functions.createExecution(
+            'posts-function',
             JSON.stringify({}),
             undefined,
-            'posts',
+            '/posts',
             ExecutionMethod.GET
         );
 
-        return text(posts.responseBody);
+        const postsJson: PostsDocument[] = JSON.parse(allPosts.responseBody);
+
+        // Group posts by type and create global postId -> userId lookup
+        const postsByType = new Map<PostsTypeType, Array<{ postId: string; userId: string }>>();
+        const postIdToUserId = new Map<string, string>();
+        const query: string[] = [];
+        
+        postsJson.forEach(post => {
+            if (post.contentRefId) {
+                const existing = postsByType.get(post.type) || [];
+
+                existing.push({ postId: post.contentRefId, userId: post.userId });
+                postIdToUserId.set(post.contentRefId, post.userId);
+                query.push(Query.equal('$id', post.contentRefId));
+                postsByType.set(post.type, existing);
+            }            
+        });
+
+        const posts: (RichTextPostDocument & { userId?: string })[] = [];
+        
+        await Promise.all(
+            Array.from(postsByType.entries()).map(async ([type]) => {
+                const documentList = await databases.listDocuments('main', type, [
+                    Query.or(query),
+                    Query.limit(query.length)
+                ]) as unknown as Models.DocumentList<RichTextPostDocument>;
+                
+                // Attach userId to each document using global lookup and push directly to posts
+                documentList.documents.forEach((doc) => {
+                    const userId = postIdToUserId.get(doc.$id);
+                    posts.push(userId ? { ...doc, userId } : doc);
+                });
+            })
+        )
+
+        return json(posts);
     } catch (_error: unknown) {
+        console.error('[API - GET /api/posts] Error:', _error);
         return json({ error: 'Failed to get posts' }, { status: 500 });
     }
 }

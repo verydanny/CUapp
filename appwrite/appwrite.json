@@ -37,7 +37,39 @@
             }
         }
     },
-    "functions": [],
+    "functions": [
+        {
+            "$id": "posts-function",
+            "execute": [
+                "users"
+            ],
+            "name": "POSTS function",
+            "enabled": true,
+            "logging": true,
+            "runtime": "bun-1.1",
+            "scopes": [
+                "users.read",
+                "teams.read",
+                "databases.read",
+                "databases.write",
+                "collections.read",
+                "collections.write",
+                "attributes.read",
+                "attributes.write",
+                "indexes.read",
+                "indexes.write",
+                "documents.read",
+                "documents.write"
+            ],
+            "events": [],
+            "schedule": "",
+            "timeout": 15,
+            "entrypoint": "src/main.ts",
+            "commands": "bun install --production --frozen-lockfile",
+            "specification": "s-0.5vcpu-512mb",
+            "path": "functions/POSTS function"
+        }
+    ],
     "databases": [
         {
             "$id": "main",
@@ -314,27 +346,11 @@
                     "default": null
                 },
                 {
-                    "key": "excerpt",
-                    "type": "string",
-                    "required": false,
-                    "array": false,
-                    "size": 500,
-                    "default": null
-                },
-                {
                     "key": "coverImageFileId",
                     "type": "string",
                     "required": false,
                     "array": false,
                     "size": 255,
-                    "default": null
-                },
-                {
-                    "key": "coverImageUrl",
-                    "type": "string",
-                    "required": false,
-                    "array": false,
-                    "size": 2048,
                     "default": null
                 },
                 {

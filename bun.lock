@@ -36,6 +36,7 @@
         "eslint-config-prettier": "^10.1.5",
         "eslint-plugin-storybook": "^9.0.4",
         "eslint-plugin-svelte": "^3.9.1",
+        "fetch-appwrite-types": "^2.2.2",
         "globals": "^16.2.0",
         "playwright": "^1.52.0",
         "prettier": "^3.5.3",
@@ -412,6 +413,8 @@
 
     "concat-map": ["concat-map@0.0.1", "", {}, ""],
 
+    "consola": ["consola@3.4.2", "", {}, "sha512-5IKcdX0nnYavi6G7TtOhwkYzyjfJlatbjMjuLSfE2kYT5pMDOilZ4OvMhi637CcDICTmz3wARPoyhqyX1Y+XvA=="],
+
     "cookie": ["cookie@0.6.0", "", {}, ""],
 
     "create-require": ["create-require@1.1.1", "", {}, ""],
@@ -467,6 +470,8 @@
     "domutils": ["domutils@2.8.0", "", { "dependencies": { "dom-serializer": "^1.0.1", "domelementtype": "^2.2.0", "domhandler": "^4.2.0" } }, "sha512-w96Cjofp72M5IIhpjgobBimYEfoPjx1Vx0BSX9P30WBdZW2WIKU0T1Bd0kz2eNZ9ikjKgHbEyKx8BB6H1L3h3A=="],
 
     "dotenv": ["dotenv@8.6.0", "", {}, ""],
+
+    "dts-dom": ["dts-dom@3.7.0", "", {}, "sha512-WnmiiHfhtcYS+DyGd2Rq3J6QA3ATVBdKtlrhutc/VzQVFoBgNDm+gnYc5gZizsXAI0xQ2frZntT5IJFeB2qQIg=="],
 
     "enhanced-resolve": ["enhanced-resolve@5.18.1", "", { "dependencies": { "graceful-fs": "^4.2.4", "tapable": "^2.2.0" } }, ""],
 
@@ -533,6 +538,8 @@
     "fastq": ["fastq@1.19.1", "", { "dependencies": { "reusify": "^1.0.4" } }, ""],
 
     "fdir": ["fdir@6.4.4", "", { "peerDependencies": { "picomatch": "^3 || ^4" } }, ""],
+
+    "fetch-appwrite-types": ["fetch-appwrite-types@2.2.2", "", { "dependencies": { "consola": "^3.2.3", "dotenv": "^16.4.5", "dts-dom": "^3.7.0", "node-appwrite": "^13.0.0", "ts-node": "^10.9.2" }, "bin": { "fetch-appwrite-types": "dist/bin/index.js" } }, "sha512-cuBcWuWytCJOWLoLgUsqqBpaqWBtlu2pRKt2KDo5nKc/5N4eHL0xWf1JWRh4LZO4mgpldch8/lt39mAJ39FUYA=="],
 
     "file-entry-cache": ["file-entry-cache@8.0.0", "", { "dependencies": { "flat-cache": "^4.0.0" } }, ""],
 
@@ -1037,6 +1044,10 @@
     "eslint-utils/eslint-visitor-keys": ["eslint-visitor-keys@2.1.0", "", {}, "sha512-0rSmRBzXgDzIsD6mGdJgevzgezI534Cer5L/vyMX0kHzT/jiB43jRhd9YUlMGYLQy2zprNmoT8qasCGtY+QaKw=="],
 
     "fast-glob/glob-parent": ["glob-parent@5.1.2", "", { "dependencies": { "is-glob": "^4.0.1" } }, ""],
+
+    "fetch-appwrite-types/dotenv": ["dotenv@16.5.0", "", {}, "sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg=="],
+
+    "fetch-appwrite-types/node-appwrite": ["node-appwrite@13.0.0", "", { "dependencies": { "node-fetch-native-with-agent": "1.7.2" } }, "sha512-O1g1RWcRYcvnVvR0Dykjoe/4UcL6ELVvZosb4B8/hhNvleuWfN2fOFxzeCaU8amGW6UtVtZqvNaUT3IF1mPBdA=="],
 
     "fs-extra/jsonfile": ["jsonfile@4.0.0", "", { "optionalDependencies": { "graceful-fs": "^4.1.6" } }, ""],
 

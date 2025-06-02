@@ -1,13 +1,7 @@
-// import { mdsvex } from 'mdsvex'
-// import adapter from '@sveltejs/adapter-auto'
-// import adapter from 'svelte-adapter-bun'
 import adapter from '@sveltejs/adapter-node';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
-// import type { Config } from '@sveltejs/kit'
 
 const isStorybook = !!(process.env.STORYBOOK === 'true');
-
-console.log('isStorybook', isStorybook);
 
 
 /** @type {import('@sveltejs/kit').Config} */

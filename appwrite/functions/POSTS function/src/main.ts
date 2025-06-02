@@ -4,14 +4,14 @@ import { Client, Databases, Query } from 'node-appwrite'
 import { serve as serveElysia } from '@gravlabs/appwrite-elysia-adapter-bun'
 import type { AppwriteElysiaSingleton } from '@gravlabs/appwrite-elysia-adapter-bun/types.d.ts'
 
-const appwriteClient = new Client()
-    .setEndpoint(Bun.env.APPWRITE_FUNCTION_API_ENDPOINT)
-    .setProject(Bun.env.APPWRITE_FUNCTION_PROJECT_ID)
-
 // You can re-use this in other functions to set Client/Databases/etc
 export const appwritePlugin = new Elysia<'', AppwriteElysiaSingleton>({ name: 'appwrite' }).resolve(
     { as: 'scoped' },
     ({ headers }) => {
+        const appwriteClient = new Client()
+            .setEndpoint(Bun.env.APPWRITE_FUNCTION_API_ENDPOINT)
+            .setProject(Bun.env.APPWRITE_FUNCTION_PROJECT_ID)
+
         const client = appwriteClient.setKey(headers['x-appwrite-key'] ?? '')
         const databases = new Databases(client)
 
@@ -41,25 +41,44 @@ const postsModel = new Elysia().model({
     getPostsResponseSchema
 })
 
+const postsQuerySchema = t.Optional(
+    t.Object({
+        posts: t.Optional(
+            t.Array(
+                t.Object({
+                    id: t.String(),
+                    type: t.String()
+                })
+            )
+        )
+    })
+)
+
 export const posts = new Elysia()
     .use(appwritePlugin)
     .use(postsModel)
-    .get('/posts', async ({ databases }) => {
-        return databases.listDocuments('main', 'posts', [
-            Query.limit(10)
-        ]) as unknown as typeof getPostsResponseSchema.static
-    })
     .get(
-        '/posts/:id',
-        ({ databases, params }) => {
-            return databases.getDocument(
-                'main',
-                'posts',
-                params.id
-            ) as unknown as typeof postUpdateResponseSchema.static
+        '/posts',
+        async ({ databases }) => {
+            // if (query.posts) {
+            //     const types = query.posts.map((post) => post.type)
+            //     const result = (await databases.listDocuments('main', 'posts', [
+            //         Query.limit(10),
+            //     ])) as unknown as typeof getPostsResponseSchema.static
+
+            //     appwrite.log(`${JSON.stringify(result.documents)}`)
+
+            //     return result.documents
+            // }
+
+            const result = (await databases.listDocuments('main', 'posts', [
+                Query.limit(10)
+            ])) as unknown as typeof getPostsResponseSchema.static
+
+            return result.documents
         },
         {
-            response: 'postUpdateResponseSchema'
+            query: postsQuerySchema
         }
     )
     .put(

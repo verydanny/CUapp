@@ -1,6 +1,6 @@
 import { type Cookies } from '@sveltejs/kit';
 import { Client, Account, Databases, Users, Storage, type Models, Functions } from 'node-appwrite';
-import { APPWRITE_KEY } from '$env/static/private';
+import { APPWRITE_API_KEY } from '$env/static/private';
 import {
     PUBLIC_ORIGIN,
     PUBLIC_APPWRITE_ENDPOINT,
@@ -50,7 +50,7 @@ export function createAdminClient() {
     const client = new Client()
         .setEndpoint(PUBLIC_APPWRITE_ENDPOINT)
         .setProject(PUBLIC_APPWRITE_PROJECT)
-        .setKey(APPWRITE_KEY); // Set the Appwrite API key
+        .setKey(APPWRITE_API_KEY); // Set the Appwrite API key
 
     // Return the services we want to use.
     return {
