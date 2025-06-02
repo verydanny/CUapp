@@ -1,12 +1,11 @@
-import { json } from '@sveltejs/kit';
+import { text, json } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
-import { Permission, Role, Query } from 'node-appwrite';
+import { ExecutionMethod, Permission, Role } from 'node-appwrite';
 import { createUserSessionClient } from '$lib/server/appwrite-utils/appwrite.js';
 import {
     createPost,
     type RequiredPostDocument
 } from '$lib/server/appwrite-utils/posts.appwrite.js';
-import { DATABASE_ID, POSTS_COLLECTION_ID } from '$lib/server/model.const.js';
 
 export async function GET(event: RequestEvent): Promise<Response> {
     const { locals, cookies } = event;
@@ -15,13 +14,18 @@ export async function GET(event: RequestEvent): Promise<Response> {
         return json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { databases } = createUserSessionClient({ cookies });
+    const { functions } = createUserSessionClient({ cookies });
 
     try {
-        const posts = await databases.listDocuments(DATABASE_ID, POSTS_COLLECTION_ID, [
-            Query.limit(10)
-        ]);
-        return json(posts);
+        const posts = await functions.createExecution(
+            'starter',
+            JSON.stringify({}),
+            undefined,
+            'posts',
+            ExecutionMethod.GET
+        );
+
+        return text(posts.responseBody);
     } catch (_error: unknown) {
         return json({ error: 'Failed to get posts' }, { status: 500 });
     }

@@ -1,31 +1,85 @@
-import { Client, Users } from 'node-appwrite'
+import { Elysia, t } from 'elysia'
+import { Client, Databases, Query } from 'node-appwrite'
 
-// Define proper types for Appwrite function parameters
-type AppwriteFunctionContext = {
-    req: {
-        path: string
-        headers: Record<string, string>
+import { serve as serveElysia } from '@gravlabs/appwrite-elysia-adapter-bun'
+import type { AppwriteElysiaSingleton } from '@gravlabs/appwrite-elysia-adapter-bun/types.d.ts'
+
+const appwriteClient = new Client()
+    .setEndpoint(Bun.env.APPWRITE_FUNCTION_API_ENDPOINT)
+    .setProject(Bun.env.APPWRITE_FUNCTION_PROJECT_ID)
+
+// You can re-use this in other functions to set Client/Databases/etc
+export const appwritePlugin = new Elysia<'', AppwriteElysiaSingleton>({ name: 'appwrite' }).resolve(
+    { as: 'scoped' },
+    ({ headers }) => {
+        const client = appwriteClient.setKey(headers['x-appwrite-key'] ?? '')
+        const databases = new Databases(client)
+
+        return {
+            databases,
+            client
+        }
     }
-    res: {
-        text: (text: string) => unknown
-        json: (json: unknown) => unknown
-    }
-    log: (message: string) => void
-    _error: (message: string) => void
-}
+)
 
-const appwrite = new Client()
-    .setEndpoint(Bun.env.APPWRITE_FUNCTION_API_ENDPOINT || '')
-    .setProject(Bun.env.APPWRITE_FUNCTION_PROJECT_ID || '')
+const postUpdateResponseSchema = t.Object({
+    title: t.String(),
+    content: t.String()
+})
 
-// This Appwrite function will be executed every time your function is triggered
-export default async ({ req, res, log, _error }: AppwriteFunctionContext) => {
-    appwrite.setKey(req.headers['x-appwrite-key'] || '')
-    // Check ping endpoint
-    if (req.path === '/ping') {
-        return res.text('Pong')
-    }
+const postUpdateRequestSchema = t.Object({
+    id: t.String()
+})
 
-    // Return basic info about the function environment
-    return res.json({})
-}
+const getPostsResponseSchema = t.Object({
+    documents: t.Array(postUpdateResponseSchema)
+})
+
+const postsModel = new Elysia().model({
+    postUpdateRequestSchema,
+    postUpdateResponseSchema,
+    getPostsResponseSchema
+})
+
+export const posts = new Elysia()
+    .use(appwritePlugin)
+    .use(postsModel)
+    .get('/posts', async ({ databases }) => {
+        return databases.listDocuments('main', 'posts', [
+            Query.limit(10)
+        ]) as unknown as typeof getPostsResponseSchema.static
+    })
+    .get(
+        '/posts/:id',
+        ({ databases, params }) => {
+            return databases.getDocument(
+                'main',
+                'posts',
+                params.id
+            ) as unknown as typeof postUpdateResponseSchema.static
+        },
+        {
+            response: 'postUpdateResponseSchema'
+        }
+    )
+    .put(
+        '/posts/:id',
+        async ({ databases, params, body }) => {
+            // Use the extracted type here and rename the variable to avoid conflict
+            return databases.updateDocument(
+                'main',
+                'posts',
+                params.id,
+                body
+            ) as unknown as typeof postUpdateResponseSchema.static
+        },
+        {
+            body: 'postUpdateRequestSchema'
+        }
+    )
+    .delete('/posts/:id', ({ databases, params }) => {
+        return databases.deleteDocument('main', 'posts', params.id)
+    })
+
+export type Posts = typeof posts
+export default serveElysia(posts)

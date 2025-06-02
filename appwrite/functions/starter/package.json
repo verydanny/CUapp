@@ -5,6 +5,15 @@
     "main": "src/main.ts",
     "type": "module",
     "dependencies": {
+        "@elysiajs/eden": "^1.3.2",
+        "@gravlabs/appwrite-elysia-adapter-bun": "^0.1.0",
+        "elysia": "^1.3.1",
         "node-appwrite": "^17.0.0"
+    },
+    "scripts": {
+        "build": "bun build --production --target=bun --minify-syntax --minify-whitespace --minify-identifiers --packages=external --outfile lib/main.js src/main.ts"
+    },
+    "devDependencies": {
+        "@types/bun": "^1.1.29"
     }
 }

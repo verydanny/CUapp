@@ -40,14 +40,25 @@
     "functions": [
         {
             "$id": "starter",
-            "execute": [],
+            "execute": [
+                "users"
+            ],
             "name": "starter",
             "enabled": true,
             "logging": true,
             "runtime": "bun-1.1",
             "scopes": [
                 "users.read",
-                "users.write"
+                "databases.read",
+                "databases.write",
+                "collections.read",
+                "collections.write",
+                "attributes.read",
+                "attributes.write",
+                "indexes.read",
+                "indexes.write",
+                "documents.read",
+                "documents.write"
             ],
             "events": [],
             "schedule": "",

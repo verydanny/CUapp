@@ -25,6 +25,7 @@ export interface FeedDisplayPost {
 export const load: ServerLoad = async ({ fetch }) => {
     try {
         const postsResponse = await fetch('/api/posts'); // Assuming GET /api/posts lists all posts
+
         if (!postsResponse.ok) {
             console.error(
                 'Failed to fetch posts:',
@@ -38,6 +39,7 @@ export const load: ServerLoad = async ({ fetch }) => {
                 status: postsResponse.status
             };
         }
+
         const postsData = await postsResponse.json();
         // Appwrite list calls return { documents: ..., total: ... }
         const posts: PostDocument[] = postsData.documents || [];

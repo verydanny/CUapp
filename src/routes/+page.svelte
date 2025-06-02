@@ -4,6 +4,8 @@
 
     let { data }: { data: PageData } = $props();
 
+    console.log(data);
+
     let posts = $derived(data.posts);
     let error = $derived(data.error);
     let pageTitle = $derived(data.pageTitle || 'Feed');

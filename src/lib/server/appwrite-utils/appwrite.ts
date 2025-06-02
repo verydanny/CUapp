@@ -1,5 +1,5 @@
 import { type Cookies } from '@sveltejs/kit';
-import { Client, Account, Databases, Users, Storage, type Models } from 'node-appwrite';
+import { Client, Account, Databases, Users, Storage, type Models, Functions } from 'node-appwrite';
 import { APPWRITE_KEY } from '$env/static/private';
 import {
     PUBLIC_ORIGIN,
@@ -93,6 +93,9 @@ export function createUserSessionClient({ cookies }: { cookies: Cookies }) {
         },
         get databases() {
             return new Databases(client);
+        },
+        get functions() {
+            return new Functions(client);
         }
     };
 }

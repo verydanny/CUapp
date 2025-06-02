@@ -4,5 +4,6 @@
     "trailingComma": "none",
     "printWidth": 100,
     "tabWidth": 4,
-    "semi": false
+    "semi": false,
+    "jsxSingleQuote": true
 }

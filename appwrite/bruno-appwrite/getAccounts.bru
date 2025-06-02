@@ -1,0 +1,35 @@
+meta {
+  name: getAccounts
+  type: graphql
+  seq: 1
+}
+
+post {
+  url: http://appwrite.local/v1/graphql
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  query GetPostWithContentInfo($postId: String!) {
+    databasesGetDocument(
+      databaseId: "main"
+      collectionId: "posts"
+      documentId: $postId
+    ) {
+      # Assuming your post type is 'Posts' after schema exploration
+      ... on Document {
+        _id
+        data
+      }
+    }
+  }
+  
+  
+}
+
+body:graphql:vars {
+  {
+    "postId": "682cdcc2001355689550"
+  }
+}

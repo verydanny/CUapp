@@ -1,3 +1,4 @@
 {
     "tailwindCSS.experimental.configFile": "src/app.css",
+    "typescript.tsdk": "node_modules/typescript/lib",
 }
