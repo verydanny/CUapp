@@ -1,6 +1,6 @@
 {
-    "projectId": "social",
-    "projectName": "Social",
+    "projectId": "app",
+    "projectName": "My App",
     "settings": {
         "services": {
             "account": true,
