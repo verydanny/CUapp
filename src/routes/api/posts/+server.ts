@@ -29,28 +29,25 @@ export async function GET(event: RequestEvent): Promise<Response> {
         const postsJson: PostsDocument[] = JSON.parse(allPosts.responseBody);
 
         // Group posts by type and create global postId -> userId lookup
-        const postsByType = new Map<PostsTypeType, Array<{ postId: string; userId: string }>>();
+        const postsByType = new Map<PostsTypeType, string[]>();
         const postIdToUserId = new Map<string, string>();
-        const query: string[] = [];
-        
-        postsJson.forEach(post => {
-            if (post.contentRefId) {
-                const existing = postsByType.get(post.type) || [];
-
-                existing.push({ postId: post.contentRefId, userId: post.userId });
-                postIdToUserId.set(post.contentRefId, post.userId);
-                query.push(Query.equal('$id', post.contentRefId));
-                postsByType.set(post.type, existing);
-            }            
-        });
-
         const posts: (RichTextPostDocument & { userId?: string })[] = [];
         
+        postsJson.forEach(post => {
+            const existing = postsByType.get(post.type) || [];
+
+            if (post.contentRefId) {
+                existing.push(post.contentRefId);
+                postIdToUserId.set(post.contentRefId, post.userId);
+            }
+
+            postsByType.set(post.type, existing);
+        });
+        
         await Promise.all(
-            Array.from(postsByType.entries()).map(async ([type]) => {
+            Array.from(postsByType.entries()).map(async ([type, postIds]) => {
                 const documentList = await databases.listDocuments('main', type, [
-                    Query.or(query),
-                    Query.limit(query.length)
+                    Query.equal('$id', postIds),
                 ]) as unknown as Models.DocumentList<RichTextPostDocument>;
                 
                 // Attach userId to each document using global lookup and push directly to posts

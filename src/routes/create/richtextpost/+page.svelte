@@ -7,7 +7,6 @@
     // Removed postId state
     let title = $state('');
     let body = $state('');
-    let excerpt = $state('');
     let submissionStatus = $state('');
     let isLoading = $state(false);
 
@@ -33,7 +32,7 @@
             fetch('/api/richtextposts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ $id: contentRefId, postId, title, body, excerpt })
+                body: JSON.stringify({ $id: contentRefId, postId, title, body })
             });
 
         if (!title.trim()) {
@@ -55,7 +54,6 @@
             submissionStatus = `Success! Post created. ID: ${postResult.$id}`;
             title = '';
             body = '';
-            excerpt = '';
         } catch (error) {
             console.error('Error during post creation flow:', error);
             submissionStatus = `Error: An unexpected error occurred. ${(error as Error).message || 'Check console.'}`;
@@ -117,19 +115,6 @@
                     placeholder="Write your post content here..."
                     bind:value={body}
                     required
-                    disabled={isLoading}
-                ></textarea>
-            </div>
-
-            <div class="form-control">
-                <label class="label" for="excerpt">
-                    <span class="label-text">Excerpt (Optional)</span>
-                </label>
-                <textarea
-                    id="excerpt"
-                    class="textarea textarea-bordered h-24 w-full"
-                    placeholder="Short summary or teaser (optional)"
-                    bind:value={excerpt}
                     disabled={isLoading}
                 ></textarea>
             </div>
