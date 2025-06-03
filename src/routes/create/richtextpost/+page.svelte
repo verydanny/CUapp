@@ -109,14 +109,6 @@
                 <label class="label" for="body">
                     <span class="label-text">Body</span>
                 </label>
-                <textarea
-                    id="body"
-                    class="textarea textarea-bordered h-48 w-full"
-                    placeholder="Write your post content here..."
-                    bind:value={body}
-                    required
-                    disabled={isLoading}
-                ></textarea>
             </div>
 
             <div class="form-control mt-6">

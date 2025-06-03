@@ -18,20 +18,6 @@ export interface ProfilesType {
 export interface ProfilesDocument extends ProfilesType, Models.Document {
 }
 
-export interface RichTextPostType {
-    postId: string;
-    title: string;
-    body: string;
-    coverImageFileId?: string;
-    coverImageAltText?: string;
-    version?: number;
-    estimatedReadTimeMinutes?: number;
-    contentSchemaVersion?: string;
-}
-
-export interface RichTextPostDocument extends RichTextPostType, Models.Document {
-}
-
 export interface ImessageParticipantsType {
     userId: string;
     name: string;
@@ -84,9 +70,9 @@ export interface ImessageConversationDocument extends ImessageConversationType, 
 }
 
 export enum PostsTypeType {
-    "richTextPost" = "richTextPost",
     "imessageConversation" = "imessageConversation",
     "imagePost" = "imagePost",
+    "textPost" = "textPost",
 }
 
 export enum PostsTypeStatus {
@@ -116,5 +102,19 @@ export interface PostsType {
 }
 
 export interface PostsDocument extends PostsType, Models.Document {
+}
+
+export interface TextPostType {
+    postId: string;
+    title: string;
+    body: string;
+    coverImageFileId?: string;
+    coverImageAltText?: string;
+    version?: number;
+    estimatedReadTimeMinutes?: number;
+    contentSchemaVersion?: string;
+}
+
+export interface TextPostDocument extends TextPostType, Models.Document {
 }
 

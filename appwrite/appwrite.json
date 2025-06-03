@@ -309,7 +309,7 @@
             ]
         },
         {
-            "$id": "richTextPost",
+            "$id": "textPost",
             "$permissions": [
                 "create(\"users\")",
                 "read(\"users\")",
@@ -317,7 +317,7 @@
                 "delete(\"users\")"
             ],
             "databaseId": "main",
-            "name": "richTextPost",
+            "name": "textPost",
             "enabled": true,
             "documentSecurity": true,
             "attributes": [
@@ -342,7 +342,7 @@
                     "type": "string",
                     "required": true,
                     "array": false,
-                    "size": 10000000,
+                    "size": 100000000,
                     "default": null
                 },
                 {
@@ -440,9 +440,9 @@
                     "required": true,
                     "array": false,
                     "elements": [
-                        "richTextPost",
                         "imessageConversation",
-                        "imagePost"
+                        "imagePost",
+                        "textPost"
                     ],
                     "format": "enum",
                     "default": null

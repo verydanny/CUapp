@@ -11,7 +11,6 @@ import { type PostsDocument, type RichTextPostDocument, PostsTypeType } from '$r
 export type PostResponse = (RichTextPostDocument & { userId?: string })[]
 
 export async function GET(event: RequestEvent): Promise<Response> {
-    const start = performance.now();
     const { locals, cookies } = event;
 
     if (!locals.user?.$id) {
@@ -52,8 +51,6 @@ export async function GET(event: RequestEvent): Promise<Response> {
                 });
             })
         )
-        const end = performance.now();
-        console.log(`Posts function took ${end - start}ms`);
 
         return json(posts);
     } catch (_error: unknown) {

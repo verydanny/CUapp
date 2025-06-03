@@ -17,8 +17,7 @@
         "test:e2e": "playwright test",
         "storybook": "STORYBOOK=true storybook dev -p 6006",
         "build-storybook": "storybook build",
-        "appwrite:import": "bun run -b appwrite-migrate migrate --import",
-        "chromatic": "chromatic"
+        "appwrite:types": "bun run -b appwrite/fetch-types"
     },
     "devDependencies": {
         "@changesets/changelog-github": "^0.5.1",

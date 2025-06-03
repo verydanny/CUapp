@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { createAdminClient } from '$lib/server/appwrite-utils/appwrite.js';
-import { APPWRITE_BUCKET_IMAGES } from '$env/static/private'; // Assuming you have a bucket ID in env
+import { PUBLIC_APPWRITE_BUCKET_IMAGES } from '$env/static/public'; // Assuming you have a bucket ID in env
 
 export const GET: RequestHandler = async ({ url }) => {
     const fileId = url.searchParams.get('fileId');
@@ -10,7 +10,7 @@ export const GET: RequestHandler = async ({ url }) => {
         throw error(400, 'Missing fileId parameter');
     }
 
-    if (!APPWRITE_BUCKET_IMAGES) {
+    if (!PUBLIC_APPWRITE_BUCKET_IMAGES) {
         console.error('APPWRITE_BUCKET_IMAGES environment variable is not set.');
         throw error(500, 'Image bucket not configured on server.');
     }
@@ -23,7 +23,7 @@ export const GET: RequestHandler = async ({ url }) => {
         // Using getFilePreview for potentially smaller, web-optimized versions
         // Adjust width/height/quality as needed
         const imageBuffer = await storage.getFilePreview(
-            APPWRITE_BUCKET_IMAGES,
+            PUBLIC_APPWRITE_BUCKET_IMAGES,
             fileId
             // Optional parameters for preview customization:
             // 400, // width

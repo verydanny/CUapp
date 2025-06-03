@@ -26,7 +26,7 @@ export const actions = {
         const password = formData.get('password') as string;
 
         if (!email || !password) {
-            return {
+            return { 
                 type: 'failure',
                 status: 400,
                 data: {
