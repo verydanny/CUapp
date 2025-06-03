@@ -1,9 +1,9 @@
 <script lang="ts">
     import type {
-        iMessageConversation,
-        iMessageMessage,
-        iMessageParticipant
-    } from '$lib/utils/imessage.utils.js';
+        ImessageConversationDocument,
+        ImessageMessagesType,
+        ImessageParticipantsType
+    } from '$root/lib/types/appwrite.js';
     import ConversationHeader from './ConversationHeader.svelte';
     import Conversation from './Conversation.svelte';
 
@@ -15,10 +15,10 @@
         loading = false,
         postId = undefined
     }: {
-        conversation: iMessageConversation | null; // Allow null from parent
-        messages: iMessageMessage[];
-        participants: iMessageParticipant[];
-        rightSideParticipant: iMessageParticipant | undefined | null; // Allow undefined or null
+        conversation: ImessageConversationDocument | null; // Allow null from parent
+        messages: ImessageMessagesType[];
+        participants: ImessageParticipantsType[];
+        rightSideParticipant: ImessageParticipantsType | undefined | null; // Allow undefined or null
         loading?: boolean;
         postId?: string;
     } = $props();

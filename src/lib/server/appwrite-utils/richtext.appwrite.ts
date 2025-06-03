@@ -1,43 +1,30 @@
 import { ID } from 'node-appwrite';
 import type { Models, Databases } from 'node-appwrite';
 import { DATABASE_ID, RICH_TEXT_POST_COLLECTION_ID } from '$lib/server/model.const.js';
+import type { TextPostType } from '$root/lib/types/appwrite';
 
-// --- Data Transfer Object (DTO) Interfaces for RichTextPost Operations ---
+// --- Data Transfer Object (DTO) Interfaces for textPost Operations ---
 
-// Describes the data structure required when creating a new RichTextPost document.
-export interface CreateRichTextPostData {
-    $id: string;
-    postId: string;
-    title: string;
-    body: string;
-    excerpt?: string;
-    coverImageFileId?: string;
-    coverImageUrl?: string;
-    coverImageAltText?: string;
-    version?: number;
-    estimatedReadTimeMinutes?: number;
-    contentSchemaVersion?: string;
-}
+// Describes the data structure required when creating a new textPost document.
 
 // For updates, all fields are optional.
-export type UpdateRichTextPostData = Partial<CreateRichTextPostData>;
 
-// Generic type for Appwrite document data for RichTextPost.
+// Generic type for Appwrite document data for textPost.
 
 // --- Appwrite Configuration Constants ---
 // Values are now imported directly from $env/static/private at the top of the file.
 
-// --- CRUD Functions for RichTextPost Entities ---
+// --- CRUD Functions for textPost Entities ---
 
 /**
- * Creates a RichTextPost document in Appwrite.
+ * Creates a textPost document in Appwrite.
  * @param appwriteDatabases Instance of AppwriteDatabasesClient.
  * @param data Data for the new rich text post.
  * @returns The created Appwrite document.
  */
-export async function createRichTextPost(
+export async function createtextPost(
     appwriteDatabases: Databases,
-    data: CreateRichTextPostData,
+    data: TextPostType & { $id?: string },
     permissions?: string[]
 ): Promise<Models.Document> {
     const id = data?.$id ?? ID.unique();
@@ -52,18 +39,18 @@ export async function createRichTextPost(
         );
         return document;
     } catch (error) {
-        console.error('Error creating RichTextPost document:', error);
+        console.error('Error creating textPost document:', error);
         throw error;
     }
 }
 
 /**
- * Fetches a RichTextPost document by its Appwrite document ID.
+ * Fetches a textPost document by its Appwrite document ID.
  * @param appwriteDatabases Instance of AppwriteDatabasesClient.
  * @param documentId The Appwrite document ID of the rich text post.
  * @returns The fetched Appwrite document.
  */
-export async function getRichTextPostById(
+export async function gettextPostById(
     appwriteDatabases: Databases,
     documentId: string
 ): Promise<Models.Document> {
@@ -75,22 +62,22 @@ export async function getRichTextPostById(
         );
         return document;
     } catch (error) {
-        console.error(`Error fetching RichTextPost by ID ${documentId}:`, error);
+        console.error(`Error fetching textPost by ID ${documentId}:`, error);
         throw error;
     }
 }
 
 /**
- * Updates a RichTextPost document in Appwrite.
+ * Updates a textPost document in Appwrite.
  * @param appwriteDatabases Instance of AppwriteDatabasesClient.
  * @param documentId The Appwrite document ID of the rich text post to update.
  * @param data Partial data containing fields to update.
  * @returns The updated Appwrite document.
  */
-export async function updateRichTextPost(
+export async function updatetextPost(
     appwriteDatabases: Databases,
     documentId: string,
-    data: UpdateRichTextPostData,
+    data: Partial<TextPostType> & { $id?: string },
     permissions?: string[]
 ): Promise<Models.Document> {
     try {
@@ -103,17 +90,17 @@ export async function updateRichTextPost(
         );
         return document;
     } catch (error) {
-        console.error(`Error updating RichTextPost ${documentId}:`, error);
+        console.error(`Error updating textPost ${documentId}:`, error);
         throw error;
     }
 }
 
 /**
- * Deletes a RichTextPost document from Appwrite.
+ * Deletes a textPost document from Appwrite.
  * @param appwriteDatabases Instance of AppwriteDatabasesClient.
  * @param documentId The Appwrite document ID of the rich text post to delete.
  */
-export async function deleteRichTextPost(
+export async function deletetextPost(
     appwriteDatabases: Databases,
     documentId: string
 ): Promise<void> {
@@ -124,7 +111,7 @@ export async function deleteRichTextPost(
             documentId
         );
     } catch (error) {
-        console.error(`Error deleting RichTextPost ${documentId}:`, error);
+        console.error(`Error deleting textPost ${documentId}:`, error);
         throw error;
     }
 }

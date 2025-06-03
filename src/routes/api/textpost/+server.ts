@@ -1,8 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
 import { Permission, Role } from 'node-appwrite';
-import { createRichTextPost } from '$lib/server/appwrite-utils/richtext.appwrite.js';
-import type { CreateRichTextPostData } from '$lib/server/appwrite-utils/richtext.appwrite.js';
+import { createtextPost } from '$lib/server/appwrite-utils/richtext.appwrite.js';
 import { createUserSessionClient } from '$lib/server/appwrite-utils/appwrite.js';
 
 // Placeholder POST function
@@ -14,7 +13,7 @@ export async function POST(event: RequestEvent) {
     const { databases } = createUserSessionClient({ cookies: event.cookies });
 
     try {
-        const data = (await event.request.json()) as CreateRichTextPostData;
+        const data = await event.request.json();
 
         // Basic validation
         if (!data.postId || typeof data.postId !== 'string') {
@@ -28,17 +27,17 @@ export async function POST(event: RequestEvent) {
         }
 
         // Add other optional field validations if necessary, or use a schema validation library like Zod
-        const newRichTextPostDocument = await createRichTextPost(databases, data, [
+        const newtextPostDocument = await createtextPost(databases, data, [
             Permission.read(Role.any()),
             Permission.write(Role.user(event.locals.user.$id))
         ]);
-        return json(newRichTextPostDocument, { status: 201 });
+        return json(newtextPostDocument, { status: 201 });
     } catch (error: unknown) {
         if (error instanceof SyntaxError) {
             return json({ error: 'Invalid JSON in request body' }, { status: 400 });
         }
 
-        console.error('[API - POST /api/richtextposts] Error:', error);
+        console.error('[API - POST /api/textPosts] Error:', error);
 
         // Check if error is an object and has a message property before accessing it
         const message =

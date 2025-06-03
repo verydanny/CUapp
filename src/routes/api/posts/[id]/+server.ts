@@ -13,7 +13,7 @@ import {
  */
 export async function PATCH(event: RequestEvent): Promise<Response> {
     const { locals, cookies, request, params } = event;
-    const postId = params.id;
+    const postId = params['id'];
 
     if (!locals.user?.$id) {
         return json({ error: 'Unauthorized' }, { status: 401 });
@@ -42,7 +42,8 @@ export async function PATCH(event: RequestEvent): Promise<Response> {
             userId: existingPost.userId,
             type: existingPost.type,
             status: existingPost.status,
-            accessLevel: existingPost.accessLevel
+            accessLevel: existingPost.accessLevel,
+            contentRefId: existingPost.contentRefId
         };
         if (requestData.contentRefId !== undefined)
             dataToUpdate.contentRefId = requestData.contentRefId;

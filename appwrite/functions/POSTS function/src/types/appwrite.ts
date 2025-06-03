@@ -17,7 +17,7 @@ export interface ProfilesType {
 
 export interface ProfilesDocument extends ProfilesType, Models.Document {}
 
-export interface RichTextPostType {
+export interface textPostType {
     postId: string
     title: string
     body: string
@@ -28,7 +28,7 @@ export interface RichTextPostType {
     contentSchemaVersion?: string
 }
 
-export interface RichTextPostDocument extends RichTextPostType, Models.Document {}
+export interface textPostDocument extends textPostType, Models.Document {}
 
 export interface ImessageParticipantsType {
     userId: string
@@ -79,7 +79,7 @@ export interface ImessageConversationType {
 export interface ImessageConversationDocument extends ImessageConversationType, Models.Document {}
 
 export enum PostsTypeType {
-    'richTextPost' = 'richTextPost',
+    'textPost' = 'textPost',
     'imessageConversation' = 'imessageConversation',
     'imagePost' = 'imagePost'
 }

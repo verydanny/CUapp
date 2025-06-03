@@ -8,19 +8,16 @@ type WithUndefined<T> = {
     [P in keyof T]: T[P] | undefined;
 };
 
-export interface BasicProfile {
-    $id: string | undefined;
-    username: string | undefined;
-    profileImage: string | undefined;
-    permissions: string[];
-}
+export type BasicProfile = WithUndefined<
+    Pick<import('./lib/types/appwrite').ProfilesDocument, '$id' | 'username' | 'permissions'>
+>;
 
 export interface Profile extends BasicProfile {
     isProfileOwner: boolean;
 }
 
 export interface UserWithAdmin
-    extends Partial<
+    extends WithUndefined<
         Pick<Models.User<Models.Preferences>, '$id' | 'email' | 'name' | 'phone' | 'labels'>
     > {
     userIsAdmin: boolean;

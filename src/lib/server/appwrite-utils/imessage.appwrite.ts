@@ -7,53 +7,11 @@ import {
     IMESSAGE_PARTICIPANTS_COLLECTION_ID
 } from '$lib/server/model.const.js';
 import type { Databases } from 'node-appwrite';
-
-// --- Data Transfer Object (DTO) Interfaces for Appwrite Operations ---
-
-// Describes the data structure required when creating a new iMessage conversation document.
-export interface CreateIMessageConversationData {
-    conversationId: string; // Unique logical ID for the conversation
-    participantDocRefs: string[]; // Array of Appwrite document IDs for participants
-    rightSideParticipantDocRef: string; // Appwrite document ID of the participant on the right
-    screenshotMessageIds: string[]; // Array of `messageId`s (from iMessageMessage) for ordering
-    totalScreenshots: number; // Count of messages/screenshots
-    postId: string; // ID of a related parent post/entity
-}
-
-// For updates, all fields are optional.
-export type UpdateIMessageConversationData = Partial<CreateIMessageConversationData>;
-
-// Describes the data structure for creating a new iMessage message document.
-export interface CreateIMessageMessageData {
-    conversationId: string; // Links to iMessageConversation.conversationId
-    messageId: string; // Unique identifier for this message within the conversation
-    participantDocId: string; // Appwrite document ID of the sender (iMessageParticipant)
-    content: string; // Textual content or caption for images
-    timestamp: string; // ISO 8601 datetime string of when the message was created/sent
-    timestampDisplay?: string; // Optional pre-formatted display string for the timestamp
-    isEdited: boolean; // Flag if the message has been edited
-    screenshotIndex: number; // Zero-based index for ordering from a screenshot
-    deliveryStatus?: 'sent' | 'delivered' | 'read'; // Delivery status
-    messageType?: 'text' | 'image'; // Type of message, defaults to 'text'
-    imageUrl?: string; // URL for image messages (if externally hosted)
-    imageFileId?: string; // Appwrite File ID for image messages (if in Appwrite Storage)
-    imageAltText?: string; // Alt text for image messages
-}
-
-// For updates, all fields are optional.
-export type UpdateIMessageMessageData = Partial<CreateIMessageMessageData>;
-
-// Describes the data structure for creating a new iMessage participant document.
-export interface CreateIMessageParticipantData {
-    userId: string; // User identifier (e.g., Appwrite User ID)
-    name: string; // Display name of the participant
-    avatarFileId?: string; // Optional Appwrite File ID for the avatar
-}
-
-// For updates, all fields are optional.
-export type UpdateIMessageParticipantData = Partial<CreateIMessageParticipantData>;
-
-// --- CRUD Functions for iMessage Entities ---
+import type {
+    ImessageConversationType,
+    ImessageMessagesType,
+    ImessageParticipantsType
+} from '$root/lib/types/appwrite';
 
 /**
  * Creates an iMessage conversation document in Appwrite.
@@ -63,7 +21,7 @@ export type UpdateIMessageParticipantData = Partial<CreateIMessageParticipantDat
  */
 export async function createIMessageConversation(
     appwriteDatabases: Databases,
-    data: CreateIMessageConversationData,
+    data: ImessageConversationType,
     permissions?: string[]
 ): Promise<Models.Document> {
     try {
@@ -90,7 +48,7 @@ export async function createIMessageConversation(
  */
 export async function createIMessageMessage(
     appwriteDatabases: Databases,
-    data: CreateIMessageMessageData,
+    data: ImessageMessagesType,
     permissions?: string[]
 ): Promise<Models.Document> {
     try {
@@ -116,7 +74,7 @@ export async function createIMessageMessage(
  */
 export async function createIMessageParticipant(
     appwriteDatabases: Databases,
-    data: CreateIMessageParticipantData,
+    data: ImessageParticipantsType,
     permissions?: string[]
 ): Promise<Models.Document> {
     try {
@@ -247,7 +205,7 @@ export async function getIMessageParticipantsByIds(
 export async function updateIMessageConversation(
     appwriteDatabases: Databases,
     documentId: string,
-    data: UpdateIMessageConversationData
+    data: ImessageParticipantsType
 ): Promise<Models.Document> {
     try {
         const document = await appwriteDatabases.updateDocument(
@@ -294,7 +252,7 @@ export async function deleteIMessageConversation(
 export async function updateIMessageMessage(
     appwriteDatabases: Databases,
     documentId: string,
-    data: UpdateIMessageMessageData
+    data: ImessageMessagesType
 ): Promise<Models.Document> {
     try {
         const document = await appwriteDatabases.updateDocument(
@@ -341,7 +299,7 @@ export async function deleteIMessageMessage(
 export async function updateIMessageParticipant(
     appwriteDatabases: Databases,
     documentId: string,
-    data: UpdateIMessageParticipantData
+    data: ImessageParticipantsType
 ): Promise<Models.Document> {
     try {
         const document = await appwriteDatabases.updateDocument(

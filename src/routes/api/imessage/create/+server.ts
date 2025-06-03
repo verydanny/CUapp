@@ -10,11 +10,13 @@ import type {
 import {
     createIMessageConversation,
     createIMessageMessage,
-    createIMessageParticipant,
-    type CreateIMessageMessageData,
-    type CreateIMessageParticipantData
+    createIMessageParticipant
 } from '$lib/server/appwrite-utils/imessage.appwrite.js';
 import { createUserSessionClient } from '$lib/server/appwrite-utils/appwrite.js';
+import {
+    ImessageMessagesTypeDeliveryStatus,
+    ImessageMessagesTypeMessageType
+} from '$root/lib/types/appwrite.js';
 
 // This endpoint simulates creating and returning a mock iMessage conversation.
 // In a real scenario, this would interact with a database.
@@ -33,14 +35,14 @@ export const POST: RequestHandler = async ({ request: _request, locals, cookies 
         const mockUserAlias2 = 'You'; // Representing the user viewing the chat
 
         // 1. Create Participants
-        const participantData1: CreateIMessageParticipantData = {
+        const participantData1 = {
             userId: locals.user.$id as string,
             name: mockUserAlias1
             // avatarFileId: '...' // Optional
         };
         const participant1 = await createIMessageParticipant(databases, participantData1);
 
-        const participantData2: CreateIMessageParticipantData = {
+        const participantData2 = {
             userId: locals.user.$id as string,
             name: mockUserAlias2
             // avatarFileId: '...'
@@ -53,7 +55,13 @@ export const POST: RequestHandler = async ({ request: _request, locals, cookies 
         // 2. Create Messages
         const conversationIdForMessages = ID.unique(); // Temp ID for messages, will be part of the conversation doc
         const messageInputs = [
-            { pId: participant1.$id, content: 'Yeah grill me', idx: 0, minsAgo: 5 },
+            {
+                pId: participant1.$id,
+                content: 'Yeah grill me',
+                idx: 0,
+                minsAgo: 5,
+                status: 'sent' as const
+            },
             {
                 pId: participant2.$id,
                 content: 'Haha',
@@ -72,7 +80,8 @@ export const POST: RequestHandler = async ({ request: _request, locals, cookies 
                 pId: participant1.$id,
                 content: 'Adding a Twitter button to a syndication story',
                 idx: 3,
-                minsAgo: 3
+                minsAgo: 3,
+                status: 'sent' as const
             },
             {
                 pId: participant2.$id,
@@ -81,7 +90,13 @@ export const POST: RequestHandler = async ({ request: _request, locals, cookies 
                 minsAgo: 2,
                 status: 'delivered' as const
             },
-            { pId: participant1.$id, content: 'V exciting', idx: 5, minsAgo: 1.5 },
+            {
+                pId: participant1.$id,
+                content: 'V exciting',
+                idx: 5,
+                minsAgo: 1.5,
+                status: 'delivered' as const
+            },
             {
                 pId: participant1.$id,
                 content: 'Check this out!',
@@ -89,7 +104,8 @@ export const POST: RequestHandler = async ({ request: _request, locals, cookies 
                 minsAgo: 1,
                 type: 'image' as const,
                 imgUrl: 'https://picsum.photos/seed/imessageTest/300/200',
-                alt: 'Test image'
+                alt: 'Test image',
+                status: 'delivered' as const
             },
             {
                 pId: participant2.$id,
@@ -98,23 +114,29 @@ export const POST: RequestHandler = async ({ request: _request, locals, cookies 
                 minsAgo: 0.5,
                 status: 'sent' as const
             },
-            { pId: participant1.$id, content: 'There we go', idx: 8, minsAgo: 0.2 }
+            {
+                pId: participant1.$id,
+                content: 'There we go',
+                idx: 8,
+                minsAgo: 0.2,
+                status: 'sent' as const
+            }
         ];
 
         const createdMessagesPromises = messageInputs.map(async (msgInput) => {
-            const messageData: CreateIMessageMessageData = {
+            const messageData = {
                 conversationId: conversationIdForMessages, // This will be the $id of the conversation document
                 messageId: ID.unique(),
                 participantDocId: msgInput.pId,
                 content: msgInput.type === 'image' ? msgInput.content || '' : msgInput.content,
-                messageType: msgInput.type || 'text',
-                imageUrl: msgInput.imgUrl,
-                imageAltText: msgInput.alt,
+                messageType: ImessageMessagesTypeMessageType.text,
+                imageUrl: msgInput.imgUrl || '',
+                imageAltText: 'fake alt text',
                 // imageFileId could be set if uploading to Appwrite storage first
-                timestamp: new Date(Date.now() - msgInput.minsAgo * 60000).toISOString(),
+                timestamp: new Date(Date.now() - msgInput.minsAgo * 60000),
                 isEdited: false,
                 screenshotIndex: msgInput.idx,
-                deliveryStatus: msgInput.status
+                deliveryStatus: ImessageMessagesTypeDeliveryStatus.sent
             };
             return createIMessageMessage(databases, messageData);
         });
@@ -127,7 +149,7 @@ export const POST: RequestHandler = async ({ request: _request, locals, cookies 
             postId: `post_${ID.unique()}`,
             participantDocRefs: createdParticipants.map((p) => p.$id),
             rightSideParticipantDocRef: rightSideParticipantDocRef,
-            screenshotMessageIds: createdMessages.map((m) => m.messageId), // Use the actual messageId from created message
+            screenshotMessageIds: createdMessages.map((m) => m['messageId'] as string), // Use the actual messageId from created message
             totalScreenshots: createdMessages.length
         };
 

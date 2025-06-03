@@ -1,5 +1,5 @@
 import { redirect } from '@sveltejs/kit';
-import type { LoadEvent, RequestEvent } from '@sveltejs/kit';
+import type { RequestEvent } from '@sveltejs/kit';
 import { AppwriteException } from 'node-appwrite';
 
 // Define the messages constant if it's not exported from const.js
@@ -11,7 +11,7 @@ const messages = {
 import { routes } from '$lib/const.js';
 import { adminCreateEmailPasswordSession } from '$root/lib/server/appwrite-utils/accountHelpers.js';
 
-export const load = async ({ parent }: LoadEvent) => {
+export const load = async ({ parent }) => {
     const data = await parent();
 
     if (data?.loggedInProfile?.username) {
@@ -26,7 +26,7 @@ export const actions = {
         const password = formData.get('password') as string;
 
         if (!email || !password) {
-            return { 
+            return {
                 type: 'failure',
                 status: 400,
                 data: {

@@ -2,14 +2,13 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
-    createRichTextPost,
-    getRichTextPostById,
-    updateRichTextPost,
-    deleteRichTextPost,
-    type CreateRichTextPostData,
-    type UpdateRichTextPostData
+    createtextPost,
+    gettextPostById,
+    updatetextPost,
+    deletetextPost
 } from './richtext.appwrite.js';
 import type { Databases, Models } from 'node-appwrite';
+import type { TextPostType } from '$root/lib/types/appwrite.js';
 
 const mockCreateDocument = vi.fn();
 const mockGetDocument = vi.fn();
@@ -26,9 +25,9 @@ const mockDatabases = {
 } as unknown as Databases;
 
 const DATABASE_ID = 'main';
-const RICH_TEXT_POST_COLLECTION_ID = 'richTextPosts';
+const RICH_TEXT_POST_COLLECTION_ID = 'textPosts';
 
-describe('Appwrite: RichTextPost Interactions', () => {
+describe('Appwrite: textPost Interactions', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockCreateDocument.mockResolvedValue({
@@ -37,23 +36,21 @@ describe('Appwrite: RichTextPost Interactions', () => {
             $databaseId: DATABASE_ID,
             $createdAt: new Date().toISOString(),
             $updatedAt: new Date().toISOString(),
-            $permissions: [],
-            ...({} as CreateRichTextPostData) // Cast to avoid type errors for spread
+            $permissions: []
         } as Models.Document);
     });
 
     describe('Creation', () => {
-        describe('createRichTextPost', () => {
-            it('should call createDocument with correct parameters when creating a RichTextPost', async () => {
-                const postData: CreateRichTextPostData = {
+        describe('createtextPost', () => {
+            it('should call createDocument with correct parameters when creating a textPost', async () => {
+                const postData = {
                     postId: 'parentPost123',
                     title: 'My First Rich Text Post',
                     body: '<p>Hello World</p>',
-                    excerpt: 'A short intro',
                     version: 1
                 };
 
-                await createRichTextPost(mockDatabases, postData);
+                await createtextPost(mockDatabases, postData);
 
                 expect(mockDatabases.createDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.createDocument).toHaveBeenCalledWith(
@@ -64,8 +61,8 @@ describe('Appwrite: RichTextPost Interactions', () => {
                 );
             });
 
-            it('should re-throw errors from Appwrite createDocument when creating a RichTextPost', async () => {
-                const postData: CreateRichTextPostData = {
+            it('should re-throw errors from Appwrite createDocument when creating a textPost', async () => {
+                const postData: TextPostType = {
                     postId: 'parentPostError',
                     title: 'Error Post',
                     body: '<p>Error content</p>'
@@ -74,9 +71,7 @@ describe('Appwrite: RichTextPost Interactions', () => {
 
                 mockCreateDocument.mockRejectedValue(mockError);
 
-                await expect(createRichTextPost(mockDatabases, postData)).rejects.toThrow(
-                    mockError
-                );
+                await expect(createtextPost(mockDatabases, postData)).rejects.toThrow(mockError);
 
                 expect(mockDatabases.createDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.createDocument).toHaveBeenCalledWith(
@@ -90,10 +85,10 @@ describe('Appwrite: RichTextPost Interactions', () => {
     });
 
     describe('Fetching', () => {
-        describe('getRichTextPostById', () => {
+        describe('gettextPostById', () => {
             it('should call getDocument with correct parameters and return the document', async () => {
                 const mockDocumentId = 'rtpDoc123';
-                const mockFetchedData: CreateRichTextPostData = {
+                const mockFetchedData = {
                     postId: 'parentPostFetched',
                     title: 'Fetched Post',
                     body: '<p>Fetched content</p>'
@@ -109,7 +104,7 @@ describe('Appwrite: RichTextPost Interactions', () => {
                 };
                 mockGetDocument.mockResolvedValue(mockReturnedDoc);
 
-                const fetchedDoc = await getRichTextPostById(mockDatabases, mockDocumentId);
+                const fetchedDoc = await gettextPostById(mockDatabases, mockDocumentId);
 
                 expect(mockDatabases.getDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.getDocument).toHaveBeenCalledWith(
@@ -126,7 +121,7 @@ describe('Appwrite: RichTextPost Interactions', () => {
 
                 mockGetDocument.mockRejectedValue(mockError);
 
-                await expect(getRichTextPostById(mockDatabases, mockDocumentId)).rejects.toThrow(
+                await expect(gettextPostById(mockDatabases, mockDocumentId)).rejects.toThrow(
                     mockError
                 );
 
@@ -141,10 +136,10 @@ describe('Appwrite: RichTextPost Interactions', () => {
     });
 
     describe('Updating', () => {
-        describe('updateRichTextPost', () => {
+        describe('updatetextPost', () => {
             it('should call updateDocument with correct parameters and return the updated document', async () => {
                 const mockDocumentId = 'rtpDocUpdate123';
-                const updateData: UpdateRichTextPostData = {
+                const updateData = {
                     title: 'Updated Title',
                     excerpt: 'Updated excerpt'
                 };
@@ -159,15 +154,11 @@ describe('Appwrite: RichTextPost Interactions', () => {
                     title: updateData.title!,
                     body: '<p>Original body</p>',
                     excerpt: updateData.excerpt
-                    // ... other fields from CreateRichTextPostData as needed for full mock
+                    // ... other fields from CreatetextPostData as needed for full mock
                 };
                 mockUpdateDocument.mockResolvedValue(mockReturnedUpdatedDoc);
 
-                const updatedDoc = await updateRichTextPost(
-                    mockDatabases,
-                    mockDocumentId,
-                    updateData
-                );
+                const updatedDoc = await updatetextPost(mockDatabases, mockDocumentId, updateData);
 
                 expect(mockDatabases.updateDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.updateDocument).toHaveBeenCalledWith(
@@ -181,13 +172,13 @@ describe('Appwrite: RichTextPost Interactions', () => {
 
             it('should re-throw errors from Appwrite updateDocument', async () => {
                 const mockDocumentId = 'rtpDocUpdateError';
-                const updateData: UpdateRichTextPostData = { title: 'Update Error' };
+                const updateData = { title: 'Update Error' };
                 const mockError = new Error('Appwrite updateDocument error');
 
                 mockUpdateDocument.mockRejectedValue(mockError);
 
                 await expect(
-                    updateRichTextPost(mockDatabases, mockDocumentId, updateData)
+                    updatetextPost(mockDatabases, mockDocumentId, updateData)
                 ).rejects.toThrow(mockError);
 
                 expect(mockDatabases.updateDocument).toHaveBeenCalledOnce();
@@ -202,13 +193,13 @@ describe('Appwrite: RichTextPost Interactions', () => {
     });
 
     describe('Deleting', () => {
-        describe('deleteRichTextPost', () => {
+        describe('deletetextPost', () => {
             it('should call deleteDocument with correct parameters', async () => {
                 const mockDocumentId = 'rtpDocDelete123';
                 // deleteDocument usually resolves with undefined or an empty object upon success
                 mockDeleteDocument.mockResolvedValue(undefined);
 
-                await deleteRichTextPost(mockDatabases, mockDocumentId);
+                await deletetextPost(mockDatabases, mockDocumentId);
 
                 expect(mockDatabases.deleteDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.deleteDocument).toHaveBeenCalledWith(
@@ -224,7 +215,7 @@ describe('Appwrite: RichTextPost Interactions', () => {
 
                 mockDeleteDocument.mockRejectedValue(mockError);
 
-                await expect(deleteRichTextPost(mockDatabases, mockDocumentId)).rejects.toThrow(
+                await expect(deletetextPost(mockDatabases, mockDocumentId)).rejects.toThrow(
                     mockError
                 );
 

@@ -6,6 +6,21 @@
     let posts = $derived(data.posts);
     let error = $derived(data.error);
     let pageTitle = $derived(data.pageTitle || 'Feed');
+    let userIdUsernameMap: Map<string, string> = $state(new Map());
+
+    $effect(() => {
+        const getUsers = async () => {
+            if (posts && posts.length) {
+                posts.forEach((post) => {
+                    if (post?.userId) {
+                        userIdUsernameMap.set(post.userId, null);
+                    }
+                });
+            }
+        };
+
+        getUsers();
+    });
 </script>
 
 <svelte:head>
@@ -39,11 +54,12 @@
 
                         <div class="card-actions mt-4 justify-end">
                             <span class="text-base-content/60 text-xs">
-                                Posted on: {new Date(post.$createdAt).toLocaleDateString()} by User: {post.userId}
+                                Posted on: {new Date(post.$createdAt).toLocaleDateString()} by User:
+                                {post.userId}
                             </span>
                             <!-- Link to full post page - assumes /posts/[id] will exist -->
                             <a
-                                href={`/posts/${post.id}`}
+                                href={`/posts/${post.$id}`}
                                 class="btn btn-sm btn-outline btn-primary"
                             >
                                 Read More
@@ -56,7 +72,7 @@
     {:else if !error}
         <div class="py-10 text-center">
             <p class="text-base-content/70 text-xl">No posts yet. Be the first to create one!</p>
-            <a href="/create/richtextpost" class="btn btn-primary mt-4">Create Rich Text Post</a>
+            <a href="/create/textpost" class="btn btn-primary mt-4">Create</a>
         </div>
     {/if}
 </div>

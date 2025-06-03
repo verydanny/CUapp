@@ -4,13 +4,13 @@ import { DATABASE_ID, POSTS_COLLECTION_ID } from '$lib/server/model.const.js';
 export interface RequiredPostDocument {
     postId: string;
     userId: string;
-    type: 'richTextPost' | 'imagePost' | 'status'; // Add other valid post types
+    type: 'textPost' | 'imagePost' | 'status'; // Add other valid post types
     tags?: string[];
     likesCount?: number;
     commentsCount?: number;
     status: 'published' | 'draft' | 'archived';
     accessLevel: 'public' | 'followers' | 'private' | 'mutuals' | 'unlisted' | 'team'; // Define access levels
-    contentRefId?: string;
+    contentRefId: string;
 }
 
 export type PostDocument = Models.Document & RequiredPostDocument;

@@ -1,6 +1,7 @@
-import { Databases, Query } from 'node-appwrite';
+import { Databases, type Models, Query } from 'node-appwrite';
 
 import type { BasicProfile, UserWithAdmin } from '$root/app.d.ts'; // Keep this import
+import type { ProfilesDocument } from '../types/appwrite';
 
 export async function getProfileById(id: string, databases: Databases): Promise<BasicProfile> {
     if (!id) {
@@ -11,9 +12,8 @@ export async function getProfileById(id: string, databases: Databases): Promise<
 
     return {
         $id: profile?.$id,
-        username: profile?.username,
-        profileImage: undefined,
-        permissions: profile?.permissions ?? []
+        username: profile?.['username'],
+        permissions: profile?.['permissions'] ?? []
     };
 }
 
@@ -25,10 +25,10 @@ export async function getProfileByUsername(
         throw new Error('Username is required');
     }
 
-    const profile = await databases.listDocuments('main', 'profiles', [
+    const profile = (await databases.listDocuments('main', 'profiles', [
         Query.equal('username', username),
         Query.limit(1)
-    ]);
+    ])) as Models.DocumentList<ProfilesDocument>;
 
     if (profile.documents.length === 0) {
         throw new Error('Profile not found', {
@@ -42,10 +42,9 @@ export async function getProfileByUsername(
     }
 
     return {
-        $id: profile.documents[0].$id,
-        username: profile.documents[0].username,
-        profileImage: undefined,
-        permissions: profile.documents[0].permissions ?? []
+        $id: profile.documents[0]?.$id,
+        username: profile.documents[0]?.username,
+        permissions: profile.documents[0]?.permissions
     };
 }
 

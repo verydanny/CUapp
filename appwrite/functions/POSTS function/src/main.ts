@@ -3,7 +3,7 @@ import { Client, Databases, Query, type Models } from 'node-appwrite'
 
 import { serve as serveElysia } from '@gravlabs/appwrite-elysia-adapter-bun'
 import type { AppwriteElysiaSingleton } from '@gravlabs/appwrite-elysia-adapter-bun/types.d.ts'
-import type { RichTextPostDocument } from './types/appwrite.ts'
+import type { textPostDocument } from './types/appwrite.ts'
 
 // You can re-use this in other functions to set Client/Databases/etc
 export const appwritePlugin = new Elysia<'', AppwriteElysiaSingleton>({ name: 'appwrite' }).resolve(
@@ -47,7 +47,7 @@ const postsQuerySchema = t.Optional(
         postIds: t.Optional(t.Array(t.String())),
         type: t.Optional(
             t.Union([
-                t.Literal('richTextPost'),
+                t.Literal('textPost'),
                 t.Literal('imessageConversation'),
                 t.Literal('imagePost')
             ])
@@ -64,7 +64,7 @@ export const posts = new Elysia()
             if (query.postIds && query.type) {
                 const result = (await databases.listDocuments('main', query.type, [
                     Query.equal('$id', query.postIds)
-                ])) as unknown as Models.DocumentList<RichTextPostDocument>
+                ])) as unknown as Models.DocumentList<textPostDocument>
 
                 return result.documents
             }

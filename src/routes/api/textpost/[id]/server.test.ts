@@ -4,25 +4,21 @@ import { AppwriteException } from 'appwrite';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { RequestEvent } from '@sveltejs/kit';
 import { GET, PATCH, DELETE } from './+server.js';
-import type {
-    CreateRichTextPostData,
-    UpdateRichTextPostData
-} from '$lib/server/appwrite-utils/richtext.appwrite.js';
 
 // Mock the Appwrite utility functions
-const mockGetRichTextPostById = vi.hoisted(() => vi.fn());
-const mockUpdateRichTextPost = vi.hoisted(() => vi.fn());
-const mockDeleteRichTextPost = vi.hoisted(() => vi.fn());
+const mockGettextPostById = vi.hoisted(() => vi.fn());
+const mockUpdatetextPost = vi.hoisted(() => vi.fn());
+const mockDeletetextPost = vi.hoisted(() => vi.fn());
 
 vi.mock('$lib/server/appwrite-utils/richtext.appwrite.js', () => ({
-    getRichTextPostById: mockGetRichTextPostById,
-    updateRichTextPost: mockUpdateRichTextPost,
-    deleteRichTextPost: mockDeleteRichTextPost
+    gettextPostById: mockGettextPostById,
+    updatetextPost: mockUpdatetextPost,
+    deletetextPost: mockDeletetextPost
 }));
 
-describe('GET /api/richtextposts/[id]', () => {
+describe('GET /api/textPosts/[id]', () => {
     const mockPostId = 'rtp123';
-    const mockRichTextPostData: CreateRichTextPostData = {
+    const mocktextPostData = {
         postId: 'parentPost789',
         title: 'Fetched Rich Text Post',
         body: '<p>Detailed content of the fetched post.</p>',
@@ -31,12 +27,12 @@ describe('GET /api/richtextposts/[id]', () => {
     };
     const mockDocument: Models.Document = {
         $id: mockPostId,
-        $collectionId: 'richTextPosts', // Assuming this from previous context
+        $collectionId: 'textPosts', // Assuming this from previous context
         $databaseId: 'main', // Assuming this
         $createdAt: new Date().toISOString(),
         $updatedAt: new Date().toISOString(),
         $permissions: [],
-        ...mockRichTextPostData
+        ...mocktextPostData
     };
 
     beforeEach(() => {
@@ -44,12 +40,12 @@ describe('GET /api/richtextposts/[id]', () => {
     });
 
     it('should return 200 and the rich text post if found', async () => {
-        mockGetRichTextPostById.mockResolvedValue(mockDocument);
+        mockGettextPostById.mockResolvedValue(mockDocument);
 
         const event = {
             params: { id: mockPostId },
-            request: new Request(`http://localhost/api/richtextposts/${mockPostId}`),
-            url: new URL(`http://localhost/api/richtextposts/${mockPostId}`),
+            request: new Request(`http://localhost/api/textPosts/${mockPostId}`),
+            url: new URL(`http://localhost/api/textPosts/${mockPostId}`),
             locals: {}
         } as unknown as RequestEvent;
 
@@ -58,7 +54,7 @@ describe('GET /api/richtextposts/[id]', () => {
 
         expect(response.status).toBe(200);
         expect(body).toEqual(mockDocument);
-        expect(mockGetRichTextPostById).toHaveBeenCalledWith(expect.anything(), mockPostId);
+        expect(mockGettextPostById).toHaveBeenCalledWith(expect.anything(), mockPostId);
     });
 
     it('should return 404 if the rich text post is not found', async () => {
@@ -68,12 +64,12 @@ describe('GET /api/richtextposts/[id]', () => {
             404,
             'document_not_found'
         );
-        mockGetRichTextPostById.mockRejectedValue(notFoundError);
+        mockGettextPostById.mockRejectedValue(notFoundError);
 
         const event = {
             params: { id: 'nonExistentId' },
-            request: new Request('http://localhost/api/richtextposts/nonExistentId'),
-            url: new URL('http://localhost/api/richtextposts/nonExistentId'),
+            request: new Request('http://localhost/api/textPosts/nonExistentId'),
+            url: new URL('http://localhost/api/textPosts/nonExistentId'),
             locals: {}
         } as unknown as RequestEvent;
 
@@ -81,18 +77,18 @@ describe('GET /api/richtextposts/[id]', () => {
         const body = await response.json();
 
         expect(response.status).toBe(404);
-        expect(body.error).toBe('RichTextPost not found');
-        expect(mockGetRichTextPostById).toHaveBeenCalledWith(expect.anything(), 'nonExistentId');
+        expect(body.error).toBe('textPost not found');
+        expect(mockGettextPostById).toHaveBeenCalledWith(expect.anything(), 'nonExistentId');
     });
 
     it('should return 500 if there is an unexpected server error', async () => {
         const serverError = new Error('Database connection failed');
-        mockGetRichTextPostById.mockRejectedValue(serverError);
+        mockGettextPostById.mockRejectedValue(serverError);
 
         const event = {
             params: { id: mockPostId },
-            request: new Request(`http://localhost/api/richtextposts/${mockPostId}`),
-            url: new URL(`http://localhost/api/richtextposts/${mockPostId}`),
+            request: new Request(`http://localhost/api/textPosts/${mockPostId}`),
+            url: new URL(`http://localhost/api/textPosts/${mockPostId}`),
             locals: {}
         } as unknown as RequestEvent;
 
@@ -100,21 +96,21 @@ describe('GET /api/richtextposts/[id]', () => {
         const body = await response.json();
 
         expect(response.status).toBe(500);
-        expect(body.error).toBe('Failed to fetch RichTextPost');
-        expect(mockGetRichTextPostById).toHaveBeenCalledWith(expect.anything(), mockPostId);
+        expect(body.error).toBe('Failed to fetch textPost');
+        expect(mockGettextPostById).toHaveBeenCalledWith(expect.anything(), mockPostId);
     });
 });
 
-describe('PATCH /api/richtextposts/[id]', () => {
+describe('PATCH /api/textPosts/[id]', () => {
     const mockPostId = 'rtpUpdate123';
-    const updateData: UpdateRichTextPostData = {
+    const updateData = {
         title: 'Updated Title',
         body: '<p>Updated body content.</p>',
         excerpt: 'Updated excerpt.'
     };
     const mockUpdatedDocument: Models.Document = {
         $id: mockPostId,
-        $collectionId: 'richTextPosts',
+        $collectionId: 'textPosts',
         $databaseId: 'main',
         $createdAt: new Date().toISOString(),
         $updatedAt: new Date().toISOString(),
@@ -130,16 +126,16 @@ describe('PATCH /api/richtextposts/[id]', () => {
     });
 
     it('should update the rich text post and return 200 with the updated document', async () => {
-        mockUpdateRichTextPost.mockResolvedValue(mockUpdatedDocument);
+        mockUpdatetextPost.mockResolvedValue(mockUpdatedDocument);
 
         const event = {
             params: { id: mockPostId },
-            request: new Request(`http://localhost/api/richtextposts/${mockPostId}`, {
+            request: new Request(`http://localhost/api/textPosts/${mockPostId}`, {
                 method: 'PATCH',
                 body: JSON.stringify(updateData),
                 headers: { 'Content-Type': 'application/json' }
             }),
-            url: new URL(`http://localhost/api/richtextposts/${mockPostId}`),
+            url: new URL(`http://localhost/api/textPosts/${mockPostId}`),
             locals: {}
         } as unknown as RequestEvent;
 
@@ -148,11 +144,7 @@ describe('PATCH /api/richtextposts/[id]', () => {
 
         expect(response.status).toBe(200);
         expect(body).toEqual(mockUpdatedDocument);
-        expect(mockUpdateRichTextPost).toHaveBeenCalledWith(
-            expect.anything(),
-            mockPostId,
-            updateData
-        );
+        expect(mockUpdatetextPost).toHaveBeenCalledWith(expect.anything(), mockPostId, updateData);
     });
 
     it('should return 404 if the rich text post to update is not found', async () => {
@@ -161,16 +153,16 @@ describe('PATCH /api/richtextposts/[id]', () => {
             404,
             'document_not_found'
         );
-        mockUpdateRichTextPost.mockRejectedValue(notFoundError);
+        mockUpdatetextPost.mockRejectedValue(notFoundError);
 
         const event = {
             params: { id: 'nonExistentIdToUpdate' },
-            request: new Request('http://localhost/api/richtextposts/nonExistentIdToUpdate', {
+            request: new Request('http://localhost/api/textPosts/nonExistentIdToUpdate', {
                 method: 'PATCH',
                 body: JSON.stringify(updateData),
                 headers: { 'Content-Type': 'application/json' }
             }),
-            url: new URL('http://localhost/api/richtextposts/nonExistentIdToUpdate'),
+            url: new URL('http://localhost/api/textPosts/nonExistentIdToUpdate'),
             locals: {}
         } as unknown as RequestEvent;
 
@@ -178,18 +170,18 @@ describe('PATCH /api/richtextposts/[id]', () => {
         const body = await response.json();
 
         expect(response.status).toBe(404);
-        expect(body.error).toBe('RichTextPost not found to update');
+        expect(body.error).toBe('textPost not found to update');
     });
 
     it('should return 400 if the request body is invalid or empty', async () => {
         const event = {
             params: { id: mockPostId },
-            request: new Request(`http://localhost/api/richtextposts/${mockPostId}`, {
+            request: new Request(`http://localhost/api/textPosts/${mockPostId}`, {
                 method: 'PATCH',
                 body: JSON.stringify({}), // Empty body
                 headers: { 'Content-Type': 'application/json' }
             }),
-            url: new URL(`http://localhost/api/richtextposts/${mockPostId}`),
+            url: new URL(`http://localhost/api/textPosts/${mockPostId}`),
             locals: {}
         } as unknown as RequestEvent;
 
@@ -199,12 +191,12 @@ describe('PATCH /api/richtextposts/[id]', () => {
 
         const invalidSyntaxEvent = {
             params: { id: mockPostId },
-            request: new Request(`http://localhost/api/richtextposts/${mockPostId}`, {
+            request: new Request(`http://localhost/api/textPosts/${mockPostId}`, {
                 method: 'PATCH',
                 body: '{title: "no quotes"}', // Invalid JSON syntax
                 headers: { 'Content-Type': 'application/json' }
             }),
-            url: new URL(`http://localhost/api/richtextposts/${mockPostId}`),
+            url: new URL(`http://localhost/api/textPosts/${mockPostId}`),
             locals: {}
         } as unknown as RequestEvent;
         const invalidSyntaxResponse = await PATCH(invalidSyntaxEvent);
@@ -215,16 +207,16 @@ describe('PATCH /api/richtextposts/[id]', () => {
 
     it('should return 500 if there is an unexpected server error during update', async () => {
         const serverError = new Error('Database connection failed during update');
-        mockUpdateRichTextPost.mockRejectedValue(serverError);
+        mockUpdatetextPost.mockRejectedValue(serverError);
 
         const event = {
             params: { id: mockPostId },
-            request: new Request(`http://localhost/api/richtextposts/${mockPostId}`, {
+            request: new Request(`http://localhost/api/textPosts/${mockPostId}`, {
                 method: 'PATCH',
                 body: JSON.stringify(updateData),
                 headers: { 'Content-Type': 'application/json' }
             }),
-            url: new URL(`http://localhost/api/richtextposts/${mockPostId}`),
+            url: new URL(`http://localhost/api/textPosts/${mockPostId}`),
             locals: {}
         } as unknown as RequestEvent;
 
@@ -232,11 +224,11 @@ describe('PATCH /api/richtextposts/[id]', () => {
         const body = await response.json();
 
         expect(response.status).toBe(500);
-        expect(body.error).toBe('Failed to update RichTextPost');
+        expect(body.error).toBe('Failed to update textPost');
     });
 });
 
-describe('DELETE /api/richtextposts/[id]', () => {
+describe('DELETE /api/textPosts/[id]', () => {
     const mockPostId = 'rtpDelete123';
 
     beforeEach(() => {
@@ -244,21 +236,21 @@ describe('DELETE /api/richtextposts/[id]', () => {
     });
 
     it('should delete the rich text post and return 204 on success', async () => {
-        mockDeleteRichTextPost.mockResolvedValue(undefined);
+        mockDeletetextPost.mockResolvedValue(undefined);
 
         const event = {
             params: { id: mockPostId },
-            request: new Request(`http://localhost/api/richtextposts/${mockPostId}`, {
+            request: new Request(`http://localhost/api/textPosts/${mockPostId}`, {
                 method: 'DELETE'
             }),
-            url: new URL(`http://localhost/api/richtextposts/${mockPostId}`),
+            url: new URL(`http://localhost/api/textPosts/${mockPostId}`),
             locals: {}
         } as unknown as RequestEvent;
 
         const response = await DELETE(event);
 
         expect(response.status).toBe(204);
-        expect(mockDeleteRichTextPost).toHaveBeenCalledWith(expect.anything(), mockPostId);
+        expect(mockDeletetextPost).toHaveBeenCalledWith(expect.anything(), mockPostId);
     });
 
     it('should return 404 if the rich text post to delete is not found', async () => {
@@ -267,14 +259,14 @@ describe('DELETE /api/richtextposts/[id]', () => {
             404,
             'document_not_found'
         );
-        mockDeleteRichTextPost.mockRejectedValue(notFoundError);
+        mockDeletetextPost.mockRejectedValue(notFoundError);
 
         const event = {
             params: { id: 'nonExistentIdToDelete' },
-            request: new Request('http://localhost/api/richtextposts/nonExistentIdToDelete', {
+            request: new Request('http://localhost/api/textPosts/nonExistentIdToDelete', {
                 method: 'DELETE'
             }),
-            url: new URL('http://localhost/api/richtextposts/nonExistentIdToDelete'),
+            url: new URL('http://localhost/api/textPosts/nonExistentIdToDelete'),
             locals: {}
         } as unknown as RequestEvent;
 
@@ -282,20 +274,17 @@ describe('DELETE /api/richtextposts/[id]', () => {
         const body = await response.json();
 
         expect(response.status).toBe(404);
-        expect(body.error).toBe('RichTextPost not found to delete');
-        expect(mockDeleteRichTextPost).toHaveBeenCalledWith(
-            expect.anything(),
-            'nonExistentIdToDelete'
-        );
+        expect(body.error).toBe('textPost not found to delete');
+        expect(mockDeletetextPost).toHaveBeenCalledWith(expect.anything(), 'nonExistentIdToDelete');
     });
 
     it('should return 400 if id parameter is missing', async () => {
         const event = {
             params: {},
-            request: new Request('http://localhost/api/richtextposts/', {
+            request: new Request('http://localhost/api/textPosts/', {
                 method: 'DELETE'
             }),
-            url: new URL('http://localhost/api/richtextposts/'),
+            url: new URL('http://localhost/api/textPosts/'),
             locals: {}
         } as unknown as RequestEvent;
 
@@ -304,19 +293,19 @@ describe('DELETE /api/richtextposts/[id]', () => {
 
         expect(response.status).toBe(400);
         expect(body.error).toBe('Post ID is required for deletion');
-        expect(mockDeleteRichTextPost).not.toHaveBeenCalled();
+        expect(mockDeletetextPost).not.toHaveBeenCalled();
     });
 
     it('should return 500 if there is an unexpected server error during deletion', async () => {
         const serverError = new Error('Database connection failed during deletion');
-        mockDeleteRichTextPost.mockRejectedValue(serverError);
+        mockDeletetextPost.mockRejectedValue(serverError);
 
         const event = {
             params: { id: mockPostId },
-            request: new Request(`http://localhost/api/richtextposts/${mockPostId}`, {
+            request: new Request(`http://localhost/api/textPosts/${mockPostId}`, {
                 method: 'DELETE'
             }),
-            url: new URL(`http://localhost/api/richtextposts/${mockPostId}`),
+            url: new URL(`http://localhost/api/textPosts/${mockPostId}`),
             locals: {}
         } as unknown as RequestEvent;
 
@@ -324,7 +313,7 @@ describe('DELETE /api/richtextposts/[id]', () => {
         const body = await response.json();
 
         expect(response.status).toBe(500);
-        expect(body.error).toBe('Failed to delete RichTextPost');
-        expect(mockDeleteRichTextPost).toHaveBeenCalledWith(expect.anything(), mockPostId);
+        expect(body.error).toBe('Failed to delete textPost');
+        expect(mockDeletetextPost).toHaveBeenCalledWith(expect.anything(), mockPostId);
     });
 });

@@ -1,10 +1,10 @@
 import { Client, Account, Storage, Databases } from 'appwrite';
-import { PUBLIC_APPWRITE_ENDPOINT, PUBLIC_APPWRITE_PROJECT } from '$env/static/public';
+import { APPWRITE_ENDPOINT, APPWRITE_PROJECT_ID } from '$env/static/public';
 
 export function createUserSessionClient(session: string) {
     const client = new Client()
-        .setEndpoint(PUBLIC_APPWRITE_ENDPOINT)
-        .setProject(PUBLIC_APPWRITE_PROJECT)
+        .setEndpoint(APPWRITE_ENDPOINT)
+        .setProject(APPWRITE_PROJECT_ID)
         .setSession(session);
 
     const account = new Account(client);

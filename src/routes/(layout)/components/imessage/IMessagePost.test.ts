@@ -1,15 +1,14 @@
-import type { Models } from 'appwrite';
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/svelte';
 import IMessagePost from './IMessagePost.svelte';
 import type {
-    iMessageConversation,
-    iMessageMessage,
-    iMessageParticipant
-} from '$lib/utils/imessage.utils.js';
+    ImessageConversationDocument,
+    ImessageMessagesType,
+    ImessageParticipantsDocument
+} from '$root/lib/types/appwrite.js';
 
 // Mock data
-const mockParticipants: iMessageParticipant[] = [
+const mockParticipants: ImessageParticipantsDocument[] = [
     {
         $id: 'part-1',
         $collectionId: 'imessageParticipants',
@@ -32,40 +31,43 @@ const mockParticipants: iMessageParticipant[] = [
     }
 ];
 
-const mockMessages: iMessageMessage[] = [
-    {
-        $id: 'msg-1',
-        $collectionId: 'imessageMessages',
-        $databaseId: 'main',
-        $createdAt: new Date().toISOString(),
-        $updatedAt: new Date().toISOString(),
-        $permissions: [],
-        conversationId: 'conv-1',
-        messageId: 'msg-1',
-        participantDocId: 'part-1',
-        content: 'Test message 1',
-        timestamp: new Date().toISOString(),
-        isEdited: false,
-        screenshotIndex: 0
-    },
-    {
-        $id: 'msg-2',
-        $collectionId: 'imessageMessages',
-        $databaseId: 'main',
-        $createdAt: new Date().toISOString(),
-        $updatedAt: new Date().toISOString(),
-        $permissions: [],
-        conversationId: 'conv-1',
-        messageId: 'msg-2',
-        participantDocId: 'part-2',
-        content: 'Test message 2',
-        timestamp: new Date().toISOString(),
-        isEdited: false,
-        screenshotIndex: 1
-    }
-];
+const mockMessages = {
+    total: 2,
+    documents: [
+        {
+            $id: 'msg-1',
+            $collectionId: 'imessageMessages',
+            $databaseId: 'main',
+            $createdAt: new Date().toISOString(),
+            $updatedAt: new Date().toISOString(),
+            $permissions: [],
+            conversationId: 'conv-1',
+            messageId: 'msg-1',
+            participantDocId: 'part-1',
+            content: 'Test message 1',
+            timestamp: new Date(),
+            isEdited: false,
+            screenshotIndex: 0
+        },
+        {
+            $id: 'msg-2',
+            $collectionId: 'imessageMessages',
+            $databaseId: 'main',
+            $createdAt: new Date().toISOString(),
+            $updatedAt: new Date().toISOString(),
+            $permissions: [],
+            conversationId: 'conv-1',
+            messageId: 'msg-2',
+            participantDocId: 'part-2',
+            content: 'Test message 2',
+            timestamp: new Date(),
+            isEdited: false,
+            screenshotIndex: 1
+        }
+    ]
+};
 
-const mockConversation: iMessageConversation & Models.Document = {
+const mockConversation: ImessageConversationDocument = {
     $id: 'conv-1',
     $collectionId: 'imessageConversations',
     $databaseId: 'main',
@@ -84,7 +86,7 @@ describe('IMessagePost Component', () => {
     it('renders the component with messages', () => {
         const { container } = render(IMessagePost, {
             conversation: mockConversation,
-            messages: mockMessages,
+            messages: mockMessages.documents,
             participants: mockParticipants,
             rightSideParticipant: mockParticipants[1]
         });
@@ -100,7 +102,7 @@ describe('IMessagePost Component', () => {
     it('renders a loading state when loading is true', () => {
         const { container } = render(IMessagePost, {
             conversation: null,
-            messages: mockMessages,
+            messages: mockMessages.documents,
             participants: mockParticipants,
             rightSideParticipant: mockParticipants[0],
             loading: true
@@ -119,7 +121,7 @@ describe('IMessagePost Component', () => {
 
         const { container } = render(IMessagePost, {
             conversation: badConversation,
-            messages: mockMessages,
+            messages: mockMessages.documents,
             participants: mockParticipants,
             rightSideParticipant: null
         });
@@ -133,7 +135,7 @@ describe('IMessagePost Component', () => {
     it('renders a link to the post when postId is provided', () => {
         const { container } = render(IMessagePost, {
             conversation: mockConversation,
-            messages: mockMessages,
+            messages: mockMessages.documents,
             participants: mockParticipants,
             postId: 'test-post-id',
             rightSideParticipant: mockParticipants[1]
@@ -149,11 +151,11 @@ describe('IMessagePost Component', () => {
         // Create messages in reverse order
         const reverseMessages = [
             {
-                ...mockMessages[1],
+                ...mockMessages.documents[1],
                 screenshotIndex: 1
             },
             {
-                ...mockMessages[0],
+                ...mockMessages.documents[0],
                 screenshotIndex: 0
             }
         ];
@@ -162,7 +164,7 @@ describe('IMessagePost Component', () => {
 
         const { container } = render(IMessagePost, {
             conversation: mockConversation,
-            messages: reverseMessages,
+            messages: reverseMessages as ImessageMessagesType[],
             participants: mockParticipants,
             rightSideParticipant: mockParticipants[1]
         });
@@ -170,7 +172,7 @@ describe('IMessagePost Component', () => {
         // The first message in the DOM should be the one with screenshotIndex 0
         const messageElements = container.querySelectorAll('.imessage-conversation');
         expect(messageElements.length).toBeGreaterThan(0);
-        expect(messageElements[0].textContent).toContain('Test message 1');
+        expect(messageElements[0]?.textContent).toContain('Test message 1');
 
         consoleErrorSpy.mockRestore();
     });

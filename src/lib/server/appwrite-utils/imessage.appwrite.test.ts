@@ -13,16 +13,11 @@ import {
     updateIMessageParticipant,
     deleteIMessageConversation,
     deleteIMessageMessage,
-    deleteIMessageParticipant,
-    type CreateIMessageConversationData,
-    type CreateIMessageMessageData,
-    type CreateIMessageParticipantData,
-    type UpdateIMessageConversationData,
-    type UpdateIMessageMessageData,
-    type UpdateIMessageParticipantData
+    deleteIMessageParticipant
 } from './imessage.appwrite.js'; // Import the actual function and type
 import type { Models, Databases } from 'node-appwrite'; // For Models.Document type hint
 import { Query } from 'node-appwrite'; // Import Query for test assertions
+import { ImessageMessagesTypeDeliveryStatus } from '$root/lib/types/appwrite.js';
 
 // Mock Appwrite Databases client and createDocument method
 const mockCreateDocument = vi.fn();
@@ -75,7 +70,7 @@ describe('Appwrite: iMessage Interactions', () => {
     describe('Creation', () => {
         describe('Conversation Creation', () => {
             it('should call createDocument with correct parameters when creating an iMessage conversation', async () => {
-                const conversationData: CreateIMessageConversationData = {
+                const conversationData = {
                     postId: 'post123',
                     conversationId: 'conv456',
                     participantDocRefs: ['part1', 'part2'],
@@ -130,15 +125,15 @@ describe('Appwrite: iMessage Interactions', () => {
 
         describe('Message Creation', () => {
             it('should call createDocument with correct parameters when creating an iMessage message', async () => {
-                const messageData: CreateIMessageMessageData = {
+                const messageData = {
                     conversationId: 'conv456',
                     messageId: 'msgUnique1',
                     participantDocId: 'part1',
                     content: 'Hello there!',
-                    timestamp: new Date().toISOString(),
+                    timestamp: new Date(),
                     isEdited: false,
                     screenshotIndex: 0,
-                    deliveryStatus: 'sent'
+                    deliveryStatus: ImessageMessagesTypeDeliveryStatus.sent
                 };
 
                 await createIMessageMessage(mockDatabases, messageData);
@@ -153,16 +148,16 @@ describe('Appwrite: iMessage Interactions', () => {
             });
 
             it('should re-throw errors from Appwrite createDocument when creating a message', async () => {
-                const messageData: CreateIMessageMessageData = {
+                const messageData = {
                     // Use minimal data required to call the function
                     conversationId: 'convError',
                     messageId: 'msgError',
                     participantDocId: 'partError',
                     content: 'Error message',
-                    timestamp: new Date().toISOString(),
+                    timestamp: new Date(),
                     isEdited: false,
                     screenshotIndex: 0,
-                    deliveryStatus: 'sent'
+                    deliveryStatus: ImessageMessagesTypeDeliveryStatus.sent
                 };
                 const mockError = new Error('Appwrite createDocument error');
 
@@ -187,7 +182,7 @@ describe('Appwrite: iMessage Interactions', () => {
 
         describe('Participant Creation', () => {
             it('should call createDocument with correct parameters when creating an iMessage participant', async () => {
-                const participantData: CreateIMessageParticipantData = {
+                const participantData = {
                     userId: 'userTest1',
                     name: 'Test User',
                     avatarFileId: 'avatarFile123'
@@ -205,11 +200,11 @@ describe('Appwrite: iMessage Interactions', () => {
             });
 
             it('should re-throw errors from Appwrite createDocument when creating a participant', async () => {
-                const participantData: CreateIMessageParticipantData = {
+                const participantData = {
                     // Use minimal data required to call the function
                     userId: 'userError',
                     name: 'Error Participant',
-                    avatarFileId: undefined
+                    avatarFileId: ''
                 };
                 const mockError = new Error('Appwrite createDocument error');
 
@@ -237,7 +232,7 @@ describe('Appwrite: iMessage Interactions', () => {
         describe('Get Conversation By ID', () => {
             it('should call getDocument with correct parameters and return the document', async () => {
                 const mockConversationDocId = 'docConv123';
-                const mockFetchedConversationData: CreateIMessageConversationData = {
+                const mockFetchedConversationData = {
                     postId: 'postFetched',
                     conversationId: 'convFetched',
                     participantDocRefs: ['partFetched1'],
@@ -274,7 +269,7 @@ describe('Appwrite: iMessage Interactions', () => {
         describe('Get Messages By Conversation ID', () => {
             it('should call listDocuments with correct query and return documents', async () => {
                 const targetConversationId = 'convToFetchMessagesFor';
-                const mockMessageData: CreateIMessageMessageData = {
+                const mockMessageData = {
                     conversationId: targetConversationId,
                     messageId: 'msgFetched1',
                     participantDocId: 'part1',
@@ -373,12 +368,12 @@ describe('Appwrite: iMessage Interactions', () => {
         describe('Get Participants By IDs', () => {
             it('should call getDocument for each ID and return the documents', async () => {
                 const participantIds = ['partDoc1', 'partDoc2'];
-                const mockParticipantData1: CreateIMessageParticipantData = {
+                const mockParticipantData1 = {
                     userId: 'user1',
                     name: 'Participant 1'
                 };
                 const mockParticipantDoc1: Models.Document = {
-                    $id: participantIds[0],
+                    $id: participantIds[0]!,
                     $collectionId: IMESSAGE_PARTICIPANTS_COLLECTION_ID,
                     $databaseId: DATABASE_ID,
                     $createdAt: new Date().toISOString(),
@@ -386,12 +381,12 @@ describe('Appwrite: iMessage Interactions', () => {
                     $permissions: [],
                     ...mockParticipantData1
                 };
-                const mockParticipantData2: CreateIMessageParticipantData = {
+                const mockParticipantData2 = {
                     userId: 'user2',
                     name: 'Participant 2'
                 };
                 const mockParticipantDoc2: Models.Document = {
-                    $id: participantIds[1],
+                    $id: participantIds[1]!,
                     $collectionId: IMESSAGE_PARTICIPANTS_COLLECTION_ID,
                     $databaseId: DATABASE_ID,
                     $createdAt: new Date().toISOString(),
@@ -452,7 +447,11 @@ describe('Appwrite: iMessage Interactions', () => {
 
         it('should re-throw errors from Appwrite updateDocument when updating a conversation', async () => {
             const documentIdToUpdate = 'convDocToUpdateError';
-            const updateData: UpdateIMessageConversationData = { totalScreenshots: 99 }; // Use minimal data
+            const updateData = {
+                userId: 'user1',
+                name: 'Participant 1',
+                totalScreenshots: 99
+            }; // Use minimal data
             const mockError = new Error('Appwrite updateDocument error');
 
             // Mock the updateDocument method to reject with an error
@@ -478,7 +477,9 @@ describe('Appwrite: iMessage Interactions', () => {
         describe('Conversation Updating', () => {
             it('should call updateDocument with correct parameters when updating an iMessage conversation', async () => {
                 const mockConversationDocId = 'docConvUpdate123';
-                const updateData: UpdateIMessageConversationData = {
+                const updateData = {
+                    userId: 'user1',
+                    name: 'Participant 1',
                     totalScreenshots: 2
                 };
 
@@ -497,12 +498,17 @@ describe('Appwrite: iMessage Interactions', () => {
         describe('Update Message', () => {
             it('should call updateDocument with correct parameters and return the updated document', async () => {
                 const documentIdToUpdate = 'msgDocToUpdate123';
-                const updateData: UpdateIMessageMessageData = {
+                const updateData = {
+                    conversationId: 'convOriginalMsg',
+                    messageId: 'msgOriginal',
+                    participantDocId: 'partOrig',
                     content: 'Updated message content',
-                    isEdited: true
+                    isEdited: true,
+                    timestamp: new Date(),
+                    screenshotIndex: 0
                 };
                 // Simulate the full data of the document as it would be after the update
-                const mockUpdatedMessageFullData: CreateIMessageMessageData = {
+                const mockUpdatedMessageFullData = {
                     conversationId: 'convOriginalMsg',
                     messageId: 'msgOriginal',
                     participantDocId: 'partOrig',
@@ -541,8 +547,14 @@ describe('Appwrite: iMessage Interactions', () => {
 
             it('should re-throw errors from Appwrite updateDocument when updating a message', async () => {
                 const documentIdToUpdate = 'msgDocToUpdateError';
-                const updateData: UpdateIMessageMessageData = {
-                    content: 'Error message update'
+                const updateData = {
+                    conversationId: 'convOriginalMsg',
+                    messageId: 'msgOriginal',
+                    participantDocId: 'partOrig',
+                    content: 'Error message update',
+                    timestamp: new Date(),
+                    isEdited: false,
+                    screenshotIndex: 0
                 }; // Use minimal data
                 const mockError = new Error('Appwrite updateDocument error');
 
@@ -568,12 +580,13 @@ describe('Appwrite: iMessage Interactions', () => {
         describe('Update Participant', () => {
             it('should call updateDocument with correct parameters and return the updated document', async () => {
                 const documentIdToUpdate = 'partDocToUpdate456';
-                const updateData: UpdateIMessageParticipantData = {
+                const updateData = {
+                    userId: 'userOriginal',
                     name: 'Updated Participant Name', // Example partial update
                     avatarFileId: 'newAvatarFile789'
                 };
                 // Simulate the full data of the document as it would be after the update
-                const mockUpdatedParticipantFullData: CreateIMessageParticipantData = {
+                const mockUpdatedParticipantFullData = {
                     userId: 'userOriginal', // Assume original user ID remains
                     name: updateData.name!,
                     avatarFileId: updateData.avatarFileId!
@@ -608,9 +621,10 @@ describe('Appwrite: iMessage Interactions', () => {
 
             it('should re-throw errors from Appwrite updateDocument when updating a participant', async () => {
                 const documentIdToUpdate = 'partDocToUpdateError';
-                const updateData: UpdateIMessageParticipantData = {
+                const updateData = {
+                    userId: 'userOriginal',
                     name: 'Error Participant Update'
-                }; // Use minimal data
+                }; // Use minimal Data
                 const mockError = new Error('Appwrite updateDocument error');
 
                 // Mock the updateDocument method to reject with an error

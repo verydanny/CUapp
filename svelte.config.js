@@ -3,7 +3,6 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 const isStorybook = !!(process.env.STORYBOOK === 'true');
 
-
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
     // Consult https://svelte.dev/docs/kit/integrations
@@ -18,18 +17,28 @@ const config = {
     },
 
     kit: {
-        ...(!isStorybook ? {
-            alias: {
-                $root: 'src',
-                $layout: 'src/routes/(layout)',
-                $types: '.svelte-kit/types/src'
-            }
-        } : {
-            alias: {
-                $root: 'src',
-                $layout: 'src/routes/(layout)',
-            }
-        }),
+        alias: {
+            $root: 'src',
+            $layout: 'src/routes/(layout)'
+        },
+        // ...(!isStorybook
+        //     ? {
+        //           alias: {
+        //               $root: 'src',
+        //               $layout: 'src/routes/(layout)',
+        //               $types: '.svelte-kit/types/src'
+        //           }
+        //       }
+        //     : {
+        //           alias: {
+        //               $root: 'src',
+        //               $layout: 'src/routes/(layout)'
+        //           }
+        //       }),
+        env: {
+            privatePrefix: 'SECRET_',
+            publicPrefix: ''
+        },
         adapter: adapter(),
         output: {
             preloadStrategy: 'preload-mjs'

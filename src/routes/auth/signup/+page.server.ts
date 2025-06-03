@@ -1,6 +1,6 @@
 import { type ActionResult, type RequestEvent } from '@sveltejs/kit';
 import { cleanupUserSession, createAdminClient } from '$lib/server/appwrite-utils/appwrite.js';
-import { redirect, type LoadEvent } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import { AppwriteException, ID } from 'node-appwrite';
 
 import type { RouteParams, ActionsExport } from './$types.ts';
@@ -15,7 +15,7 @@ import {
     adminCreateEmailPasswordSession
 } from '$lib/server/appwrite-utils/accountHelpers.js';
 
-export const load = async ({ parent }: LoadEvent) => {
+export const load = async ({ parent }) => {
     const data = await parent();
 
     if (data?.loggedInProfile?.username) {

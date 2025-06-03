@@ -1,14 +1,14 @@
 import { type Cookies } from '@sveltejs/kit';
 import { Client, Account, Databases, Users, Storage, type Models, Functions } from 'node-appwrite';
-import { APPWRITE_API_KEY } from '$env/static/private';
+import { SECRET_APPWRITE_API_KEY } from '$env/static/private';
 import {
-    PUBLIC_ORIGIN,
-    PUBLIC_APPWRITE_ENDPOINT,
-    PUBLIC_APPWRITE_PROJECT,
-    PUBLIC_SESSION_COOKIE_PREFIX
+    ORIGIN,
+    APPWRITE_ENDPOINT,
+    APPWRITE_PROJECT_ID,
+    SESSION_COOKIE_PREFIX
 } from '$env/static/public';
 
-export const COOKIE_NAME = PUBLIC_SESSION_COOKIE_PREFIX + PUBLIC_APPWRITE_PROJECT;
+export const COOKIE_NAME = SESSION_COOKIE_PREFIX + APPWRITE_PROJECT_ID;
 export const COOKIE_NAME_LEGACY = COOKIE_NAME + '_legacy';
 export const COOKIE_NAME_WAS_LOGGED_IN = 'was_logged_in';
 
@@ -20,7 +20,7 @@ export const setSessionCookies = (cookies: Cookies, session: Models.Session) => 
             expires: new Date(session.expire),
             secure: true,
             path: '/',
-            domain: PUBLIC_ORIGIN
+            domain: ORIGIN
         })
     );
 
@@ -48,9 +48,9 @@ export const cleanupUserSession = async (cookies: Cookies, account: Account) => 
 
 export function createAdminClient() {
     const client = new Client()
-        .setEndpoint(PUBLIC_APPWRITE_ENDPOINT)
-        .setProject(PUBLIC_APPWRITE_PROJECT)
-        .setKey(APPWRITE_API_KEY); // Set the Appwrite API key
+        .setEndpoint(APPWRITE_ENDPOINT)
+        .setProject(APPWRITE_PROJECT_ID)
+        .setKey(SECRET_APPWRITE_API_KEY); // Set the Appwrite API key
 
     // Return the services we want to use.
     return {
@@ -70,9 +70,7 @@ export function createAdminClient() {
 }
 
 export function createUserSessionClient({ cookies }: { cookies: Cookies }) {
-    const client = new Client()
-        .setEndpoint(PUBLIC_APPWRITE_ENDPOINT)
-        .setProject(PUBLIC_APPWRITE_PROJECT);
+    const client = new Client().setEndpoint(APPWRITE_ENDPOINT).setProject(APPWRITE_PROJECT_ID);
 
     // Extract our custom domain's session cookie from the request
     const session = getSessionCookie(cookies);

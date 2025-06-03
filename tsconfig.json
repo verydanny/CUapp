@@ -1,6 +1,18 @@
 {
     "extends": "./.svelte-kit/tsconfig.json",
     "compilerOptions": {
+        "strict": true,
+        "allowUnusedLabels": false,
+        "allowUnreachableCode": false,
+        "exactOptionalPropertyTypes": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "noUncheckedIndexedAccess": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+
         "allowJs": true,
         "checkJs": true,
         "esModuleInterop": true,
@@ -8,8 +20,13 @@
         "resolveJsonModule": true,
         "skipLibCheck": true,
         "sourceMap": true,
-        "strict": true,
-        "moduleResolution": "bundler"
+        "moduleResolution": "bundler",
+        
+        // Bun stuff
+		"moduleDetection": "force",
+
+		// Bundler mode
+		"allowImportingTsExtensions": true,
     },
     "include": [
         // Custom
@@ -17,14 +34,10 @@
         ".svelte-kit/ambient.d.ts",
         ".svelte-kit/non-ambient.d.ts",
         ".svelte-kit/types/**/$types.d.ts",
-        "vite.config.js",
         "vite.config.ts",
         "src/**/*.js",
-        "src/**/*.ts",
-        "src/**/*.svelte",
-        "tests/**/*.js",
-        "tests/**/*.ts",
-        "tests/**/*.svelte"
+		"src/**/*.ts",
+		"src/**/*.svelte",
     ],
     "exclude": [
         // SvelteKit

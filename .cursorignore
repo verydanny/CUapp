@@ -1,5 +1,7 @@
 !.appwrite/
 !.cursor/
+!.env
+!.env.*
 
 .svelte-kit/
 build/
