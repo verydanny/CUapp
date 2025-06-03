@@ -1,5 +1,4 @@
-import type { ServerLoad } from '@sveltejs/kit';
-import type { RichTextPostDocument } from '$root/lib/types/appwrite';
+import type { PostResponse } from './api/posts/+server.js';
 
 // This defines the expected shape of a rich text post's data fields
 // when it's part of a Models.Document
@@ -20,7 +19,7 @@ export interface FeedDisplayPost {
     content: RichTextPostSpecificData | { error: string } | null; // Content specific to the post type
 }
 
-export const load: ServerLoad = async ({ fetch }) => {
+export const load = async ({ fetch }) => {
     try {
         const postsResponse = await fetch('/api/posts'); // Assuming GET /api/posts lists all posts
 
@@ -38,7 +37,7 @@ export const load: ServerLoad = async ({ fetch }) => {
             };
         }
 
-        const postsData = await postsResponse.json() as (RichTextPostDocument & { userId?: string })[];
+        const postsData: PostResponse = await postsResponse.json();
 
         return {
             posts: postsData,

@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
-import { ExecutionMethod, Permission, Query, Role, type Models } from 'node-appwrite';
+import { Permission, Query, Role } from 'node-appwrite';
 import { createUserSessionClient } from '$lib/server/appwrite-utils/appwrite.js';
 import {
     createPost,
@@ -8,32 +8,27 @@ import {
 } from '$lib/server/appwrite-utils/posts.appwrite.js';
 import { type PostsDocument, type RichTextPostDocument, PostsTypeType } from '$root/lib/types/appwrite';
 
+export type PostResponse = (RichTextPostDocument & { userId?: string })[]
+
 export async function GET(event: RequestEvent): Promise<Response> {
+    const start = performance.now();
     const { locals, cookies } = event;
 
     if (!locals.user?.$id) {
         return json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { functions, databases } = createUserSessionClient({ cookies });
+    const { databases } = createUserSessionClient({ cookies });
 
     try {
-        const allPosts = await functions.createExecution(
-            'posts-function',
-            JSON.stringify({}),
-            undefined,
-            '/posts',
-            ExecutionMethod.GET
-        );
-
-        const postsJson: PostsDocument[] = JSON.parse(allPosts.responseBody);
+        const allPosts = (await databases.listDocuments('main', 'posts', [Query.limit(10)])).documents as PostsDocument[];
 
         // Group posts by type and create global postId -> userId lookup
         const postsByType = new Map<PostsTypeType, string[]>();
         const postIdToUserId = new Map<string, string>();
-        const posts: (RichTextPostDocument & { userId?: string })[] = [];
+        const posts: PostResponse = [];
         
-        postsJson.forEach(post => {
+        allPosts.forEach(post => {
             const existing = postsByType.get(post.type) || [];
 
             if (post.contentRefId) {
@@ -45,18 +40,20 @@ export async function GET(event: RequestEvent): Promise<Response> {
         });
         
         await Promise.all(
-            Array.from(postsByType.entries()).map(async ([type, postIds]) => {
-                const documentList = await databases.listDocuments('main', type, [
-                    Query.equal('$id', postIds),
-                ]) as unknown as Models.DocumentList<RichTextPostDocument>;
+            Array.from(postsByType.entries()).map(async ([type, postIds]) => {                
+                const documentList = (await databases.listDocuments('main', type, [
+                    Query.equal('$id', postIds)
+                ])).documents as RichTextPostDocument[];
                 
                 // Attach userId to each document using global lookup and push directly to posts
-                documentList.documents.forEach((doc) => {
+                documentList.forEach((doc) => {
                     const userId = postIdToUserId.get(doc.$id);
                     posts.push(userId ? { ...doc, userId } : doc);
                 });
             })
         )
+        const end = performance.now();
+        console.log(`Posts function took ${end - start}ms`);
 
         return json(posts);
     } catch (_error: unknown) {

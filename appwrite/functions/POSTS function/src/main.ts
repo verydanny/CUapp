@@ -1,8 +1,9 @@
 import { Elysia, t } from 'elysia'
-import { Client, Databases, Query } from 'node-appwrite'
+import { Client, Databases, Query, type Models } from 'node-appwrite'
 
 import { serve as serveElysia } from '@gravlabs/appwrite-elysia-adapter-bun'
 import type { AppwriteElysiaSingleton } from '@gravlabs/appwrite-elysia-adapter-bun/types.d.ts'
+import type { RichTextPostDocument } from './types/appwrite.ts'
 
 // You can re-use this in other functions to set Client/Databases/etc
 export const appwritePlugin = new Elysia<'', AppwriteElysiaSingleton>({ name: 'appwrite' }).resolve(
@@ -43,13 +44,13 @@ const postsModel = new Elysia().model({
 
 const postsQuerySchema = t.Optional(
     t.Object({
-        posts: t.Optional(
-            t.Array(
-                t.Object({
-                    id: t.String(),
-                    type: t.String()
-                })
-            )
+        postIds: t.Optional(t.Array(t.String())),
+        type: t.Optional(
+            t.Union([
+                t.Literal('richTextPost'),
+                t.Literal('imessageConversation'),
+                t.Literal('imagePost')
+            ])
         )
     })
 )
@@ -59,17 +60,14 @@ export const posts = new Elysia()
     .use(postsModel)
     .get(
         '/posts',
-        async ({ databases }) => {
-            // if (query.posts) {
-            //     const types = query.posts.map((post) => post.type)
-            //     const result = (await databases.listDocuments('main', 'posts', [
-            //         Query.limit(10),
-            //     ])) as unknown as typeof getPostsResponseSchema.static
+        async ({ databases, query }) => {
+            if (query.postIds && query.type) {
+                const result = (await databases.listDocuments('main', query.type, [
+                    Query.equal('$id', query.postIds)
+                ])) as unknown as Models.DocumentList<RichTextPostDocument>
 
-            //     appwrite.log(`${JSON.stringify(result.documents)}`)
-
-            //     return result.documents
-            // }
+                return result.documents
+            }
 
             const result = (await databases.listDocuments('main', 'posts', [
                 Query.limit(10)

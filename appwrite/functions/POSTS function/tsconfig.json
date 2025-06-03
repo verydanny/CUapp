@@ -31,5 +31,9 @@
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "noEmit": true
-  }
+  },
+  "include": [
+    "env.d.ts",
+    "src",
+  ]
 }

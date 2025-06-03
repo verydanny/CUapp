@@ -56,7 +56,7 @@
         "svelte-check": "^4.2.1",
         "tailwindcss": "^4.1.8",
         "typescript": "^5.8.3",
-        "typescript-eslint": "^8.33.0",
+        "typescript-eslint": "^8.33.1",
         "vite": "^6.3.5",
         "vitest": "^3.2.0"
     },
@@ -65,7 +65,7 @@
         "daisyui": "^5.0.43",
         "mime2ext": "^2.0.1",
         "node-appwrite": "^17.0.0",
-        "svelte": "^5.33.13"
+        "svelte": "^5.33.14"
     },
     "packageManager": "bun@1.2.15",
     "engines": {
