@@ -31,7 +31,6 @@
     "include": [
         // Custom
         // SvelteKit
-        "build.ts",
         ".svelte-kit/ambient.d.ts",
         ".svelte-kit/non-ambient.d.ts",
         ".svelte-kit/types/**/$types.d.ts",
