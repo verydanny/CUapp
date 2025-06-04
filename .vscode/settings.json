@@ -1,4 +1,11 @@
 {
     "tailwindCSS.experimental.configFile": "src/app.css",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/node_modules/**": true,
+        "**/.svelte-kit/**": true,
+        "**/build/**": true,
+        "**/dist/**": true
+    }
 }

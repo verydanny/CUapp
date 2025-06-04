@@ -8,7 +8,7 @@ import {
 } from '$lib/server/appwrite-utils/posts.appwrite.js';
 import { type PostsDocument, type TextPostDocument, PostsTypeType } from '$root/lib/types/appwrite';
 
-export type PostResponse = Array<TextPostDocument & { userId?: string }>;
+export type GetPostsResponse = Array<TextPostDocument & { userId?: string }>;
 
 export async function GET(event: RequestEvent): Promise<Response> {
     const { locals, cookies } = event;
@@ -26,7 +26,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
         // Group posts by type and create global postId -> userId lookup
         const postsByType = new Map<PostsTypeType, string[]>();
         const postIdToUserId = new Map<string, string>();
-        const posts: PostResponse = [];
+        const posts: GetPostsResponse = [];
 
         allPosts.forEach((post) => {
             const existing = postsByType.get(post.type) || [];

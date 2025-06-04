@@ -1,9 +1,10 @@
-// import { createUserSessionClient } from '$lib/server/appwrite-utils/appwrite.server.js';
-// import type { RequestEvent } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
-import { Query } from 'node-appwrite';
+import { type Models, Query } from 'node-appwrite';
+import type { ProfilesDocument } from '$root/lib/types/appwrite';
 import { createAdminClient } from '$root/lib/server/appwrite-utils/appwrite.js';
 import { PROFILE_COLLECTION_ID } from '$root/lib/server/model.const.js';
+
+export type UserIdsToUsernamesMapResponse = { userIdsToUsernamesMap: Record<string, string> };
 
 export async function GET(event) {
     const { url } = event;
@@ -15,9 +16,17 @@ export async function GET(event) {
 
     const { databases } = createAdminClient();
 
-    const users = await databases.listDocuments('main', PROFILE_COLLECTION_ID, [
-        Query.equal('userId', userIds)
-    ]);
+    const users = (await databases.listDocuments('main', PROFILE_COLLECTION_ID, [
+        Query.equal('$id', userIds)
+    ])) as Models.DocumentList<ProfilesDocument>;
 
-    return json({ users });
+    return json({
+        userIdsToUsernamesMap: users.documents.reduce(
+            (acc, user) => ({
+                ...acc,
+                [user.$id]: user.username
+            }),
+            {} as Record<string, string>
+        )
+    });
 }

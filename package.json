@@ -17,25 +17,29 @@
         "test:e2e": "playwright test",
         "storybook": "STORYBOOK=true storybook dev -p 6006",
         "build-storybook": "storybook build",
-        "appwrite:types": "bun run -b appwrite/fetch-types"
+        "appwrite:types": "bun run -b appwrite/fetch-types",
+        "bun:build": "bun build --packages=external --env=inline --minify-whitespace --minify-syntax --outfile build/bun/server ./build/index.js --compile"
     },
     "devDependencies": {
         "@changesets/changelog-github": "^0.5.1",
         "@changesets/cli": "^2.29.4",
+        "@eslym/sveltekit-adapter-bun": "^2.0.5",
         "@playwright/test": "^1.52.0",
         "@storybook/addon-docs": "^9.0.4",
         "@storybook/addon-svelte-csf": "^5.0.3",
         "@storybook/addon-vitest": "^9.0.4",
         "@storybook/sveltekit": "^9.0.4",
         "@sveltejs/adapter-node": "^5.2.12",
-        "@sveltejs/kit": "^2.21.1",
+        "@sveltejs/kit": "^2.21.2",
         "@sveltejs/vite-plugin-svelte": "^5.1.0",
         "@tailwindcss/vite": "^4.1.8",
         "@testing-library/svelte": "^5.2.8",
+        "@types/benchmark": "^2.1.5",
         "@types/bun": "^1.2.15",
         "@types/eslint": "^9.6.1",
         "@types/node": "^22.15.29",
-        "@vitest/browser": "^3.2.0",
+        "@vitest/browser": "^3.2.1",
+        "benchmark": "^2.1.4",
         "eslint": "^9.28.0",
         "eslint-config-prettier": "^10.1.5",
         "eslint-plugin-storybook": "^9.0.4",
@@ -52,14 +56,13 @@
         "typescript": "^5.8.3",
         "typescript-eslint": "^8.33.1",
         "vite": "^6.3.5",
-        "vitest": "^3.2.0"
-    },
-    "dependencies": {
+        "vitest": "^3.2.1",
         "appwrite": "^18.1.1",
         "daisyui": "^5.0.43",
-        "mime2ext": "^2.0.1",
-        "node-appwrite": "^17.0.0",
         "svelte": "^5.33.14"
+    },
+    "dependencies": {
+        "node-appwrite": "^17.0.0"
     },
     "packageManager": "bun@1.2.15",
     "engines": {

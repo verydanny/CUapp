@@ -5,22 +5,8 @@
 
     let posts = $derived(data.posts);
     let error = $derived(data.error);
+    let userIdsToUsernamesMap = $derived(data.userIdsToUsernamesMap);
     let pageTitle = $derived(data.pageTitle || 'Feed');
-    let userIdUsernameMap: Map<string, string> = $state(new Map());
-
-    $effect(() => {
-        const getUsers = async () => {
-            if (posts && posts.length) {
-                posts.forEach((post) => {
-                    if (post?.userId) {
-                        userIdUsernameMap.set(post.userId, null);
-                    }
-                });
-            }
-        };
-
-        getUsers();
-    });
 </script>
 
 <svelte:head>
@@ -55,7 +41,7 @@
                         <div class="card-actions mt-4 justify-end">
                             <span class="text-base-content/60 text-xs">
                                 Posted on: {new Date(post.$createdAt).toLocaleDateString()} by User:
-                                {post.userId}
+                                {userIdsToUsernamesMap?.[post?.userId ?? ''] ?? 'Anonymous User'}
                             </span>
                             <!-- Link to full post page - assumes /posts/[id] will exist -->
                             <a
