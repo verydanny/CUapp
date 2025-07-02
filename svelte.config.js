@@ -1,5 +1,5 @@
-// import adapter from '@sveltejs/adapter-node';
-import bunAdapter from '@eslym/sveltekit-adapter-bun';
+import nodeAdapter from '@sveltejs/adapter-node';
+// import bunAdapter from '@eslym/sveltekit-adapter-bun';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 const isStorybook = !!(process.env.STORYBOOK === 'true');
@@ -40,28 +40,21 @@ const config = {
             privatePrefix: 'SECRET_',
             publicPrefix: ''
         },
-        adapter: bunAdapter({
-            bundler: 'bun',
-            precompress: {
-                brotli: true,
-                files: ['htm', 'html', 'css', 'js', 'json', 'svg', 'xml', 'txt', 'md', 'markdown']
-            },
-            serveStatic: true,
-            exportPrerender: false,
-            bunBuildMinify: {
-                whitespace: true,
-                syntax: true,
-                identifiers: true
-            }
-        }),
         // adapter: bunAdapter({
-        //     transpileBun: true,
+        //     bundler: 'bun',
         //     precompress: {
         //         brotli: true,
-        //         gzip: false,
         //         files: ['htm', 'html', 'css', 'js', 'json', 'svg', 'xml', 'txt', 'md', 'markdown']
+        //     },
+        //     serveStatic: true,
+        //     exportPrerender: false,
+        //     bunBuildMinify: {
+        //         whitespace: true,
+        //         syntax: true,
+        //         identifiers: true
         //     }
         // }),
+        adapter: nodeAdapter(),
         output: {
             preloadStrategy: 'preload-mjs'
         }
