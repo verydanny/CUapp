@@ -14,19 +14,19 @@ export default defineConfig(({ mode: _mode }) => {
 
     return {
         plugins: [sveltekit(), tailwindcss()],
-        esbuild: {
-            target: 'esnext'
-        },
+        // esbuild: {
+        //     target: 'esnext'
+        // },
         // Target only modern browsers (Chrome)
-        build: {
-            target: 'esnext',
-            minify: 'esbuild',
-            sourcemap: false,
-            cssMinify: 'lightningcss',
-            modulePreload: {
-                polyfill: false
-            }
-        },
+        // build: {
+        //     target: 'esnext',
+        //     minify: 'esbuild',
+        //     sourcemap: false,
+        //     cssMinify: 'lightningcss',
+        //     modulePreload: {
+        //         polyfill: false
+        //     }
+        // },
 
         server: {
             hmr: {
