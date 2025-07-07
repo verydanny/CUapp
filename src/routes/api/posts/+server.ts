@@ -6,9 +6,9 @@ import {
     createPost,
     type RequiredPostDocument
 } from '$lib/server/appwrite-utils/posts.appwrite.js';
-import { type Posts, PostType } from '$root/lib/types/appwrite';
+import { type Posts, PostType, type TextPost } from '$root/lib/types/appwrite';
 
-export type GetPostsResponse = Array<Posts & { userId?: string }>;
+export type GetPostsResponse = Array<TextPost & { userId?: string }>;
 
 export async function GET(event: RequestEvent): Promise<Response> {
     const { locals, cookies } = event;
@@ -43,7 +43,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
             Array.from(postsByType.entries()).map(async ([type, postIds]) => {
                 const documentList = (
                     await databases.listDocuments('main', type, [Query.equal('$id', postIds)])
-                ).documents as Posts[];
+                ).documents as TextPost[];
 
                 // Attach userId to each document using global lookup and push directly to posts
                 documentList.forEach((doc) => {
