@@ -5,7 +5,7 @@ import { createUserSessionClient } from '$lib/server/appwrite-utils/appwrite.js'
 import { createPost } from '$lib/server/appwrite-utils/posts.appwrite.js';
 import { type Posts, PostType, type TextPost } from '$root/lib/types/appwrite';
 
-export type GetPostsResponse = Array<TextPost & { userId?: string }>;
+export type GetPostsResponse = Array<TextPost & { userId?: string; title: string }>;
 
 export async function GET(event: RequestEvent): Promise<Response> {
     const { locals, cookies } = event;
@@ -23,6 +23,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
         // Group posts by type and create global postId -> userId lookup
         const postsByType = new Map<PostType, string[]>();
         const postIdToUserId = new Map<string, string>();
+        const postIdToTitle = new Map<string, string>();
         const posts: GetPostsResponse = [];
 
         allPosts.forEach((post) => {
@@ -31,9 +32,9 @@ export async function GET(event: RequestEvent): Promise<Response> {
             if (post.contentRefId) {
                 existing.push(post.contentRefId);
                 postIdToUserId.set(post.contentRefId, post.userId);
+                postIdToTitle.set(post.contentRefId, post.title);
+                postsByType.set(post.postType, existing);
             }
-
-            postsByType.set(post.postType, existing);
         });
 
         await Promise.all(
@@ -44,8 +45,13 @@ export async function GET(event: RequestEvent): Promise<Response> {
 
                 // Attach userId to each document using global lookup and push directly to posts
                 documentList.forEach((doc) => {
+                    const title = postIdToTitle.get(doc.$id);
                     const userId = postIdToUserId.get(doc.$id);
-                    posts.push(userId ? { ...doc, userId } : doc);
+                    posts.push(
+                        userId
+                            ? { ...doc, userId, title: title || '' }
+                            : { ...doc, title: title || '' }
+                    );
                 });
             })
         );
@@ -81,6 +87,7 @@ export async function POST(event: RequestEvent): Promise<Response> {
         const dataToCreate = {
             postId: requestData.postId,
             userId: locals.user.$id,
+            title: requestData.title,
             postType: requestData.postType,
             tags: requestData.tags || [],
             accessLevel: requestData.accessLevel || 'private',

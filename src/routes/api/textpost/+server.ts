@@ -19,9 +19,7 @@ export async function POST(event: RequestEvent) {
         if (!data.postId || typeof data.postId !== 'string') {
             return json({ error: 'postId is required and must be a string' }, { status: 400 });
         }
-        if (!data.title || typeof data.title !== 'string') {
-            return json({ error: 'title is required and must be a string' }, { status: 400 });
-        }
+
         if (!data.body || typeof data.body !== 'string') {
             return json({ error: 'body is required and must be a string' }, { status: 400 });
         }

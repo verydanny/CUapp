@@ -330,14 +330,6 @@
                     "default": null
                 },
                 {
-                    "key": "title",
-                    "type": "string",
-                    "required": true,
-                    "array": false,
-                    "size": 255,
-                    "default": null
-                },
-                {
                     "key": "body",
                     "type": "string",
                     "required": true,
@@ -395,17 +387,6 @@
                     "status": "available",
                     "attributes": [
                         "postId"
-                    ],
-                    "orders": [
-                        "ASC"
-                    ]
-                },
-                {
-                    "key": "title_search_index",
-                    "type": "key",
-                    "status": "available",
-                    "attributes": [
-                        "title"
                     ],
                     "orders": [
                         "ASC"
@@ -509,6 +490,14 @@
                     "min": 0,
                     "max": 99999999999999,
                     "default": 0
+                },
+                {
+                    "key": "title",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 1024,
+                    "default": null
                 }
             ],
             "indexes": [

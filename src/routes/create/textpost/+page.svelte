@@ -20,13 +20,13 @@
             fetch('/api/posts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ postId, postType: PostType.TEXT_POST, contentRefId })
+                body: JSON.stringify({ postId, title, postType: PostType.TEXT_POST, contentRefId })
             });
         const createtextPost = async () =>
             fetch('/api/textpost', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ $id: contentRefId, postId, title, body })
+                body: JSON.stringify({ $id: contentRefId, postId, body })
             });
 
         if (!title.trim()) {

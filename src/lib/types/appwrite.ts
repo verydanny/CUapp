@@ -66,7 +66,6 @@ export type Profiles = Models.Document & {
 
 export type TextPost = Models.Document & {
   postId: string;
-  title: string;
   body: string;
   coverImageFileId: string | null;
   coverImageAltText: string | null;
@@ -84,6 +83,7 @@ export type Posts = Models.Document & {
   contentRefId: string | null;
   likesCount: number;
   commentsCount: number;
+  title: string;
 }
 
 export type ImessageParticipants = Models.Document & {

@@ -24,13 +24,14 @@
     {/if}
 
     {#if posts && posts.length > 0}
-        <div class="space-y-6">
+        <div class="flex flex-col items-center justify-center">
             <div class="py-10 text-center">
-                <p class="text-base-content/70 text-xl">No posts yet. Be the first to create one!</p>
                 <a href="/create/textpost" class="btn btn-primary mt-4">Create</a>
             </div>
+        </div>
+        <div class="space-y-6">
             {#each posts as post (post.$id)}
-                <article class="card bg-base-100 shadow-xl">
+                <article class="card bg-base-100 shadow-sm">
                     <div class="card-body">
                         <h2 class="card-title">
                             {post.title}
@@ -42,7 +43,7 @@
                             </div>
                         {/if}
 
-                        <div class="card-actions mt-4 justify-end">
+                        <div class="card-actions justify-end">
                             <span class="text-base-content/60 text-xs">
                                 Posted on: {new Date(post.$createdAt).toLocaleDateString()} by User:
                                 {userIdsToUsernamesMap?.[post?.userId ?? ''] ?? 'Anonymous User'}
