@@ -1,7 +1,7 @@
 import { ID } from 'node-appwrite';
 import type { Models, Databases } from 'node-appwrite';
 import { DATABASE_ID, RICH_TEXT_POST_COLLECTION_ID } from '$lib/server/model.const.js';
-import type { TextPostType } from '$root/lib/types/appwrite';
+import type { TextPost } from '$root/lib/types/appwrite';
 
 // --- Data Transfer Object (DTO) Interfaces for textPost Operations ---
 
@@ -24,7 +24,7 @@ import type { TextPostType } from '$root/lib/types/appwrite';
  */
 export async function createtextPost(
     appwriteDatabases: Databases,
-    data: TextPostType & { $id?: string },
+    data: TextPost & { $id?: string },
     permissions?: string[]
 ): Promise<Models.Document> {
     const id = data?.$id ?? ID.unique();
@@ -77,7 +77,7 @@ export async function gettextPostById(
 export async function updatetextPost(
     appwriteDatabases: Databases,
     documentId: string,
-    data: Partial<TextPostType> & { $id?: string },
+    data: Partial<TextPost> & { $id?: string },
     permissions?: string[]
 ): Promise<Models.Document> {
     try {

@@ -17,7 +17,12 @@ import {
 } from './imessage.appwrite.js'; // Import the actual function and type
 import type { Models, Databases } from 'node-appwrite'; // For Models.Document type hint
 import { Query } from 'node-appwrite'; // Import Query for test assertions
-import { ImessageMessagesTypeDeliveryStatus } from '$root/lib/types/appwrite.js';
+import {
+    DeliveryStatus,
+    type ImessageConversation,
+    type ImessageMessages,
+    type ImessageParticipants
+} from '$root/lib/types/appwrite';
 
 // Mock Appwrite Databases client and createDocument method
 const mockCreateDocument = vi.fn();
@@ -80,7 +85,10 @@ describe('Appwrite: iMessage Interactions', () => {
                 };
 
                 // Call the actual function (which is currently a placeholder)
-                await createIMessageConversation(mockDatabases, conversationData);
+                await createIMessageConversation(
+                    mockDatabases,
+                    conversationData as unknown as ImessageConversation
+                );
 
                 // Because the placeholder doesn't call mockDatabases.createDocument, this will fail.
                 expect(mockDatabases.createDocument).toHaveBeenCalledOnce();
@@ -109,7 +117,10 @@ describe('Appwrite: iMessage Interactions', () => {
 
                 // Expect the utility function call to reject with the same error
                 await expect(
-                    createIMessageConversation(mockDatabases, conversationData)
+                    createIMessageConversation(
+                        mockDatabases,
+                        conversationData as unknown as ImessageConversation
+                    )
                 ).rejects.toThrow(mockError);
 
                 // Optionally, verify that createDocument was still called
@@ -133,10 +144,13 @@ describe('Appwrite: iMessage Interactions', () => {
                     timestamp: new Date(),
                     isEdited: false,
                     screenshotIndex: 0,
-                    deliveryStatus: ImessageMessagesTypeDeliveryStatus.sent
+                    deliveryStatus: DeliveryStatus.SENT
                 };
 
-                await createIMessageMessage(mockDatabases, messageData);
+                await createIMessageMessage(
+                    mockDatabases,
+                    messageData as unknown as ImessageMessages
+                );
 
                 expect(mockDatabases.createDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.createDocument).toHaveBeenCalledWith(
@@ -157,7 +171,7 @@ describe('Appwrite: iMessage Interactions', () => {
                     timestamp: new Date(),
                     isEdited: false,
                     screenshotIndex: 0,
-                    deliveryStatus: ImessageMessagesTypeDeliveryStatus.sent
+                    deliveryStatus: DeliveryStatus.SENT
                 };
                 const mockError = new Error('Appwrite createDocument error');
 
@@ -165,9 +179,9 @@ describe('Appwrite: iMessage Interactions', () => {
                 mockCreateDocument.mockRejectedValue(mockError);
 
                 // Expect the utility function call to reject with the same error
-                await expect(createIMessageMessage(mockDatabases, messageData)).rejects.toThrow(
-                    mockError
-                );
+                await expect(
+                    createIMessageMessage(mockDatabases, messageData as unknown as ImessageMessages)
+                ).rejects.toThrow(mockError);
 
                 // Optionally, verify that createDocument was still called
                 expect(mockDatabases.createDocument).toHaveBeenCalledOnce();
@@ -188,7 +202,10 @@ describe('Appwrite: iMessage Interactions', () => {
                     avatarFileId: 'avatarFile123'
                 };
 
-                await createIMessageParticipant(mockDatabases, participantData);
+                await createIMessageParticipant(
+                    mockDatabases,
+                    participantData as unknown as ImessageParticipants
+                );
 
                 expect(mockDatabases.createDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.createDocument).toHaveBeenCalledWith(
@@ -213,7 +230,10 @@ describe('Appwrite: iMessage Interactions', () => {
 
                 // Expect the utility function call to reject with the same error
                 await expect(
-                    createIMessageParticipant(mockDatabases, participantData)
+                    createIMessageParticipant(
+                        mockDatabases,
+                        participantData as unknown as ImessageParticipants
+                    )
                 ).rejects.toThrow(mockError);
 
                 // Optionally, verify that createDocument was still called
@@ -459,7 +479,11 @@ describe('Appwrite: iMessage Interactions', () => {
 
             // Expect the utility function call to reject with the same error
             await expect(
-                updateIMessageConversation(mockDatabases, documentIdToUpdate, updateData)
+                    updateIMessageConversation(
+                    mockDatabases,
+                    documentIdToUpdate,
+                    updateData as unknown as ImessageParticipants
+                )
             ).rejects.toThrow(mockError);
 
             // Optionally, verify that updateDocument was still called
@@ -483,7 +507,11 @@ describe('Appwrite: iMessage Interactions', () => {
                     totalScreenshots: 2
                 };
 
-                await updateIMessageConversation(mockDatabases, mockConversationDocId, updateData);
+                await updateIMessageConversation(
+                    mockDatabases,
+                    mockConversationDocId,
+                    updateData as unknown as ImessageParticipants
+                );
 
                 expect(mockDatabases.updateDocument).toHaveBeenCalledOnce();
                 expect(mockDatabases.updateDocument).toHaveBeenCalledWith(
@@ -532,7 +560,7 @@ describe('Appwrite: iMessage Interactions', () => {
                 const updatedDoc = await updateIMessageMessage(
                     mockDatabases,
                     documentIdToUpdate,
-                    updateData
+                    updateData as unknown as ImessageMessages
                 );
 
                 expect(mockDatabases.updateDocument).toHaveBeenCalledOnce();
@@ -563,7 +591,11 @@ describe('Appwrite: iMessage Interactions', () => {
 
                 // Expect the utility function call to reject with the same error
                 await expect(
-                    updateIMessageMessage(mockDatabases, documentIdToUpdate, updateData)
+                    updateIMessageMessage(
+                        mockDatabases,
+                        documentIdToUpdate,
+                        updateData as unknown as ImessageMessages
+                    )
                 ).rejects.toThrow(mockError);
 
                 // Optionally, verify that updateDocument was still called
@@ -606,7 +638,7 @@ describe('Appwrite: iMessage Interactions', () => {
                 const updatedDoc = await updateIMessageParticipant(
                     mockDatabases,
                     documentIdToUpdate,
-                    updateData
+                    updateData as unknown as ImessageParticipants
                 );
 
                 expect(mockDatabases.updateDocument).toHaveBeenCalledOnce();
@@ -632,7 +664,11 @@ describe('Appwrite: iMessage Interactions', () => {
 
                 // Expect the utility function call to reject with the same error
                 await expect(
-                    updateIMessageParticipant(mockDatabases, documentIdToUpdate, updateData)
+                    updateIMessageParticipant(
+                        mockDatabases,
+                        documentIdToUpdate,
+                        updateData as unknown as ImessageParticipants
+                    )
                 ).rejects.toThrow(mockError);
 
                 // Optionally, verify that updateDocument was still called

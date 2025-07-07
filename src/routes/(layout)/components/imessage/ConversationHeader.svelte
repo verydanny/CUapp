@@ -9,7 +9,7 @@
 
     let otherParticipants = $derived.by(() => {
         return participants && rightSideParticipant
-            ? participants.filter((p) => p.$id !== rightSideParticipant.$id)
+            ? participants.filter((p: iMessageParticipant) => p.$id !== rightSideParticipant.$id)
             : [];
     });
 
@@ -22,7 +22,7 @@
         if (others.length === 1) {
             return others[0].name;
         }
-        return others.map((p) => p.name).join(', ');
+        return others.map((p: iMessageParticipant) => p.name).join(', ');
     });
 
     let avatarInitials = $derived.by(() => {

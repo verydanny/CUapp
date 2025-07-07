@@ -9,7 +9,7 @@ type WithUndefined<T> = {
 };
 
 export type BasicProfile = WithUndefined<
-    Pick<import('./lib/types/appwrite').ProfilesDocument, '$id' | 'username' | 'permissions'>
+    Pick<import('./lib/types/appwrite').Profiles, '$id' | 'username' | 'permissions' | 'profileImage'>
 >;
 
 export interface Profile extends BasicProfile {

@@ -7,7 +7,7 @@ import {
     updatetextPost,
     deletetextPost
 } from '$lib/server/appwrite-utils/richtext.appwrite.js';
-import type { TextPostType } from '$root/lib/types/appwrite.js';
+import type { TextPost } from '$root/lib/types/appwrite.js';
 
 // Placeholder GET function
 export async function GET(event: RequestEvent) {
@@ -45,7 +45,7 @@ export async function PATCH(event: RequestEvent) {
         return json({ error: 'Post ID is required for update' }, { status: 400 });
     }
 
-    let data: TextPostType;
+    let data: TextPost;
     try {
         data = await event.request.json();
         if (Object.keys(data).length === 0) {

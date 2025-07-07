@@ -8,7 +8,9 @@ export const load: LayoutServerLoad = async ({ locals, depends, cookies }) => {
 
     const loggedInProfile: BasicProfile = {
         $id: undefined,
-        username: undefined
+        username: undefined,
+        permissions: undefined,
+        profileImage: undefined
     };
 
     if (locals?.user?.$id) {

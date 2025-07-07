@@ -8,7 +8,7 @@ import {
     deletetextPost
 } from './richtext.appwrite.js';
 import type { Databases, Models } from 'node-appwrite';
-import type { TextPostType } from '$root/lib/types/appwrite.js';
+import type { TextPost } from '$root/lib/types/appwrite.js';
 
 const mockCreateDocument = vi.fn();
 const mockGetDocument = vi.fn();
@@ -48,7 +48,7 @@ describe('Appwrite: textPost Interactions', () => {
                     title: 'My First Rich Text Post',
                     body: '<p>Hello World</p>',
                     version: 1
-                };
+                } as TextPost;
 
                 await createtextPost(mockDatabases, postData);
 
@@ -62,11 +62,11 @@ describe('Appwrite: textPost Interactions', () => {
             });
 
             it('should re-throw errors from Appwrite createDocument when creating a textPost', async () => {
-                const postData: TextPostType = {
+                const postData = {
                     postId: 'parentPostError',
                     title: 'Error Post',
                     body: '<p>Error content</p>'
-                };
+                } as TextPost;
                 const mockError = new Error('Appwrite createDocument error');
 
                 mockCreateDocument.mockRejectedValue(mockError);

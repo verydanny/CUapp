@@ -14,9 +14,12 @@ import {
 } from '$lib/server/appwrite-utils/imessage.appwrite.js';
 import { createUserSessionClient } from '$lib/server/appwrite-utils/appwrite.js';
 import {
-    ImessageMessagesTypeDeliveryStatus,
-    ImessageMessagesTypeMessageType
-} from '$root/lib/types/appwrite.js';
+    DeliveryStatus,
+    MessageType,
+    type ImessageMessages,
+    type ImessageConversation,
+    type ImessageParticipants
+} from '$root/lib/types/appwrite';
 
 // This endpoint simulates creating and returning a mock iMessage conversation.
 // In a real scenario, this would interact with a database.
@@ -39,14 +42,14 @@ export const POST: RequestHandler = async ({ request: _request, locals, cookies 
             userId: locals.user.$id as string,
             name: mockUserAlias1
             // avatarFileId: '...' // Optional
-        };
+        } as ImessageParticipants;
         const participant1 = await createIMessageParticipant(databases, participantData1);
 
         const participantData2 = {
             userId: locals.user.$id as string,
             name: mockUserAlias2
             // avatarFileId: '...'
-        };
+        } as ImessageParticipants;
         const participant2 = await createIMessageParticipant(databases, participantData2);
 
         const createdParticipants = [participant1, participant2];
@@ -129,15 +132,15 @@ export const POST: RequestHandler = async ({ request: _request, locals, cookies 
                 messageId: ID.unique(),
                 participantDocId: msgInput.pId,
                 content: msgInput.type === 'image' ? msgInput.content || '' : msgInput.content,
-                messageType: ImessageMessagesTypeMessageType.text,
+                messageType: MessageType.TEXT,
                 imageUrl: msgInput.imgUrl || '',
                 imageAltText: 'fake alt text',
                 // imageFileId could be set if uploading to Appwrite storage first
                 timestamp: new Date(Date.now() - msgInput.minsAgo * 60000),
                 isEdited: false,
                 screenshotIndex: msgInput.idx,
-                deliveryStatus: ImessageMessagesTypeDeliveryStatus.sent
-            };
+                deliveryStatus: DeliveryStatus.SENT
+            } as unknown as ImessageMessages;
             return createIMessageMessage(databases, messageData);
         });
         const createdMessages = await Promise.all(createdMessagesPromises);
@@ -151,7 +154,7 @@ export const POST: RequestHandler = async ({ request: _request, locals, cookies 
             rightSideParticipantDocRef: rightSideParticipantDocRef,
             screenshotMessageIds: createdMessages.map((m) => m['messageId'] as string), // Use the actual messageId from created message
             totalScreenshots: createdMessages.length
-        };
+        } as unknown as ImessageConversation;
 
         const finalConversation = await createIMessageConversation(
             databases,

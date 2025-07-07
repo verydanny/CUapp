@@ -14,7 +14,7 @@
                     <a href={`/${loggedInProfile?.username || ''}`} data-sveltekit-preload-code>
                         <img
                             alt="Tailwind CSS Navbar component"
-                            src={loggedInProfile?.profileImage ||
+                            src={loggedInProfile?.profileImage?.[0] ||
                                 'https://prepr.io/_next/image?url=https%3A%2F%2F6rl8rq40yvya.b-cdn.net%2F7k7azex0vj4p-svelte-logo-indigo.png&w=2048&q=75'}
                         />
                     </a>

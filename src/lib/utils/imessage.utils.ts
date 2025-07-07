@@ -1,8 +1,8 @@
 import type { Models } from 'appwrite';
 import type {
-    ImessageConversationType,
-    ImessageMessagesType,
-    ImessageParticipantsType
+    ImessageConversation,
+    ImessageMessages,
+    ImessageParticipants
 } from '../types/appwrite';
 
 // --- Interface Definitions for iMessage Data Structures ---
@@ -60,8 +60,8 @@ export interface iMessageConversation {
  * @returns A new array with messages sorted by screenshotIndex.
  */
 export function sortMessagesByScreenshotIndex(
-    messages: ImessageMessagesType[]
-): ImessageMessagesType[] {
+    messages: ImessageMessages[]
+): ImessageMessages[] {
     return [...messages].sort((a, b) => a.screenshotIndex - b.screenshotIndex);
 }
 
@@ -71,8 +71,8 @@ export function sortMessagesByScreenshotIndex(
  * @returns A new array with participants sorted by name.
  */
 export function sortParticipantsByName(
-    participants: ImessageParticipantsType[]
-): ImessageParticipantsType[] {
+    participants: ImessageParticipants[]
+): ImessageParticipants[] {
     return [...participants].sort((a, b) => a.name.localeCompare(b.name));
 }
 
@@ -84,9 +84,9 @@ export function sortParticipantsByName(
  * @returns An array of iMessageMessage objects belonging to the conversation, sorted as specified.
  */
 export function getMessagesForConversation(
-    conversation: ImessageConversationType,
-    allMessages: ImessageMessagesType[]
-): ImessageMessagesType[] {
+    conversation: ImessageConversation,
+    allMessages: ImessageMessages[]
+): ImessageMessages[] {
     // Filter messages that belong to the given conversationId
     const conversationMessages = allMessages.filter(
         (msg) => msg.conversationId === conversation.conversationId
@@ -95,7 +95,7 @@ export function getMessagesForConversation(
     // Sort these messages based on the order specified in conversation.screenshotMessageIds
     const sortedMessages = conversation.screenshotMessageIds
         .map((messageId) => conversationMessages.find((msg) => msg.messageId === messageId))
-        .filter((msg): msg is ImessageMessagesType => msg !== undefined); // Type guard to filter out undefined if a messageId is not found
+        .filter((msg): msg is ImessageMessages => msg !== undefined); // Type guard to filter out undefined if a messageId is not found
 
     return sortedMessages;
 }
@@ -107,9 +107,9 @@ export function getMessagesForConversation(
  * @returns An array of iMessageParticipant objects belonging to the conversation.
  */
 export function getParticipantsForConversation(
-    conversation: ImessageConversationType,
-    allParticipants: (ImessageParticipantsType & { $id?: string })[]
-): ImessageParticipantsType[] {
+    conversation: ImessageConversation,
+    allParticipants: (ImessageParticipants & { $id?: string })[]
+): ImessageParticipants[] {
     const filteredParticipants = allParticipants.filter((participant) =>
         // Check if the participant's Appwrite $id is in the conversation's participantDocRefs array
         conversation.participantDocRefs.some((refId) => refId === participant?.$id)
@@ -125,9 +125,9 @@ export function getParticipantsForConversation(
  * @returns A new array containing only messages sent by the specified participant.
  */
 export function filterMessagesByParticipant(
-    messages: ImessageMessagesType[],
+    messages: ImessageMessages[],
     participantDocId: string
-): ImessageMessagesType[] {
+): ImessageMessages[] {
     return messages.filter((msg) => msg.participantDocId === participantDocId);
 }
 
@@ -138,9 +138,9 @@ export function filterMessagesByParticipant(
  * @returns A new array containing only messages that include the keyword in their content.
  */
 export function filterMessagesByContent(
-    messages: ImessageMessagesType[],
+    messages: ImessageMessages[],
     keyword: string
-): ImessageMessagesType[] {
+): ImessageMessages[] {
     const lowercasedKeyword = keyword.toLowerCase();
     return messages.filter((msg) => msg.content.toLowerCase().includes(lowercasedKeyword));
 }

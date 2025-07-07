@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import { type Models, Query } from 'node-appwrite';
-import type { ProfilesDocument } from '$root/lib/types/appwrite';
+import type { Profiles } from '$root/lib/types/appwrite';
 import { createAdminClient } from '$root/lib/server/appwrite-utils/appwrite.js';
 import { PROFILE_COLLECTION_ID } from '$root/lib/server/model.const.js';
 
@@ -18,7 +18,7 @@ export async function GET(event) {
 
     const users = (await databases.listDocuments('main', PROFILE_COLLECTION_ID, [
         Query.equal('$id', userIds)
-    ])) as Models.DocumentList<ProfilesDocument>;
+    ])) as Models.DocumentList<Profiles>;
 
     return json({
         userIdsToUsernamesMap: users.documents.reduce(

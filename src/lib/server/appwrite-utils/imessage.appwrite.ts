@@ -8,9 +8,9 @@ import {
 } from '$lib/server/model.const.js';
 import type { Databases } from 'node-appwrite';
 import type {
-    ImessageConversationType,
-    ImessageMessagesType,
-    ImessageParticipantsType
+    ImessageConversation,
+    ImessageMessages,
+    ImessageParticipants
 } from '$root/lib/types/appwrite';
 
 /**
@@ -21,7 +21,7 @@ import type {
  */
 export async function createIMessageConversation(
     appwriteDatabases: Databases,
-    data: ImessageConversationType,
+    data: ImessageConversation,
     permissions?: string[]
 ): Promise<Models.Document> {
     try {
@@ -48,7 +48,7 @@ export async function createIMessageConversation(
  */
 export async function createIMessageMessage(
     appwriteDatabases: Databases,
-    data: ImessageMessagesType,
+    data: ImessageMessages,
     permissions?: string[]
 ): Promise<Models.Document> {
     try {
@@ -74,7 +74,7 @@ export async function createIMessageMessage(
  */
 export async function createIMessageParticipant(
     appwriteDatabases: Databases,
-    data: ImessageParticipantsType,
+    data: ImessageParticipants,
     permissions?: string[]
 ): Promise<Models.Document> {
     try {
@@ -205,7 +205,7 @@ export async function getIMessageParticipantsByIds(
 export async function updateIMessageConversation(
     appwriteDatabases: Databases,
     documentId: string,
-    data: ImessageParticipantsType
+    data: ImessageParticipants
 ): Promise<Models.Document> {
     try {
         const document = await appwriteDatabases.updateDocument(
@@ -252,7 +252,7 @@ export async function deleteIMessageConversation(
 export async function updateIMessageMessage(
     appwriteDatabases: Databases,
     documentId: string,
-    data: ImessageMessagesType
+    data: ImessageMessages
 ): Promise<Models.Document> {
     try {
         const document = await appwriteDatabases.updateDocument(
@@ -299,7 +299,7 @@ export async function deleteIMessageMessage(
 export async function updateIMessageParticipant(
     appwriteDatabases: Databases,
     documentId: string,
-    data: ImessageParticipantsType
+    data: ImessageParticipants
 ): Promise<Models.Document> {
     try {
         const document = await appwriteDatabases.updateDocument(

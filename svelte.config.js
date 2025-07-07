@@ -20,7 +20,8 @@ const config = {
     kit: {
         alias: {
             $root: 'src',
-            $layout: 'src/routes/(layout)'
+            $layout: 'src/routes/(layout)',
+            $types: '.svelte-kit/types/src'
         },
         // ...(!isStorybook
         //     ? {

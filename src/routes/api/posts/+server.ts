@@ -6,9 +6,9 @@ import {
     createPost,
     type RequiredPostDocument
 } from '$lib/server/appwrite-utils/posts.appwrite.js';
-import { type PostsDocument, type TextPostDocument, PostsTypeType } from '$root/lib/types/appwrite';
+import { type Posts, PostType } from '$root/lib/types/appwrite';
 
-export type GetPostsResponse = Array<TextPostDocument & { userId?: string }>;
+export type GetPostsResponse = Array<Posts & { userId?: string }>;
 
 export async function GET(event: RequestEvent): Promise<Response> {
     const { locals, cookies } = event;
@@ -21,29 +21,29 @@ export async function GET(event: RequestEvent): Promise<Response> {
 
     try {
         const allPosts = (await databases.listDocuments('main', 'posts', [Query.limit(10)]))
-            .documents as PostsDocument[];
+            .documents as Posts[];
 
         // Group posts by type and create global postId -> userId lookup
-        const postsByType = new Map<PostsTypeType, string[]>();
+        const postsByType = new Map<PostType, string[]>();
         const postIdToUserId = new Map<string, string>();
         const posts: GetPostsResponse = [];
 
         allPosts.forEach((post) => {
-            const existing = postsByType.get(post.type) || [];
+            const existing = postsByType.get(post.postType) || [];
 
             if (post.contentRefId) {
                 existing.push(post.contentRefId);
                 postIdToUserId.set(post.contentRefId, post.userId);
             }
 
-            postsByType.set(post.type, existing);
+            postsByType.set(post.postType, existing);
         });
 
         await Promise.all(
             Array.from(postsByType.entries()).map(async ([type, postIds]) => {
                 const documentList = (
                     await databases.listDocuments('main', type, [Query.equal('$id', postIds)])
-                ).documents as TextPostDocument[];
+                ).documents as Posts[];
 
                 // Attach userId to each document using global lookup and push directly to posts
                 documentList.forEach((doc) => {
