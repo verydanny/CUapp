@@ -3,7 +3,6 @@ import type { UserIdsToUsernamesMapResponse } from './api/users/+server.js';
 
 // export const prerender = true;
 export const ssr = true;
-export const csr = false;
 
 const getUniqueUserIds = (posts: GetPostsResponse) => {
     const seen = new Set<string>();

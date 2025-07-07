@@ -1,3 +1,5 @@
+import { PostType } from '$root/lib/types/appwrite';
+
 export const ADMIN_LABEL = 'admin';
 
 /** PROFILE CONSTANTS */
@@ -13,7 +15,7 @@ export const DATABASE_ID = 'main';
 export const POSTS_COLLECTION_ID = 'posts';
 
 // Rich test posts
-export const RICH_TEXT_POST_COLLECTION_ID = 'textPost';
+export const RICH_TEXT_POST_COLLECTION_ID = PostType.TEXT_POST;
 
 // iMessage Posts
 export const IMESSAGE_CONVERSATION_COLLECTION_ID = 'imessageConversation';

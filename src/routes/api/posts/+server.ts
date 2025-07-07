@@ -1,11 +1,8 @@
 import { json } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
-import { Permission, Query, Role } from 'node-appwrite';
+import { type Models, Permission, Query, Role } from 'node-appwrite';
 import { createUserSessionClient } from '$lib/server/appwrite-utils/appwrite.js';
-import {
-    createPost,
-    type RequiredPostDocument
-} from '$lib/server/appwrite-utils/posts.appwrite.js';
+import { createPost } from '$lib/server/appwrite-utils/posts.appwrite.js';
 import { type Posts, PostType, type TextPost } from '$root/lib/types/appwrite';
 
 export type GetPostsResponse = Array<TextPost & { userId?: string }>;
@@ -73,16 +70,18 @@ export async function POST(event: RequestEvent): Promise<Response> {
     const { databases } = createUserSessionClient({ cookies });
 
     try {
-        const requestData = (await request.json()) as RequiredPostDocument;
+        const requestData = (await request.json()) as Exclude<Posts, keyof Models.Document> & {
+            postId: string;
+        };
 
-        if (!requestData.type || typeof requestData.type !== 'string') {
+        if (!requestData.postType || typeof requestData.postType !== 'string') {
             return json({ error: 'Post type is required.' }, { status: 400 });
         }
 
-        const dataToCreate: RequiredPostDocument = {
+        const dataToCreate = {
             postId: requestData.postId,
             userId: locals.user.$id,
-            type: requestData.type,
+            postType: requestData.postType,
             tags: requestData.tags || [],
             accessLevel: requestData.accessLevel || 'private',
             status: requestData.status || 'draft',

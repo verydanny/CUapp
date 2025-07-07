@@ -25,6 +25,10 @@
 
     {#if posts && posts.length > 0}
         <div class="space-y-6">
+            <div class="py-10 text-center">
+                <p class="text-base-content/70 text-xl">No posts yet. Be the first to create one!</p>
+                <a href="/create/textpost" class="btn btn-primary mt-4">Create</a>
+            </div>
             {#each posts as post (post.$id)}
                 <article class="card bg-base-100 shadow-xl">
                     <div class="card-body">

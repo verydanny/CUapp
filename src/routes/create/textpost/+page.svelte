@@ -1,9 +1,9 @@
 <script lang="ts">
     // import type { CreatetextPostData } from '$lib/server/appwrite-utils/richtext.appwrite.js';
-    import type { PostDocument } from '$lib/server/appwrite-utils/posts.appwrite.js';
     import { ID } from 'node-appwrite';
+    import { PostType, type Posts } from '$root/lib/types/appwrite';
 
-    let selectedPostType = $state<string>('textPost');
+    let selectedPostType = $state<string>(PostType.TEXT_POST);
     // Removed postId state
     let title = $state<string>('');
     let body = $state<string>('');
@@ -20,7 +20,7 @@
             fetch('/api/posts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ postId, type: 'textPost', contentRefId })
+                body: JSON.stringify({ postId, postType: PostType.TEXT_POST, contentRefId })
             });
         const createtextPost = async () =>
             fetch('/api/textpost', {
@@ -52,7 +52,7 @@
 
         try {
             const [post, _textPost] = await Promise.all([createPost(), createtextPost()]);
-            const postResult = (await post.json()) as PostDocument;
+            const postResult = (await post.json()) as Posts;
 
             submissionStatus = {
                 message: `Success! Post created. ID: ${postResult.$id}`,

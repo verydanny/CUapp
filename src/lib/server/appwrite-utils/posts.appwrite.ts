@@ -1,19 +1,7 @@
-import type { Databases, Models } from 'node-appwrite';
+import type { Databases } from 'node-appwrite';
 import { DATABASE_ID, POSTS_COLLECTION_ID } from '$lib/server/model.const.js';
-
-export interface RequiredPostDocument {
-    postId: string;
-    userId: string;
-    type: 'textPost' | 'imagePost' | 'status'; // Add other valid post types
-    tags?: string[];
-    likesCount?: number;
-    commentsCount?: number;
-    status: 'published' | 'draft' | 'archived';
-    accessLevel: 'public' | 'followers' | 'private' | 'mutuals' | 'unlisted' | 'team'; // Define access levels
-    contentRefId: string;
-}
-
-export type PostDocument = Models.Document & RequiredPostDocument;
+import type { Posts } from '$root/lib/types/appwrite';
+import type { WithoutDocument } from '$root/lib/types/appwrite-types-utils';
 /**
  * Creates a generic Post document in Appwrite.
  * @param databases Instance of Appwrite Databases service.
@@ -21,12 +9,15 @@ export type PostDocument = Models.Document & RequiredPostDocument;
  * @param permissions Optional document-level permissions.
  * @returns The created Appwrite document.
  */
+
 export async function createPost(
     databases: Databases,
-    data: RequiredPostDocument,
+    data: WithoutDocument<Posts> & { postId: string },
     permissions?: string[]
-): Promise<PostDocument> {
+): Promise<Posts> {
     const { postId, ...rest } = data;
+
+    console.log('data', data);
     try {
         const document = await databases.createDocument(
             DATABASE_ID,
@@ -35,7 +26,7 @@ export async function createPost(
             rest,
             permissions ?? []
         );
-        return document as PostDocument;
+        return document as Posts;
     } catch (error) {
         console.error('Error creating Post document:', error);
         throw error;
@@ -53,9 +44,9 @@ export async function createPost(
 export async function updatePost(
     databases: Databases,
     documentId: string,
-    data: RequiredPostDocument,
+    data: Posts,
     permissions?: string[] // Typically permissions aren't updated like this, but included for flexibility
-): Promise<PostDocument> {
+): Promise<Posts> {
     try {
         // If permissions are provided, it implies wanting to update them.
         // Otherwise, pass undefined so Appwrite doesn't attempt to clear them.
@@ -66,7 +57,7 @@ export async function updatePost(
             data,
             permissions // Pass permissions if provided, otherwise undefined
         );
-        return document as PostDocument;
+        return document as Posts;
     } catch (error) {
         console.error(`Error updating Post document ${documentId}:`, error);
         throw error;
@@ -79,13 +70,10 @@ export async function updatePost(
  * @param documentId The Appwrite document ID of the post.
  * @returns The fetched Appwrite document.
  */
-export async function getPostById(
-    databases: Databases,
-    documentId: string
-): Promise<PostDocument | null> {
+export async function getPostById(databases: Databases, documentId: string): Promise<Posts | null> {
     try {
         const document = await databases.getDocument(DATABASE_ID, POSTS_COLLECTION_ID, documentId);
-        return document as PostDocument;
+        return document as Posts;
     } catch (error) {
         // Appwrite throws an error if document not found
         // Check if error is an AppwriteException-like object with a code property
